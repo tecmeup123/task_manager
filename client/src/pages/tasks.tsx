@@ -171,15 +171,39 @@ export default function Tasks() {
     <div className="pb-20 md:pb-0">
       {/* Toolbar */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 md:mb-6">
-        <div className="flex items-center mb-4 md:mb-0">
+        <div className="flex flex-col mb-4 md:mb-0">
           {isLoading ? (
             <Skeleton className="h-8 w-48" />
           ) : currentEdition ? (
             <>
-              <h2 className="text-xl font-semibold">Edition: {currentEdition.code}</h2>
-              <Badge variant="default" className="ml-2 bg-green-500 hover:bg-green-600">
-                Active
-              </Badge>
+              <div className="flex items-center">
+                <h2 className="text-xl font-semibold">Edition: {currentEdition.code}</h2>
+                <Badge variant="default" className="ml-2 bg-green-500 hover:bg-green-600">
+                  Active
+                </Badge>
+              </div>
+              
+              {/* Edition Picker Dropdown */}
+              <div className="mt-2">
+                <Select
+                  value={editionId ? editionId.toString() : ''}
+                  onValueChange={(value) => {
+                    setLocation(`/tasks/${value}`);
+                  }}
+                  disabled={editionsLoading}
+                >
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Switch Edition" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {editions.map(edition => (
+                      <SelectItem key={edition.id} value={edition.id.toString()}>
+                        {edition.code} ({edition.trainingType})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </>
           ) : (
             <h2 className="text-xl font-semibold">No Edition Selected</h2>

@@ -297,39 +297,60 @@ export default function Editions() {
             </div>
           ) : editions && editions.length > 0 ? (
             <div className="space-y-4">
-              {editions.slice(0, 3).map((edition: any) => (
-                <div key={edition.id} className="flex flex-col gap-3 border-b pb-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="bg-primary/10 p-2 rounded-md mr-3">
-                        <CalendarDays className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium">{edition.code}</p>
-                          <Badge variant={edition.trainingType === "GLR" ? "default" : "secondary"}>
-                            {edition.trainingType}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Starts {formatDate(edition.startDate)} · Week {edition.currentWeek || 1}
-                        </p>
-                      </div>
+              {/* Filter editions that haven't started yet or in the future */}
+              {(() => {
+                const today = new Date();
+                const upcomingEditions = editions
+                  .filter((edition: any) => {
+                    const startDate = edition.startDate ? new Date(edition.startDate) : null;
+                    return startDate && startDate > today;
+                  })
+                  .sort((a: any, b: any) => {
+                    const dateA = new Date(a.startDate);
+                    const dateB = new Date(b.startDate);
+                    return dateA.getTime() - dateB.getTime();
+                  })
+                  .slice(0, 3);
+                
+                if (upcomingEditions.length === 0) {
+                  return (
+                    <div className="text-center py-4 text-muted-foreground">
+                      No upcoming editions scheduled
                     </div>
-                    <Link to={`/tasks/${edition.id}`}>
-                      <Button variant="ghost" size="sm" className="hidden sm:flex">
-                        View <ArrowRight className="ml-1 h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="sm:hidden">
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
-                    </Link>
+                  );
+                }
+                
+                return upcomingEditions.map((edition: any) => (
+                  <div key={edition.id} className="flex flex-col gap-3 border-b pb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="bg-primary/10 p-2 rounded-md mr-3">
+                          <CalendarDays className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">{edition.code}</p>
+                            <Badge variant={edition.trainingType === "GLR" ? "default" : "secondary"}>
+                              {edition.trainingType}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Starts {formatDate(edition.startDate)}
+                          </p>
+                        </div>
+                      </div>
+                      <Link to={`/tasks/${edition.id}`}>
+                        <Button variant="ghost" size="sm" className="hidden sm:flex">
+                          View <ArrowRight className="ml-1 h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="sm:hidden">
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
-                  <div className="pr-2 sm:pr-10">
-                    <WeekProgressIndicator currentWeek={edition.currentWeek || 1} />
-                  </div>
-                </div>
-              ))}
+                ));
+              })()}
             </div>
           ) : (
             <div className="text-center py-4 text-muted-foreground">
