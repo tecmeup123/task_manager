@@ -161,9 +161,9 @@ export default function Tasks() {
   const isLoading = editionsLoading || tasksLoading;
 
   return (
-    <div>
+    <div className="pb-20 md:pb-0">
       {/* Toolbar */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 md:mb-6">
         <div className="flex items-center mb-4 md:mb-0">
           {isLoading ? (
             <Skeleton className="h-8 w-48" />
@@ -179,82 +179,94 @@ export default function Tasks() {
           )}
         </div>
         
+        {/* Filter and action buttons - responsive layout */}
         <div className="flex flex-wrap gap-2">
-          <Select
-            value={selectedWeek}
-            onValueChange={setSelectedWeek}
-            disabled={isLoading}
-          >
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Select Week" />
-            </SelectTrigger>
-            <SelectContent>
-              {WEEK_OPTIONS.map(option => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex flex-wrap gap-2 w-full md:w-auto">
+            <Select
+              value={selectedWeek}
+              onValueChange={setSelectedWeek}
+              disabled={isLoading}
+            >
+              <SelectTrigger className="w-full md:w-[150px]">
+                <SelectValue placeholder="Select Week" />
+              </SelectTrigger>
+              <SelectContent>
+                {WEEK_OPTIONS.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Select
+              value={selectedTrainingType}
+              onValueChange={setSelectedTrainingType}
+              disabled={isLoading}
+            >
+              <SelectTrigger className="w-full md:w-[150px]">
+                <SelectValue placeholder="Training Type" />
+              </SelectTrigger>
+              <SelectContent>
+                {TRAINING_TYPE_OPTIONS.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Select
+              value={selectedStatus}
+              onValueChange={setSelectedStatus}
+              disabled={isLoading}
+            >
+              <SelectTrigger className="w-full md:w-[150px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                {TASK_STATUS_OPTIONS.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           
-          <Select
-            value={selectedTrainingType}
-            onValueChange={setSelectedTrainingType}
-            disabled={isLoading}
-          >
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Training Type" />
-            </SelectTrigger>
-            <SelectContent>
-              {TRAINING_TYPE_OPTIONS.map(option => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Select
-            value={selectedStatus}
-            onValueChange={setSelectedStatus}
-            disabled={isLoading}
-          >
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              {TASK_STATUS_OPTIONS.map(option => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Button 
-            disabled={isLoading || !currentEdition} 
-            onClick={() => setIsAddTaskFormOpen(true)}
-          >
-            <Plus className="mr-1 h-4 w-4" /> Add Task
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            disabled={isLoading || !currentEdition}
-            onClick={() => setIsCreateEditionOpen(true)}
-          >
-            <Copy className="mr-1 h-4 w-4" /> Duplicate Edition
-          </Button>
-          
-          <Button variant="outline" disabled={isLoading || !currentEdition}>
-            <Download className="mr-1 h-4 w-4" /> Export
-          </Button>
+          {/* Action buttons - separate row on mobile */}
+          <div className="flex flex-wrap gap-2 w-full md:w-auto mt-2 md:mt-0">
+            <Button 
+              className="flex-1 md:flex-initial"
+              disabled={isLoading || !currentEdition} 
+              onClick={() => setIsAddTaskFormOpen(true)}
+            >
+              <Plus className="mr-1 h-4 w-4" /> Add Task
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="flex-1 md:flex-initial"
+              disabled={isLoading || !currentEdition}
+              onClick={() => setIsCreateEditionOpen(true)}
+            >
+              <Copy className="mr-1 h-4 w-4" /> Duplicate
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="flex-1 md:flex-initial"
+              disabled={isLoading || !currentEdition}
+            >
+              <Download className="mr-1 h-4 w-4" /> Export
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Week progress indicator */}
-      <Card className="mb-6">
+      <Card className="mb-4 md:mb-6">
         <CardContent className="p-4">
           <h3 className="text-sm font-semibold mb-3">Progress</h3>
           {isLoading ? (
@@ -300,11 +312,11 @@ export default function Tasks() {
 
       {/* Tasks Table */}
       <Card>
-        {/* Table Header */}
+        {/* Table Header - more mobile-friendly */}
         <div className="grid grid-cols-12 gap-2 p-3 border-b border-neutral-200 bg-neutral-100 text-sm font-medium text-neutral-700">
-          <div className="col-span-2 md:col-span-1">Task Code</div>
+          <div className="col-span-3 md:col-span-1">Task Code</div>
           <div className="col-span-3 md:col-span-2">Week</div>
-          <div className="col-span-7 md:col-span-4">Task</div>
+          <div className="col-span-6 md:col-span-4">Task</div>
           <div className="hidden md:block md:col-span-1">Duration</div>
           <div className="hidden md:block md:col-span-1">Due Date</div>
           <div className="hidden md:block md:col-span-1">Type</div>

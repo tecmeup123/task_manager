@@ -36,55 +36,54 @@ export default function WeekTasks({
     >
       {/* Week Header */}
       <div 
-        className={`grid grid-cols-12 gap-2 p-3 cursor-pointer ${
+        className={`p-3 cursor-pointer ${
           weekStatus === 'CURRENT WEEK' 
             ? 'bg-primary bg-opacity-10 hover:bg-primary hover:bg-opacity-15' 
             : 'bg-neutral-50 hover:bg-neutral-100'
         }`}
         onClick={onToggleExpand}
       >
-        <div className="col-span-11 flex items-center">
-          {isExpanded ? (
-            <ChevronDown 
-              className={`mr-2 ${
-                weekStatus === 'CURRENT WEEK' ? 'text-primary' : 'text-neutral-500'
-              }`} 
-            />
-          ) : (
-            <ChevronRight 
-              className={`mr-2 ${
-                weekStatus === 'CURRENT WEEK' ? 'text-primary' : 'text-neutral-500'
-              }`} 
-            />
-          )}
-          <span 
-            className={`font-medium ${
-              weekStatus === 'CURRENT WEEK' ? 'text-primary' : ''
-            }`}
-          >
-            {week}{weekStatus === 'CURRENT WEEK' ? " (Current)" : ""}
-          </span>
-          <Badge 
-            variant="outline" 
-            className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
-              weekStatus === 'CURRENT WEEK' ? 'bg-primary bg-opacity-20 text-primary' : 'bg-neutral-200 text-neutral-700'
-            }`}
-          >
-            {taskCount} {taskCount === 1 ? 'task' : 'tasks'}
-          </Badge>
-          <Badge 
-            variant={completionStatus === 'Complete' ? 'success' : completionStatus === 'In Progress' ? 'warning' : 'secondary'} 
-            className="ml-2"
-          >
-            {completionStatus}
-          </Badge>
-        </div>
-        <div 
-          className={`col-span-1 text-right ${
-            weekStatus === 'CURRENT WEEK' ? 'text-primary' : 'text-neutral-500'
-          }`}
-        >
-          <MoreVertical className="h-4 w-4 inline" />
+        <div className="flex flex-wrap items-center justify-between">
+          <div className="flex items-center mr-2">
+            {isExpanded ? (
+              <ChevronDown 
+                className={`mr-2 flex-shrink-0 ${
+                  weekStatus === 'CURRENT WEEK' ? 'text-primary' : 'text-neutral-500'
+                }`} 
+              />
+            ) : (
+              <ChevronRight 
+                className={`mr-2 flex-shrink-0 ${
+                  weekStatus === 'CURRENT WEEK' ? 'text-primary' : 'text-neutral-500'
+                }`} 
+              />
+            )}
+            <span 
+              className={`font-medium whitespace-nowrap ${
+                weekStatus === 'CURRENT WEEK' ? 'text-primary' : ''
+              }`}
+            >
+              {week}{weekStatus === 'CURRENT WEEK' ? " (Current)" : ""}
+            </span>
+          </div>
+          
+          <div className="flex items-center flex-wrap">
+            <Badge 
+              variant="outline" 
+              className={`mr-2 my-1 px-2 py-0.5 text-xs rounded-full ${
+                weekStatus === 'CURRENT WEEK' ? 'bg-primary bg-opacity-20 text-primary' : 'bg-neutral-200 text-neutral-700'
+              }`}
+            >
+              {taskCount} {taskCount === 1 ? 'task' : 'tasks'}
+            </Badge>
+            <Badge 
+              variant={completionStatus === 'Complete' ? 'success' : 'secondary'} 
+              className={`mr-2 my-1 ${completionStatus === 'In Progress' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : ''}`}
+            >
+              {completionStatus}
+            </Badge>
+            <MoreVertical className="h-4 w-4 text-neutral-500" />
+          </div>
         </div>
       </div>
 
