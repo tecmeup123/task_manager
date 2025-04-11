@@ -36,47 +36,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a new edition
   app.post("/api/editions", async (req, res) => {
     try {
-      // Extract useTemplateTasks from request body
-      let useTemplateTasks = false;
-      if (typeof req.body.useTemplateTasks === 'boolean') {
-        useTemplateTasks = req.body.useTemplateTasks;
+      const editionData = insertEditionSchema.parse(req.body);
+      const edition = await storage.createEdition(editionData);
+      res.status(201).json(edition);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ message: validationError.message });
       }
-      
-      // Remove non-schema fields before validation
-      const { useTemplateTasks: _, ...editionData } = req.body;
-      
+      console.error("Error creating edition:", error);
+      res.status(500).json({ message: "Failed to create edition" });
+    }
+  });
+  
+  // Create a new edition with template tasks
+  app.post("/api/editions/with-template", async (req, res) => {
+    try {
       // Validate edition data
-      const validatedEditionData = insertEditionSchema.parse(editionData);
+      const editionData = insertEditionSchema.parse(req.body);
       
-      const edition = await storage.createEdition(validatedEditionData);
+      // Create the edition
+      const edition = await storage.createEdition(editionData);
       
-      // If useTemplateTasks is true, add template tasks to the new edition
-      if (useTemplateTasks) {
-        // Import the TASK_TEMPLATE from client constants
-        const { TASK_TEMPLATE } = await import("../client/src/lib/constants");
-        
-        // Loop through all weeks and tasks in the template
-        for (const [week, weekTasks] of Object.entries(TASK_TEMPLATE)) {
-          for (const templateTask of weekTasks) {
-            // Create a task in the database for each template task
-            const task = {
-              editionId: edition.id,
-              week,
-              name: templateTask.name,
-              taskCode: templateTask.taskCode,
-              trainingType: templateTask.trainingType,
-              status: "Not Started",
-              duration: templateTask.duration || null,
-              assignedTo: templateTask.assignedTo || null,
-              owner: templateTask.owner || null,
-              dueDate: null,
-              links: null,
-              inflexible: false,
-              notes: null
-            };
-            
-            await storage.createTask(task);
-          }
+      // Add template tasks to the new edition
+      const { TASK_TEMPLATE } = await import("../client/src/lib/constants");
+      
+      // Loop through all weeks and tasks in the template
+      for (const [week, weekTasks] of Object.entries(TASK_TEMPLATE)) {
+        for (const templateTask of weekTasks) {
+          // Create a task in the database for each template task
+          const task = {
+            editionId: edition.id,
+            week,
+            name: templateTask.name,
+            taskCode: templateTask.taskCode,
+            trainingType: templateTask.trainingType,
+            status: "Not Started",
+            duration: templateTask.duration || null,
+            assignedTo: templateTask.assignedTo || null,
+            owner: templateTask.owner || null,
+            dueDate: null,
+            links: null,
+            inflexible: false,
+            notes: null
+          };
+          
+          await storage.createTask(task);
         }
       }
       
@@ -86,7 +91,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const validationError = fromZodError(error);
         return res.status(400).json({ message: validationError.message });
       }
-      console.error("Error creating edition:", error);
+      console.error("Error creating edition with template:", error);
       res.status(500).json({ message: "Failed to create edition" });
     }
   });

@@ -111,8 +111,14 @@ export default function CreateEditionForm({
         // Duplicate edition
         return apiRequest("POST", `/api/editions/${sourceEditionId}/duplicate`, values);
       } else {
-        // Create new edition
-        return apiRequest("POST", "/api/editions", values);
+        // Create new edition - choose endpoint based on useTemplateTasks
+        const { useTemplateTasks, ...editionData } = values;
+        
+        if (useTemplateTasks) {
+          return apiRequest("POST", "/api/editions/with-template", editionData);
+        } else {
+          return apiRequest("POST", "/api/editions", editionData);
+        }
       }
     },
     onSuccess: () => {
