@@ -62,7 +62,7 @@ export default function Tasks() {
 
   // Fetch tasks for the current edition
   const { data: tasks = [], isLoading: tasksLoading, refetch: refetchTasks } = useQuery<any[]>({
-    queryKey: ["/api/editions", currentEdition?.id, "tasks"],
+    queryKey: [`/api/editions/${currentEdition?.id}/tasks`],
     enabled: !!currentEdition?.id,
   });
 
@@ -107,7 +107,7 @@ export default function Tasks() {
   const handleTaskSave = async (updatedTask: any) => {
     try {
       await apiRequest('PATCH', `/api/tasks/${updatedTask.id}`, updatedTask);
-      queryClient.invalidateQueries({ queryKey: ["/api/editions", currentEdition?.id, "tasks"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/editions/${currentEdition?.id}/tasks`] });
       setIsTaskModalOpen(false);
       toast({
         title: "Task updated",
@@ -128,7 +128,7 @@ export default function Tasks() {
         ...newTask,
         editionId: currentEdition.id,
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/editions", currentEdition?.id, "tasks"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/editions/${currentEdition?.id}/tasks`] });
       setIsAddTaskFormOpen(false);
       toast({
         title: "Task created",
@@ -151,11 +151,16 @@ export default function Tasks() {
     return matchesWeek && matchesType && matchesStatus;
   }) : [];
 
+  // Add logging to debug
+  console.log("Filtered tasks:", filteredTasks);
+  
   // Group tasks by week
   const tasksByWeek = getTasksByWeek(filteredTasks);
+  console.log("Tasks by week:", tasksByWeek);
   
   // Get all weeks, sorted
   const weeks = sortWeeks(Object.keys(tasksByWeek));
+  console.log("Sorted weeks:", weeks);
   
   // Calculate progress based on completed tasks
   const completedTasks = tasks ? tasks.filter((task: any) => task.status === 'Done').length : 0;
