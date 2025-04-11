@@ -25,7 +25,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const [currentEditionId, setCurrentEditionId] = useState<number | null>(null);
 
   // Fetch editions for the sidebar
-  const { data: editions, isLoading } = useQuery({
+  const { data: editions = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/editions"],
   });
 
@@ -95,24 +95,30 @@ export default function MainLayout({ children }: MainLayoutProps) {
         <aside className="w-48 hidden md:block bg-white border-r border-neutral-200 fixed h-full pt-4">
           <div className="px-4 py-2 text-sm font-medium text-neutral-500 uppercase">Navigation</div>
           <nav>
-            <Link to="/">
-              <a className={`flex items-center px-4 py-2 text-sm ${location === "/" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
-                <LayoutDashboard className="w-5 h-5 mr-2" />
-                <span>Dashboard</span>
-              </a>
-            </Link>
-            <Link to="/tasks">
-              <a className={`flex items-center px-4 py-2 text-sm ${location.startsWith("/tasks") ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
-                <ListTodo className="w-5 h-5 mr-2" />
-                <span>Tasks</span>
-              </a>
-            </Link>
-            <Link to="/editions">
-              <a className={`flex items-center px-4 py-2 text-sm ${location === "/editions" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
-                <GraduationCap className="w-5 h-5 mr-2" />
-                <span>Editions</span>
-              </a>
-            </Link>
+            <div>
+              <Link to="/">
+                <div className={`flex items-center px-4 py-2 text-sm ${location === "/" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
+                  <LayoutDashboard className="w-5 h-5 mr-2" />
+                  <span>Dashboard</span>
+                </div>
+              </Link>
+            </div>
+            <div>
+              <Link to="/tasks">
+                <div className={`flex items-center px-4 py-2 text-sm ${location.startsWith("/tasks") ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
+                  <ListTodo className="w-5 h-5 mr-2" />
+                  <span>Tasks</span>
+                </div>
+              </Link>
+            </div>
+            <div>
+              <Link to="/editions">
+                <div className={`flex items-center px-4 py-2 text-sm ${location === "/editions" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
+                  <GraduationCap className="w-5 h-5 mr-2" />
+                  <span>Editions</span>
+                </div>
+              </Link>
+            </div>
             <a href="#" className="flex items-center px-4 py-2 text-sm text-neutral-600 hover:bg-neutral-100">
               <Users className="w-5 h-5 mr-2" />
               <span>Trainers</span>
@@ -137,12 +143,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
               </>
             ) : editions && editions.length > 0 ? (
               editions.map((edition: any) => (
-                <Link key={edition.id} to={`/tasks/${edition.id}`}>
-                  <a className={`text-sm mb-2 px-2 py-1 rounded flex items-center ${edition.id === currentEditionId ? 'bg-primary-light bg-opacity-10 text-primary' : 'hover:bg-neutral-100 text-neutral-600'}`}>
-                    <BookOpen className="w-4 h-4 mr-1" />
-                    {edition.code}
-                  </a>
-                </Link>
+                <div key={edition.id}>
+                  <Link to={`/tasks/${edition.id}`}>
+                    <div className={`text-sm mb-2 px-2 py-1 rounded flex items-center ${edition.id === currentEditionId ? 'bg-primary-light bg-opacity-10 text-primary' : 'hover:bg-neutral-100 text-neutral-600'}`}>
+                      <BookOpen className="w-4 h-4 mr-1" />
+                      {edition.code}
+                    </div>
+                  </Link>
+                </div>
               ))
             ) : (
               <div className="text-sm text-neutral-500">No editions available</div>

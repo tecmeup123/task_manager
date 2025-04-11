@@ -26,7 +26,7 @@ import WeekTasks from "@/components/week-tasks";
 import TaskDetailModal from "@/components/task-detail-modal";
 import CreateEditionForm from "@/components/create-edition-form";
 import { formatDate, getTasksByWeek, getWeekStatus, sortWeeks, getAllWeeks } from "@/lib/utils";
-import { WEEK_OPTIONS, TRAINING_TYPE_OPTIONS } from "@/lib/constants";
+import { WEEK_OPTIONS, TRAINING_TYPE_OPTIONS, TASK_STATUS_OPTIONS } from "@/lib/constants";
 
 export default function Tasks() {
   const params = useParams();
@@ -40,6 +40,7 @@ export default function Tasks() {
   const [isCreateEditionOpen, setIsCreateEditionOpen] = useState(false);
   const [selectedWeek, setSelectedWeek] = useState("all");
   const [selectedTrainingType, setSelectedTrainingType] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState("all");
   const [expandedWeeks, setExpandedWeeks] = useState<Record<string, boolean>>({});
 
   // Fetch all editions

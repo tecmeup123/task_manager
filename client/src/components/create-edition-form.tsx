@@ -90,7 +90,7 @@ export default function CreateEditionForm({
 
   // Populate form with source edition data if duplicating
   useEffect(() => {
-    if (sourceEdition) {
+    if (sourceEdition && sourceEdition.code) {
       form.reset({
         code: sourceEdition.code.replace(/\d{4}/, getEditionCode(year, month, variant).slice(0, 4)),
         trainingType: sourceEdition.trainingType,
