@@ -151,6 +151,9 @@ export default function Tasks() {
     return matchesWeek && matchesType && matchesStatus;
   }) : [];
 
+  // Add logging to debug task data
+  console.log("Task data example:", tasks.length > 0 ? tasks[0] : "No tasks");
+  
   // Group tasks by week
   const tasksByWeek = getTasksByWeek(filteredTasks);
   
