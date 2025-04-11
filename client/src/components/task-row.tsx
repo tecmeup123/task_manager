@@ -37,10 +37,10 @@ export default function TaskRow({ task, onClick, isCurrentWeek = false }: TaskRo
         </div>
         
         <div className="md:col-span-2 flex items-center">
-          {task.week}
+          Week {task.week}
         </div>
         
-        <div className="md:col-span-4 flex items-center">
+        <div className="md:col-span-4 flex items-center font-medium">
           {task.name}
         </div>
         
@@ -86,7 +86,7 @@ export default function TaskRow({ task, onClick, isCurrentWeek = false }: TaskRo
           </div>
           
           <div className="col-span-3 flex items-center text-xs text-neutral-500">
-            {task.week}
+            Week {task.week}
           </div>
           
           <div className="col-span-6 flex items-center justify-end">
@@ -98,7 +98,7 @@ export default function TaskRow({ task, onClick, isCurrentWeek = false }: TaskRo
           </div>
         </div>
         
-        <div className="font-medium mb-1 line-clamp-2">
+        <div className="font-medium mb-1 line-clamp-2 text-base">
           {task.name}
         </div>
         
