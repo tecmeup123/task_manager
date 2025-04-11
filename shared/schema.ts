@@ -1,17 +1,25 @@
-import { pgTable, text, serial, integer, boolean, timestamp, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, varchar, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// User model remains unchanged
+// Define user roles
+export const roleEnum = z.enum(["admin", "editor", "viewer"]);
+export type Role = z.infer<typeof roleEnum>;
+
+// Expanded user model with roles
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  fullName: text("full_name"),
+  email: text("email"),
+  role: text("role").default("viewer").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -115,3 +123,44 @@ export const trainerStatusEnum = z.enum([
 ]);
 
 export type TrainerStatus = z.infer<typeof trainerStatusEnum>;
+
+// Action types for audit log
+export const actionEnum = z.enum([
+  "create",
+  "update",
+  "delete",
+  "complete"
+]);
+
+export type Action = z.infer<typeof actionEnum>;
+
+// Entity types for audit log
+export const entityEnum = z.enum([
+  "task",
+  "edition",
+  "trainer",
+  "user"
+]);
+
+export type Entity = z.infer<typeof entityEnum>;
+
+// Audit log table to track all changes
+export const auditLogs = pgTable("audit_logs", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  entityType: text("entity_type").notNull(),
+  entityId: integer("entity_id").notNull(),
+  action: text("action").notNull(),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+  previousState: json("previous_state"),
+  newState: json("new_state"),
+  notes: text("notes"),
+});
+
+export const insertAuditLogSchema = createInsertSchema(auditLogs).omit({
+  id: true,
+  timestamp: true,
+});
+
+export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
+export type AuditLog = typeof auditLogs.$inferSelect;
