@@ -29,6 +29,9 @@ export default function Home() {
       return;
     }
     
+    // Create a flag to track if the component is still mounted
+    let isMounted = true;
+    
     // Create an array of promises, one for each edition's tasks
     const fetchPromises = editionIds.map(id => 
       fetch(`/api/editions/${id}/tasks`).then(res => res.json())
@@ -37,15 +40,25 @@ export default function Home() {
     // Wait for all promises to resolve
     Promise.all(fetchPromises)
       .then(results => {
-        // Flatten the array of arrays into a single array of tasks
-        const combinedTasks = results.flat();
-        setAllTasks(combinedTasks);
-        setTasksLoading(false);
+        // Only update state if component is still mounted
+        if (isMounted) {
+          // Flatten the array of arrays into a single array of tasks
+          const combinedTasks = results.flat();
+          setAllTasks(combinedTasks);
+          setTasksLoading(false);
+        }
       })
       .catch(error => {
-        console.error("Error fetching tasks:", error);
-        setTasksLoading(false);
+        if (isMounted) {
+          console.error("Error fetching tasks:", error);
+          setTasksLoading(false);
+        }
       });
+      
+    // Cleanup function to cancel the effect when component unmounts
+    return () => {
+      isMounted = false;
+    };
   }, [editionIds]);
   
   // Keep this for backward compatibility with existing code

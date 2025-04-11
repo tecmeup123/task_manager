@@ -165,18 +165,24 @@ export default function MainLayout({ children }: MainLayoutProps) {
                   <span>Editions</span>
                 </div>
               </Link>
-              <a href="#" className="flex items-center px-4 py-3 text-base text-neutral-600 hover:bg-neutral-100 rounded-md">
-                <Users className="w-5 h-5 mr-3" />
-                <span>Trainers</span>
-              </a>
-              <a href="#" className="flex items-center px-4 py-3 text-base text-neutral-600 hover:bg-neutral-100 rounded-md">
-                <BarChart className="w-5 h-5 mr-3" />
-                <span>Reports</span>
-              </a>
-              <a href="#" className="flex items-center px-4 py-3 text-base text-neutral-600 hover:bg-neutral-100 rounded-md">
-                <Settings className="w-5 h-5 mr-3" />
-                <span>Settings</span>
-              </a>
+              <Link to="/trainers">
+                <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/trainers" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
+                  <Users className="w-5 h-5 mr-3" />
+                  <span>Trainers</span>
+                </div>
+              </Link>
+              <Link to="/reports">
+                <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/reports" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
+                  <BarChart className="w-5 h-5 mr-3" />
+                  <span>Reports</span>
+                </div>
+              </Link>
+              <Link to="/settings">
+                <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/settings" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
+                  <Settings className="w-5 h-5 mr-3" />
+                  <span>Settings</span>
+                </div>
+              </Link>
             </div>
           </nav>
           
@@ -234,18 +240,24 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 </div>
               </Link>
             </div>
-            <a href="#" className="flex items-center px-4 py-2 text-sm text-neutral-600 hover:bg-neutral-100">
-              <Users className="w-5 h-5 mr-2" />
-              <span>Trainers</span>
-            </a>
-            <a href="#" className="flex items-center px-4 py-2 text-sm text-neutral-600 hover:bg-neutral-100">
-              <BarChart className="w-5 h-5 mr-2" />
-              <span>Reports</span>
-            </a>
-            <a href="#" className="flex items-center px-4 py-2 text-sm text-neutral-600 hover:bg-neutral-100">
-              <Settings className="w-5 h-5 mr-2" />
-              <span>Settings</span>
-            </a>
+            <Link to="/trainers">
+              <div className={`flex items-center px-4 py-2 text-sm ${location === "/trainers" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
+                <Users className="w-5 h-5 mr-2" />
+                <span>Trainers</span>
+              </div>
+            </Link>
+            <Link to="/reports">
+              <div className={`flex items-center px-4 py-2 text-sm ${location === "/reports" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
+                <BarChart className="w-5 h-5 mr-2" />
+                <span>Reports</span>
+              </div>
+            </Link>
+            <Link to="/settings">
+              <div className={`flex items-center px-4 py-2 text-sm ${location === "/settings" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
+                <Settings className="w-5 h-5 mr-2" />
+                <span>Settings</span>
+              </div>
+            </Link>
           </nav>
           
           <div className="px-4 py-2 mt-6 text-sm font-medium text-neutral-500 uppercase">Current Editions</div>
@@ -294,10 +306,10 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <GraduationCap className="h-6 w-6" />
             <span className="text-xs mt-1">Editions</span>
           </Link>
-          <div className="flex flex-col items-center text-neutral-500">
+          <Link to="/settings" className={`flex flex-col items-center ${location === '/settings' ? 'text-primary' : 'text-neutral-500'}`}>
             <Settings className="h-6 w-6" />
             <span className="text-xs mt-1">Settings</span>
-          </div>
+          </Link>
         </div>
       )}
     </div>
