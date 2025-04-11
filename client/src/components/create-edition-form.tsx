@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -81,6 +82,7 @@ export default function CreateEditionForm({
       trainingType: "GLR",
       startDate: new Date(),
       tasksStartDate: subWeeks(new Date(), 5),
+      useTemplateTasks: true
     },
   });
 
@@ -97,6 +99,7 @@ export default function CreateEditionForm({
         trainingType: sourceEdition.trainingType,
         startDate: new Date(sourceEdition.startDate),
         tasksStartDate: new Date(sourceEdition.tasksStartDate),
+        useTemplateTasks: true // Maintain template tasks option
       });
     }
   }, [sourceEdition, form, year, month, variant]);
@@ -310,15 +313,10 @@ export default function CreateEditionForm({
                 render={({ field }) => (
                   <FormItem className="md:col-span-2 flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 mt-2">
                     <FormControl>
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={field.value}
-                          onChange={field.onChange}
-                          id="useTemplateTasks"
-                          className="h-4 w-4 text-primary rounded border-gray-300 focus:ring-primary"
-                        />
-                      </div>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel>Use template tasks</FormLabel>

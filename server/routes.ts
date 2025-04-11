@@ -36,7 +36,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a new edition
   app.post("/api/editions", async (req, res) => {
     try {
-      const { useTemplateTasks, ...editionData } = req.body;
+      // Extract useTemplateTasks from request body
+      let useTemplateTasks = false;
+      if (typeof req.body.useTemplateTasks === 'boolean') {
+        useTemplateTasks = req.body.useTemplateTasks;
+      }
+      
+      // Remove non-schema fields before validation
+      const { useTemplateTasks: _, ...editionData } = req.body;
+      
+      // Validate edition data
       const validatedEditionData = insertEditionSchema.parse(editionData);
       
       const edition = await storage.createEdition(validatedEditionData);
