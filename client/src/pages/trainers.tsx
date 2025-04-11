@@ -53,17 +53,14 @@ export default function Trainers() {
   const { data: trainers = [], isLoading, isError } = useQuery({
     queryKey: ['/api/trainers'],
     queryFn: async () => {
-      return apiRequest('/api/trainers');
+      return await fetch('/api/trainers').then(res => res.json());
     }
   });
 
   // Create trainer mutation
   const createTrainerMutation = useMutation({
     mutationFn: async (data: TrainerFormValues) => {
-      return apiRequest('/api/trainers', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
+      return await apiRequest('POST', '/api/trainers', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/trainers'] });
@@ -85,10 +82,7 @@ export default function Trainers() {
   // Update trainer mutation
   const updateTrainerMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number, data: TrainerFormValues }) => {
-      return apiRequest(`/api/trainers/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-      });
+      return await apiRequest('PATCH', `/api/trainers/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/trainers'] });
@@ -110,9 +104,7 @@ export default function Trainers() {
   // Delete trainer mutation
   const deleteTrainerMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest(`/api/trainers/${id}`, {
-        method: 'DELETE',
-      });
+      return await apiRequest('DELETE', `/api/trainers/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/trainers'] });
