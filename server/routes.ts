@@ -52,8 +52,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a new edition with template tasks
   app.post("/api/editions/with-template", async (req, res) => {
     try {
+      // Log the received data for debugging
+      console.log("Received data for edition with template:", req.body);
+      
+      // Ensure dates are properly formatted
+      const formattedData = {
+        ...req.body,
+        startDate: req.body.startDate ? new Date(req.body.startDate) : new Date(),
+        tasksStartDate: req.body.tasksStartDate ? new Date(req.body.tasksStartDate) : new Date()
+      };
+      
+      console.log("Formatted data:", formattedData);
+      
       // Validate edition data
-      const editionData = insertEditionSchema.parse(req.body);
+      const editionData = insertEditionSchema.parse(formattedData);
       
       // Create the edition
       const edition = await storage.createEdition(editionData);

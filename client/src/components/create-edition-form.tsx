@@ -114,10 +114,19 @@ export default function CreateEditionForm({
         // Create new edition - choose endpoint based on useTemplateTasks
         const { useTemplateTasks, ...editionData } = values;
         
+        // Format dates as ISO strings for proper JSON serialization
+        const formattedData = {
+          ...editionData,
+          startDate: editionData.startDate.toISOString(),
+          tasksStartDate: editionData.tasksStartDate.toISOString()
+        };
+        
+        console.log("Sending data:", formattedData);
+        
         if (useTemplateTasks) {
-          return apiRequest("POST", "/api/editions/with-template", editionData);
+          return apiRequest("POST", "/api/editions/with-template", formattedData);
         } else {
-          return apiRequest("POST", "/api/editions", editionData);
+          return apiRequest("POST", "/api/editions", formattedData);
         }
       }
     },
