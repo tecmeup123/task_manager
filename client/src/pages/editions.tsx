@@ -41,6 +41,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Plus, MoreVertical, Copy, Trash2, Edit, CalendarDays, Layers, ArrowRight } from "lucide-react";
+import WeekProgressIndicator from "@/components/week-progress-indicator";
 import CreateEditionForm from "@/components/create-edition-form";
 import { formatDate } from "@/lib/utils";
 
@@ -140,7 +141,9 @@ export default function Editions() {
                     <TableCell>
                       <Badge variant="success">{edition.status}</Badge>
                     </TableCell>
-                    <TableCell>Week {edition.currentWeek}</TableCell>
+                    <TableCell className="w-[250px]">
+                    <WeekProgressIndicator currentWeek={edition.currentWeek || 1} />
+                  </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -201,23 +204,33 @@ export default function Editions() {
           ) : editions && editions.length > 0 ? (
             <div className="space-y-4">
               {editions.slice(0, 3).map((edition: any) => (
-                <div key={edition.id} className="flex items-center justify-between border-b pb-4">
-                  <div className="flex items-center">
-                    <div className="bg-primary/10 p-2 rounded-md mr-3">
-                      <CalendarDays className="h-5 w-5 text-primary" />
+                <div key={edition.id} className="flex flex-col gap-3 border-b pb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="bg-primary/10 p-2 rounded-md mr-3">
+                        <CalendarDays className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">{edition.code}</p>
+                          <Badge variant={edition.trainingType === "GLR" ? "default" : "secondary"}>
+                            {edition.trainingType}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Starts {formatDate(edition.startDate)} · Currently at Week {edition.currentWeek || 1}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium">{edition.code}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Starts {formatDate(edition.startDate)} · {edition.trainingType}
-                      </p>
-                    </div>
+                    <Link to={`/tasks/${edition.id}`}>
+                      <Button variant="ghost" size="sm">
+                        View <ArrowRight className="ml-1 h-4 w-4" />
+                      </Button>
+                    </Link>
                   </div>
-                  <Link to={`/tasks/${edition.id}`}>
-                    <Button variant="ghost" size="sm">
-                      View <ArrowRight className="ml-1 h-4 w-4" />
-                    </Button>
-                  </Link>
+                  <div className="pr-10">
+                    <WeekProgressIndicator currentWeek={edition.currentWeek || 1} />
+                  </div>
                 </div>
               ))}
             </div>
