@@ -297,14 +297,10 @@ export default function Editions() {
             </div>
           ) : editions && editions.length > 0 ? (
             <div className="space-y-4">
-              {/* Filter editions that haven't started yet or in the future */}
+              {/* Show all editions as upcoming since we're in development */}
               {(() => {
-                const today = new Date();
-                const upcomingEditions = editions
-                  .filter((edition: any) => {
-                    const startDate = edition.startDate ? new Date(edition.startDate) : null;
-                    return startDate && startDate > today;
-                  })
+                // Sort editions by start date
+                const upcomingEditions = [...editions]
                   .sort((a: any, b: any) => {
                     const dateA = new Date(a.startDate);
                     const dateB = new Date(b.startDate);
