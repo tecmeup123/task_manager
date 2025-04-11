@@ -151,16 +151,11 @@ export default function Tasks() {
     return matchesWeek && matchesType && matchesStatus;
   }) : [];
 
-  // Add logging to debug
-  console.log("Filtered tasks:", filteredTasks);
-  
   // Group tasks by week
   const tasksByWeek = getTasksByWeek(filteredTasks);
-  console.log("Tasks by week:", tasksByWeek);
   
   // Get all weeks, sorted
   const weeks = sortWeeks(Object.keys(tasksByWeek));
-  console.log("Sorted weeks:", weeks);
   
   // Calculate progress based on completed tasks
   const completedTasks = tasks ? tasks.filter((task: any) => task.status === 'Done').length : 0;
