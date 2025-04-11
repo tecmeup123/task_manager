@@ -41,16 +41,16 @@ export function getInitials(name: string): string {
     .substring(0, 2);
 }
 
-export function getStatusColor(status: string): {bg: string, text: string} {
+export function getStatusColor(status: string): {bg: "default" | "destructive" | "outline" | "secondary" | "success", text: string} {
   switch (status) {
     case 'Done':
-      return { bg: 'bg-green-500', text: 'text-white' };
+      return { bg: "success", text: 'text-white' };
     case 'In Progress':
-      return { bg: 'bg-amber-500', text: 'text-white' };
+      return { bg: "default", text: 'text-white' };
     case 'Pending':
-      return { bg: 'bg-amber-500', text: 'text-white' };
+      return { bg: "secondary", text: 'text-neutral-900' };
     default:
-      return { bg: 'bg-neutral-300', text: 'text-neutral-700' };
+      return { bg: "outline", text: 'text-neutral-700' };
   }
 }
 
