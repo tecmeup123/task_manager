@@ -69,7 +69,14 @@ export default function Tasks() {
   // Initialize expanded state for all weeks
   useEffect(() => {
     if (tasks) {
-      const weeks = [...new Set(tasks.map((task: any) => task.week))];
+      // Create a unique array of weeks without using Set (to avoid TypeScript downlevelIteration issues)
+      const uniqueWeeks: string[] = [];
+      tasks.forEach((task: any) => {
+        if (task.week && !uniqueWeeks.includes(task.week)) {
+          uniqueWeeks.push(task.week);
+        }
+      });
+      
       const initialExpandedState: Record<string, boolean> = {};
       
       // Initialize all weeks as collapsed except for the current week

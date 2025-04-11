@@ -92,18 +92,19 @@ export default function Editions() {
   };
 
   return (
-    <div>
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+    <div className="pb-20 md:pb-0">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 md:mb-6">
         <h2 className="text-2xl font-semibold mb-2 md:mb-0">Training Editions</h2>
         <Button onClick={() => setIsCreateEditionOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Create New Edition
+          <span className="hidden sm:inline">Create New Edition</span>
+          <span className="sm:hidden">New</span>
         </Button>
       </div>
 
-      {/* Editions Table */}
-      <Card>
-        <CardHeader>
+      {/* Editions Table (Desktop) */}
+      <Card className="hidden md:block">
+        <CardHeader className="pb-3">
           <CardTitle>All Editions</CardTitle>
           <CardDescription>Manage your training editions</CardDescription>
         </CardHeader>
@@ -189,9 +190,102 @@ export default function Editions() {
         </CardContent>
       </Card>
 
+      {/* Editions List (Mobile) */}
+      <div className="md:hidden">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle>All Editions</CardTitle>
+            <CardDescription>Manage your training editions</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              // Loading skeleton
+              <div className="space-y-4">
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+              </div>
+            ) : editions && editions.length > 0 ? (
+              <div className="space-y-4">
+                {editions.map((edition: any) => (
+                  <div 
+                    key={edition.id} 
+                    className="border rounded-lg p-4 shadow-sm hover:shadow transition-all"
+                    onClick={() => setLocation(`/tasks/${edition.id}`)}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">{edition.code}</p>
+                          <Badge variant={edition.trainingType === "GLR" ? "default" : "secondary"}>
+                            {edition.trainingType}
+                          </Badge>
+                          <Badge variant="success">{edition.status}</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Starts {formatDate(edition.startDate)}
+                        </p>
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => e.stopPropagation()}>
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={(e) => {
+                            e.stopPropagation();
+                            setLocation(`/tasks/${edition.id}`);
+                          }}>
+                            <Layers className="mr-2 h-4 w-4" />
+                            View Tasks
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={(e) => {
+                            e.stopPropagation();
+                            handleDuplicateEdition(edition);
+                          }}>
+                            <Copy className="mr-2 h-4 w-4" />
+                            Duplicate
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={(e) => {
+                            e.stopPropagation();
+                            setEditionToDelete(edition);
+                          }}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                    <div className="mt-2">
+                      <div className="text-sm font-medium mb-1">Week {edition.currentWeek || 1}/8</div>
+                      <WeekProgressIndicator currentWeek={edition.currentWeek || 1} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="mb-4">
+                  <Layers className="h-12 w-12 text-muted-foreground mx-auto" />
+                </div>
+                <h3 className="text-lg font-medium mb-2">No Editions Found</h3>
+                <p className="text-muted-foreground mb-4">
+                  Start by creating your first training edition.
+                </p>
+                <Button onClick={() => setIsCreateEditionOpen(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create New Edition
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Next Upcoming Editions Card */}
-      <Card className="mt-6">
-        <CardHeader>
+      <Card className="mt-4 md:mt-6">
+        <CardHeader className="pb-3">
           <CardTitle>Upcoming Editions</CardTitle>
           <CardDescription>Training editions scheduled to start soon</CardDescription>
         </CardHeader>
@@ -218,17 +312,20 @@ export default function Editions() {
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          Starts {formatDate(edition.startDate)} · Currently at Week {edition.currentWeek || 1}
+                          Starts {formatDate(edition.startDate)} · Week {edition.currentWeek || 1}
                         </p>
                       </div>
                     </div>
                     <Link to={`/tasks/${edition.id}`}>
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" className="hidden sm:flex">
                         View <ArrowRight className="ml-1 h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="sm:hidden">
+                        <ArrowRight className="h-4 w-4" />
                       </Button>
                     </Link>
                   </div>
-                  <div className="pr-10">
+                  <div className="pr-2 sm:pr-10">
                     <WeekProgressIndicator currentWeek={edition.currentWeek || 1} />
                   </div>
                 </div>
