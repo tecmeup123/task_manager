@@ -63,7 +63,7 @@ export default function WeekTasks({
                 weekStatus === 'CURRENT WEEK' ? 'text-primary' : ''
               }`}
             >
-              Week {week}{weekStatus === 'CURRENT WEEK' ? " (Current)" : ""}
+              Week {week === "undefined" ? "Unknown" : week}{weekStatus === 'CURRENT WEEK' ? " (Current)" : ""}
             </span>
           </div>
           
