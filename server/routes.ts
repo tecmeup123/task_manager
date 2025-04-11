@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertEditionSchema, insertTaskSchema, taskStatusEnum } from "@shared/schema";
+import { insertEditionSchema, insertTaskSchema, insertTrainerSchema, taskStatusEnum, trainerStatusEnum } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 
@@ -250,6 +250,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete task" });
+    }
+  });
+
+  // Trainer routes
+  // Get all trainers
+  app.get("/api/trainers", async (req, res) => {
+    try {
+      const trainers = await storage.getAllTrainers();
+      res.json(trainers);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch trainers" });
+    }
+  });
+
+  // Get a specific trainer
+  app.get("/api/trainers/:id", async (req, res) => {
+    try {
+      const trainer = await storage.getTrainer(Number(req.params.id));
+      if (!trainer) {
+        return res.status(404).json({ message: "Trainer not found" });
+      }
+      res.json(trainer);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch trainer" });
+    }
+  });
+
+  // Create a new trainer
+  app.post("/api/trainers", async (req, res) => {
+    try {
+      const trainerData = insertTrainerSchema.parse(req.body);
+      const trainer = await storage.createTrainer(trainerData);
+      res.status(201).json(trainer);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ message: "Failed to create trainer" });
+    }
+  });
+
+  // Update a trainer
+  app.patch("/api/trainers/:id", async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const trainer = await storage.getTrainer(id);
+      if (!trainer) {
+        return res.status(404).json({ message: "Trainer not found" });
+      }
+      
+      const updatedTrainer = await storage.updateTrainer(id, req.body);
+      res.json(updatedTrainer);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update trainer" });
+    }
+  });
+
+  // Delete a trainer
+  app.delete("/api/trainers/:id", async (req, res) => {
+    try {
+      const result = await storage.deleteTrainer(Number(req.params.id));
+      if (!result) {
+        return res.status(404).json({ message: "Trainer not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete trainer" });
     }
   });
 

@@ -5,7 +5,10 @@ import {
   InsertTask,
   User,
   InsertUser,
+  Trainer,
+  InsertTrainer,
   users,
+  trainers,
   editions,
   tasks
 } from "@shared/schema";
@@ -503,6 +506,45 @@ export class DatabaseStorage implements IStorage {
     const { db } = await import("./db");
     const [user] = await db.insert(users).values(insertUser).returning();
     return user;
+  }
+  
+  // Trainer methods
+  async getAllTrainers(): Promise<Trainer[]> {
+    const { db } = await import("./db");
+    return db.select().from(trainers);
+  }
+  
+  async getTrainer(id: number): Promise<Trainer | undefined> {
+    const { db } = await import("./db");
+    const [trainer] = await db.select().from(trainers).where(eq(trainers.id, id));
+    return trainer || undefined;
+  }
+  
+  async createTrainer(trainer: InsertTrainer): Promise<Trainer> {
+    const { db } = await import("./db");
+    const [newTrainer] = await db.insert(trainers).values(trainer).returning();
+    return newTrainer;
+  }
+  
+  async updateTrainer(id: number, trainerData: Partial<Trainer>): Promise<Trainer> {
+    const { db } = await import("./db");
+    const [updatedTrainer] = await db
+      .update(trainers)
+      .set(trainerData)
+      .where(eq(trainers.id, id))
+      .returning();
+    
+    if (!updatedTrainer) {
+      throw new Error(`Trainer with id ${id} not found`);
+    }
+    
+    return updatedTrainer;
+  }
+  
+  async deleteTrainer(id: number): Promise<boolean> {
+    const { db } = await import("./db");
+    const result = await db.delete(trainers).where(eq(trainers.id, id)).returning();
+    return result.length > 0;
   }
   
   // Trainer methods
