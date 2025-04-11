@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,12 +14,42 @@ export default function Home() {
   });
 
   const currentEdition = editions?.[0];
-
-  // Fetch tasks for the first edition if available
-  const { data: tasks, isLoading: loadingTasks } = useQuery({
-    queryKey: ["/api/editions", currentEdition?.id, "tasks"],
-    enabled: !!currentEdition?.id,
-  });
+  
+  // Set up an array to hold all edition IDs
+  const editionIds = editions?.map((edition: any) => edition.id) || [];
+  
+  // Track the loading state of all task queries
+  const [allTasks, setAllTasks] = useState<any[]>([]);
+  const [tasksLoading, setTasksLoading] = useState(true);
+  
+  // Query all tasks for all editions
+  useEffect(() => {
+    if (!editionIds.length) {
+      setTasksLoading(false);
+      return;
+    }
+    
+    // Create an array of promises, one for each edition's tasks
+    const fetchPromises = editionIds.map(id => 
+      fetch(`/api/editions/${id}/tasks`).then(res => res.json())
+    );
+    
+    // Wait for all promises to resolve
+    Promise.all(fetchPromises)
+      .then(results => {
+        // Flatten the array of arrays into a single array of tasks
+        const combinedTasks = results.flat();
+        setAllTasks(combinedTasks);
+        setTasksLoading(false);
+      })
+      .catch(error => {
+        console.error("Error fetching tasks:", error);
+        setTasksLoading(false);
+      });
+  }, [editionIds]);
+  
+  // Keep this for backward compatibility with existing code
+  const tasks = allTasks;
 
   // Task completion stats
   const taskStats = tasks ? {
@@ -67,7 +98,7 @@ export default function Home() {
   console.log("Upcoming tasks count:", upcomingTasks?.length);
   
   // Loading states
-  const isLoading = loadingEditions || loadingTasks;
+  const isLoading = loadingEditions || tasksLoading;
 
   return (
     <div>
@@ -120,9 +151,19 @@ export default function Home() {
                 <Skeleton className="h-7 w-16 mt-1" />
               ) : (
                 <p className="text-2xl font-bold">
-                  {tasks ? tasks.filter((task: any) => 
-                    parseInt(task.week) === currentEdition?.currentWeek
-                  ).length : 0}
+                  {/* Count all tasks for current week across all editions */}
+                  {Array.isArray(editions) && editions.length > 0 && (
+                    <span>
+                      {editions.reduce((count, edition) => {
+                        // Get all tasks that match this edition's current week
+                        const editionTasks = tasks?.filter((task: any) => 
+                          task.editionId === edition.id && 
+                          parseInt(task.week) === edition.currentWeek
+                        )?.length || 0;
+                        return count + editionTasks;
+                      }, 0)}
+                    </span>
+                  )}
                 </p>
               )}
             </div>
@@ -141,10 +182,20 @@ export default function Home() {
                 <Skeleton className="h-7 w-16 mt-1" />
               ) : (
                 <p className="text-2xl font-bold">
-                  {tasks ? tasks.filter((task: any) => 
-                    parseInt(task.week) === currentEdition?.currentWeek &&
-                    task.status === 'Done'
-                  ).length : 0}
+                  {/* Count all completed tasks for current week across all editions */}
+                  {Array.isArray(editions) && editions.length > 0 && (
+                    <span>
+                      {editions.reduce((count, edition) => {
+                        // Get all completed tasks that match this edition's current week
+                        const completedTasks = tasks?.filter((task: any) => 
+                          task.editionId === edition.id && 
+                          parseInt(task.week) === edition.currentWeek &&
+                          task.status === 'Done'
+                        )?.length || 0;
+                        return count + completedTasks;
+                      }, 0)}
+                    </span>
+                  )}
                 </p>
               )}
             </div>
@@ -152,18 +203,29 @@ export default function Home() {
         </Card>
         
         <Card>
-          <CardContent className="p-4 flex items-center">
-            <div className="bg-amber-100 rounded-full p-3 mr-4">
-              <Calendar className="h-6 w-6 text-amber-600" />
+          <CardContent className="p-4">
+            <div className="flex items-center mb-3">
+              <div className="bg-amber-100 rounded-full p-3 mr-4">
+                <Calendar className="h-6 w-6 text-amber-600" />
+              </div>
+              <p className="text-sm font-medium text-muted-foreground">Current Weeks</p>
             </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Current Week</p>
-              {isLoading ? (
-                <Skeleton className="h-7 w-16 mt-1" />
-              ) : (
-                <p className="text-2xl font-bold">Week {currentEdition?.currentWeek || 5}</p>
-              )}
-            </div>
+            {isLoading ? (
+              <Skeleton className="h-24 w-full mt-1" />
+            ) : (
+              <div className="space-y-2">
+                {editions && editions.length > 0 ? (
+                  editions.map((edition: any) => (
+                    <div key={edition.id} className="flex justify-between items-center">
+                      <span className="text-sm">{edition.code}</span>
+                      <span className="text-sm font-medium">Week {edition.currentWeek}</span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">No active editions</p>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
