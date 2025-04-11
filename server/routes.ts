@@ -36,14 +36,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a new edition
   app.post("/api/editions", async (req, res) => {
     try {
-      const editionData = insertEditionSchema.parse(req.body);
-      const edition = await storage.createEdition(editionData);
+      const { useTemplateTasks, ...editionData } = req.body;
+      const validatedEditionData = insertEditionSchema.parse(editionData);
+      
+      const edition = await storage.createEdition(validatedEditionData);
+      
+      // If useTemplateTasks is true, add template tasks to the new edition
+      if (useTemplateTasks) {
+        // Import the TASK_TEMPLATE from client constants
+        const { TASK_TEMPLATE } = await import("../client/src/lib/constants");
+        
+        // Loop through all weeks and tasks in the template
+        for (const [week, weekTasks] of Object.entries(TASK_TEMPLATE)) {
+          for (const templateTask of weekTasks) {
+            // Create a task in the database for each template task
+            const task = {
+              editionId: edition.id,
+              week,
+              name: templateTask.name,
+              taskCode: templateTask.taskCode,
+              trainingType: templateTask.trainingType,
+              status: "Not Started",
+              duration: templateTask.duration || null,
+              assignedTo: templateTask.assignedTo || null,
+              owner: templateTask.owner || null,
+              dueDate: null,
+              links: null,
+              inflexible: false,
+              notes: null
+            };
+            
+            await storage.createTask(task);
+          }
+        }
+      }
+      
       res.status(201).json(edition);
     } catch (error) {
       if (error instanceof ZodError) {
         const validationError = fromZodError(error);
         return res.status(400).json({ message: validationError.message });
       }
+      console.error("Error creating edition:", error);
       res.status(500).json({ message: "Failed to create edition" });
     }
   });
