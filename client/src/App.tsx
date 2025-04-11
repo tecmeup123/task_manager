@@ -9,31 +9,87 @@ import Editions from "@/pages/editions";
 import Trainers from "@/pages/trainers";
 import Reports from "@/pages/reports";
 import Settings from "@/pages/settings";
+import AuthPage from "@/pages/auth-page";
 import MainLayout from "@/components/layouts/main-layout";
+import { AuthProvider } from "@/hooks/use-auth";
+import { ProtectedRoute } from "@/lib/protected-route";
 
 function Router() {
   return (
-    <MainLayout>
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/tasks" component={Tasks} />
-        <Route path="/tasks/:editionId" component={Tasks} />
-        <Route path="/editions" component={Editions} />
-        <Route path="/trainers" component={Trainers} />
-        <Route path="/reports" component={Reports} />
-        <Route path="/settings" component={Settings} />
-        {/* Fallback to 404 */}
-        <Route component={NotFound} />
-      </Switch>
-    </MainLayout>
+    <Switch>
+      <Route path="/auth" component={AuthPage} />
+      
+      {/* Protected routes wrapped in MainLayout */}
+      <ProtectedRoute 
+        path="/" 
+        component={() => (
+          <MainLayout>
+            <Home />
+          </MainLayout>
+        )} 
+      />
+      <ProtectedRoute 
+        path="/tasks" 
+        component={() => (
+          <MainLayout>
+            <Tasks />
+          </MainLayout>
+        )} 
+      />
+      <ProtectedRoute 
+        path="/tasks/:editionId" 
+        component={() => (
+          <MainLayout>
+            <Tasks />
+          </MainLayout>
+        )} 
+      />
+      <ProtectedRoute 
+        path="/editions" 
+        component={() => (
+          <MainLayout>
+            <Editions />
+          </MainLayout>
+        )} 
+      />
+      <ProtectedRoute 
+        path="/trainers" 
+        component={() => (
+          <MainLayout>
+            <Trainers />
+          </MainLayout>
+        )} 
+      />
+      <ProtectedRoute 
+        path="/reports" 
+        component={() => (
+          <MainLayout>
+            <Reports />
+          </MainLayout>
+        )} 
+      />
+      <ProtectedRoute 
+        path="/settings" 
+        component={() => (
+          <MainLayout>
+            <Settings />
+          </MainLayout>
+        )} 
+      />
+      
+      {/* Fallback to 404 */}
+      <Route component={NotFound} />
+    </Switch>
   );
 }
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router />
-      <Toaster />
+      <AuthProvider>
+        <Router />
+        <Toaster />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

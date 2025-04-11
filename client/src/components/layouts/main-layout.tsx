@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Bell, ChevronDown, Menu, X, ArrowLeft } from "lucide-react";
+import { Search, Bell, ChevronDown, Menu, X, ArrowLeft, LogOut } from "lucide-react";
 import { 
   LayoutDashboard, 
   ListTodo,
@@ -16,6 +16,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/hooks/use-auth";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type MainLayoutProps = {
   children: React.ReactNode;
@@ -26,6 +33,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const [currentEditionId, setCurrentEditionId] = useState<number | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { user, logoutMutation } = useAuth();
 
   // Determine if we need to show a back button
   const showBackButton = location !== "/" && !mobileMenuOpen;
@@ -136,9 +144,30 @@ export default function MainLayout({ children }: MainLayoutProps) {
           <Button variant="ghost" size="icon" className="rounded-full">
             <Bell className="h-5 w-5 text-neutral-500" />
           </Button>
-          <div className="w-8 h-8 rounded-full bg-primary ml-2 flex items-center justify-center text-white text-sm">
-            AM
-          </div>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="w-8 h-8 rounded-full bg-primary ml-2 flex items-center justify-center text-white text-sm cursor-pointer">
+                {user?.username?.substring(0, 2).toUpperCase() || "AM"}
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {user && (
+                <>
+                  <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                    Signed in as <span className="font-semibold">{user.username}</span>
+                  </div>
+                  <DropdownMenuItem 
+                    className="cursor-pointer flex items-center text-red-600"
+                    onClick={() => logoutMutation.mutate()}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
