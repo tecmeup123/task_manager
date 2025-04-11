@@ -53,7 +53,12 @@ export default function Trainers() {
   const { data: trainers = [], isLoading, isError } = useQuery({
     queryKey: ['/api/trainers'],
     queryFn: async () => {
-      return await fetch('/api/trainers').then(res => res.json());
+      const res = await fetch('/api/trainers');
+      if (!res.ok) {
+        throw new Error('Failed to fetch trainers');
+      }
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
     }
   });
 
