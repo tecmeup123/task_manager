@@ -701,7 +701,12 @@ export class DatabaseStorage implements IStorage {
         name: `Task ${i1} for Week ${week}`,
         trainingType: Math.random() > 0.3 ? "GLR" : "SLR",
         duration: `${Math.floor(Math.random() * 4) + 1}h`,
-        dueDate: new Date("2024-05-15"),
+        // Set some tasks as overdue, some as upcoming, and some further in the future
+        dueDate: i1 % 3 === 0 
+          ? new Date(Date.now() - 1000 * 60 * 60 * 24 * (Math.floor(Math.random() * 5) + 1)) // Overdue (1-5 days ago)
+          : i1 % 3 === 1
+            ? new Date(Date.now() + 1000 * 60 * 60 * 24 * (Math.floor(Math.random() * 7) + 1)) // Upcoming (next 7 days)
+            : new Date("2024-05-15"), // Further in the future
         owner: owners[Math.floor(Math.random() * owners.length)],
         status,
         completionDate: status === "Done" ? new Date("2024-04-20") : null,
@@ -731,7 +736,12 @@ export class DatabaseStorage implements IStorage {
         name: `Task ${i1} for Week ${week} (Edition B)`,
         trainingType: "SLR",
         duration: `${Math.floor(Math.random() * 4) + 1}h`,
-        dueDate: new Date("2024-06-01"),
+        // Set some tasks as overdue, some as upcoming, and some further in the future
+        dueDate: i1 % 3 === 0 
+          ? new Date(Date.now() - 1000 * 60 * 60 * 24 * (Math.floor(Math.random() * 5) + 1)) // Overdue (1-5 days ago)
+          : i1 % 3 === 1
+            ? new Date(Date.now() + 1000 * 60 * 60 * 24 * (Math.floor(Math.random() * 7) + 1)) // Upcoming (next 7 days)
+            : new Date("2024-06-01"), // Further in the future
         owner: owners[Math.floor(Math.random() * owners.length)],
         status,
         completionDate: status === "Done" ? new Date("2024-04-25") : null,

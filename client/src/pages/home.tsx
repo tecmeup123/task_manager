@@ -18,7 +18,8 @@ import {
   Legend,
 } from "recharts";
 import { getStatusColor, getTasksByWeek, formatDate } from "@/lib/utils";
-import { ListTodo, Calendar, Users, Layers, CheckCircle } from "lucide-react";
+import { ListTodo, Calendar, Users, Layers, CheckCircle, Clock, AlertTriangle, ChevronRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
   const { data: editions, isLoading: loadingEditions } = useQuery({
@@ -62,6 +63,36 @@ export default function Home() {
     return aNum - bNum;
   }) : [];
 
+  // Calculate overdue and upcoming tasks
+  const today = new Date();
+  
+  // Get overdue tasks (tasks with dueDate in the past and not Done)
+  const overdueTasks = tasks ? tasks.filter((task: any) => {
+    if (task.status === 'Done') return false;
+    if (!task.dueDate) return false;
+    const dueDate = new Date(task.dueDate);
+    return dueDate < today;
+  }).sort((a: any, b: any) => {
+    if (!a.dueDate) return 1;
+    if (!b.dueDate) return -1;
+    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+  }) : [];
+  
+  // Get upcoming tasks (tasks with dueDate in the next 7 days and not Done)
+  const nextWeek = new Date();
+  nextWeek.setDate(today.getDate() + 7);
+  
+  const upcomingTasks = tasks ? tasks.filter((task: any) => {
+    if (task.status === 'Done') return false;
+    if (!task.dueDate) return false;
+    const dueDate = new Date(task.dueDate);
+    return dueDate >= today && dueDate <= nextWeek;
+  }).sort((a: any, b: any) => {
+    if (!a.dueDate) return 1;
+    if (!b.dueDate) return -1;
+    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+  }) : [];
+  
   // Loading states
   const isLoading = loadingEditions || loadingTasks;
 
@@ -258,6 +289,141 @@ export default function Home() {
             ) : (
               <div className="text-center py-6 text-muted-foreground">
                 <p>No task data available</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Overdue and Upcoming Tasks */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        {/* Overdue Tasks */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-lg flex items-center">
+                <AlertTriangle className="mr-2 h-5 w-5 text-red-500" />
+                Overdue Tasks
+              </CardTitle>
+              {!isLoading && overdueTasks.length > 0 && (
+                <Badge variant="destructive">{overdueTasks.length}</Badge>
+              )}
+            </div>
+            <CardDescription>Tasks that are past their due date</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <>
+                <Skeleton className="h-12 w-full mb-2" />
+                <Skeleton className="h-12 w-full mb-2" />
+                <Skeleton className="h-12 w-full" />
+              </>
+            ) : overdueTasks.length > 0 ? (
+              <div className="space-y-4">
+                {overdueTasks.slice(0, 5).map((task: any) => (
+                  <div key={task.id} className="flex justify-between items-start border-b pb-3">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-red-100 p-2 rounded-md mt-1">
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{task.name}</p>
+                        <div className="flex flex-wrap items-center gap-1 mt-1">
+                          <Badge variant="outline">{task.week}</Badge>
+                          <Badge variant={getStatusColor(task.status).bg}>{task.status}</Badge>
+                          <span className="text-xs text-red-500">
+                            Due: {formatDate(task.dueDate)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <Link to={`/tasks/${task.editionId}`}>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                ))}
+
+                {overdueTasks.length > 5 && (
+                  <div className="text-center pt-2">
+                    <Link to="/tasks">
+                      <Button variant="link" size="sm">
+                        View all {overdueTasks.length} overdue tasks
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-6 text-muted-foreground">
+                <p>No overdue tasks</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Upcoming Tasks */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-lg flex items-center">
+                <Clock className="mr-2 h-5 w-5 text-amber-500" />
+                Upcoming Tasks
+              </CardTitle>
+              {!isLoading && upcomingTasks.length > 0 && (
+                <Badge variant="secondary">{upcomingTasks.length}</Badge>
+              )}
+            </div>
+            <CardDescription>Tasks due in the next 7 days</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <>
+                <Skeleton className="h-12 w-full mb-2" />
+                <Skeleton className="h-12 w-full mb-2" />
+                <Skeleton className="h-12 w-full" />
+              </>
+            ) : upcomingTasks.length > 0 ? (
+              <div className="space-y-4">
+                {upcomingTasks.slice(0, 5).map((task: any) => (
+                  <div key={task.id} className="flex justify-between items-start border-b pb-3">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-amber-100 p-2 rounded-md mt-1">
+                        <Clock className="h-4 w-4 text-amber-500" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{task.name}</p>
+                        <div className="flex flex-wrap items-center gap-1 mt-1">
+                          <Badge variant="outline">{task.week}</Badge>
+                          <Badge variant={getStatusColor(task.status).bg}>{task.status}</Badge>
+                          <span className="text-xs text-amber-600">
+                            Due: {formatDate(task.dueDate)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <Link to={`/tasks/${task.editionId}`}>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                ))}
+
+                {upcomingTasks.length > 5 && (
+                  <div className="text-center pt-2">
+                    <Link to="/tasks">
+                      <Button variant="link" size="sm">
+                        View all {upcomingTasks.length} upcoming tasks
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-6 text-muted-foreground">
+                <p>No upcoming tasks due soon</p>
               </div>
             )}
           </CardContent>
