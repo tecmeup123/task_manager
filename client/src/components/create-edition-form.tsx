@@ -68,7 +68,7 @@ export default function CreateEditionForm({
   const [variant, setVariant] = useState<"A" | "B">("A");
 
   // Get source edition data if duplicating
-  const { data: sourceEdition } = useQuery({
+  const { data: sourceEdition } = useQuery<any>({
     queryKey: ["/api/editions", sourceEditionId],
     enabled: !!sourceEditionId,
   });

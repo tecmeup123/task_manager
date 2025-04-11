@@ -44,7 +44,7 @@ export default function Tasks() {
   const [expandedWeeks, setExpandedWeeks] = useState<Record<string, boolean>>({});
 
   // Fetch all editions
-  const { data: editions, isLoading: editionsLoading } = useQuery({
+  const { data: editions = [], isLoading: editionsLoading } = useQuery<any[]>({
     queryKey: ["/api/editions"],
   });
 
@@ -61,7 +61,7 @@ export default function Tasks() {
   }, [editions, editionId, setLocation]);
 
   // Fetch tasks for the current edition
-  const { data: tasks, isLoading: tasksLoading, refetch: refetchTasks } = useQuery({
+  const { data: tasks = [], isLoading: tasksLoading, refetch: refetchTasks } = useQuery<any[]>({
     queryKey: ["/api/editions", currentEdition?.id, "tasks"],
     enabled: !!currentEdition?.id,
   });
@@ -136,11 +136,12 @@ export default function Tasks() {
     }
   };
 
-  // Filter tasks based on selected week and training type
+  // Filter tasks based on selected week, training type, and status
   const filteredTasks = tasks ? tasks.filter((task: any) => {
     const matchesWeek = selectedWeek === "all" || task.week === selectedWeek;
     const matchesType = selectedTrainingType === "all" || task.trainingType === selectedTrainingType;
-    return matchesWeek && matchesType;
+    const matchesStatus = selectedStatus === "all" || task.status === selectedStatus;
+    return matchesWeek && matchesType && matchesStatus;
   }) : [];
 
   // Group tasks by week
@@ -169,7 +170,7 @@ export default function Tasks() {
           ) : currentEdition ? (
             <>
               <h2 className="text-xl font-semibold">Edition: {currentEdition.code}</h2>
-              <Badge variant="success" className="ml-2">
+              <Badge variant="default" className="ml-2 bg-green-500 hover:bg-green-600">
                 Active
               </Badge>
             </>
@@ -206,6 +207,24 @@ export default function Tasks() {
             </SelectTrigger>
             <SelectContent>
               {TRAINING_TYPE_OPTIONS.map(option => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <Select
+            value={selectedStatus}
+            onValueChange={setSelectedStatus}
+            disabled={isLoading}
+          >
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              {TASK_STATUS_OPTIONS.map(option => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
