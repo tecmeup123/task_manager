@@ -131,14 +131,14 @@ export function getTasksByWeek(tasks: any[]): Record<string, any[]> {
 export function getAllWeeks(): string[] {
   const weeks = [];
   
-  // Add negative weeks (Week -5 to Week -1)
+  // Add negative weeks (-5 to -1)
   for (let i = 5; i >= 1; i--) {
-    weeks.push(`Week -${i}`);
+    weeks.push(`-${i}`);
   }
   
-  // Add positive weeks (Week 1 to Week 8)
+  // Add positive weeks (1 to 8)
   for (let i = 1; i <= 8; i++) {
-    weeks.push(`Week ${i}`);
+    weeks.push(`${i}`);
   }
   
   return weeks;
