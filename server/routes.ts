@@ -1,14 +1,122 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertEditionSchema, insertTaskSchema, insertTrainerSchema, taskStatusEnum, trainerStatusEnum } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
+import { setupAuth } from "./auth";
+
+// Middleware to check for admin role
+function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Authentication required" });
+  }
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Admin role required" });
+  }
+  next();
+}
+
+// Middleware to check for editor or admin role
+function requireEditor(req: Request, res: Response, next: NextFunction) {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Authentication required" });
+  }
+  if (req.user.role !== "editor" && req.user.role !== "admin") {
+    return res.status(403).json({ message: "Editor or Admin role required" });
+  }
+  next();
+}
+
+// Middleware for audit logging
+function createAuditLog(entityType: string, action: string) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.isAuthenticated()) {
+      return next();
+    }
+    
+    // Store the original response methods
+    const originalJson = res.json;
+    const originalSend = res.send;
+    
+    // Override json method to capture response
+    res.json = function(body) {
+      // Try to identify the entity ID - specific handling for different routes
+      let entityId: number | undefined;
+      
+      if (req.params.id) {
+        entityId = parseInt(req.params.id);
+      } else if (body && body.id) {
+        entityId = body.id;
+      }
+      
+      // Only log if we have an entity ID
+      if (entityId) {
+        const auditLog = {
+          userId: req.user.id,
+          entityType,
+          entityId,
+          action,
+          previousState: req.method === 'PATCH' || req.method === 'DELETE' ? req.body.previousState : null,
+          newState: req.method === 'POST' || req.method === 'PATCH' ? body : null,
+          notes: `${action} ${entityType} by ${req.user.username}`
+        };
+        
+        // Log to audit log asynchronously (don't wait for completion)
+        storage.createAuditLog(auditLog)
+          .catch(err => console.error('Error creating audit log:', err));
+      }
+      
+      // Call the original method
+      return originalJson.call(res, body);
+    };
+    
+    // Override send method (for DELETE responses)
+    res.send = function(body) {
+      if (req.method === 'DELETE' && req.params.id) {
+        const auditLog = {
+          userId: req.user.id,
+          entityType,
+          entityId: parseInt(req.params.id),
+          action,
+          previousState: null,
+          newState: null,
+          notes: `${action} ${entityType} by ${req.user.username}`
+        };
+        
+        // Log to audit log asynchronously
+        storage.createAuditLog(auditLog)
+          .catch(err => console.error('Error creating audit log:', err));
+      }
+      
+      // Call the original method
+      return originalSend.call(res, body);
+    };
+    
+    next();
+  };
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Set up authentication
+  setupAuth(app);
+  
   // put application routes here
   // prefix all routes with /api
   const apiRouter = app.route("/api");
+
+  // Audit Logs
+  app.get("/api/audit-logs", requireAdmin, async (req, res) => {
+    try {
+      const entityType = req.query.entityType as string | undefined;
+      const entityId = req.query.entityId ? Number(req.query.entityId) : undefined;
+      
+      const logs = await storage.getAuditLogs(entityType, entityId);
+      res.json(logs);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch audit logs" });
+    }
+  });
 
   // Get all editions
   app.get("/api/editions", async (req, res) => {

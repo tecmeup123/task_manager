@@ -7,10 +7,13 @@ import {
   InsertUser,
   Trainer,
   InsertTrainer,
+  AuditLog,
+  InsertAuditLog,
   users,
   trainers,
   editions,
-  tasks
+  tasks,
+  auditLogs
 } from "@shared/schema";
 import { add, format, parseISO, isBefore, subWeeks } from "date-fns";
 import { and, eq, count } from "drizzle-orm";
@@ -20,7 +23,15 @@ import { and, eq, count } from "drizzle-orm";
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>;
   createUser(user: InsertUser): Promise<User>;
+  
+  // Audit logs methods
+  createAuditLog(log: InsertAuditLog): Promise<AuditLog>;
+  getAuditLogs(entityType?: string, entityId?: number): Promise<AuditLog[]>;
+  
+  // Session storage for authentication
+  sessionStore: any;
 
   // Trainer methods
   getAllTrainers(): Promise<Trainer[]>;
@@ -50,25 +61,38 @@ export interface IStorage {
   duplicateEdition(editionId: number, newEditionData: InsertEdition): Promise<Edition>;
 }
 
+import createMemoryStore from "memorystore";
+import session from "express-session";
+
+const MemoryStore = createMemoryStore(session);
+
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private trainers: Map<number, Trainer>;
   private editions: Map<number, Edition>;
   private tasks: Map<number, Task>;
+  private auditLogs: Map<number, AuditLog>;
   private currentUserId: number;
   private currentTrainerId: number;
   private currentEditionId: number;
   private currentTaskId: number;
+  private currentAuditLogId: number;
+  sessionStore: session.Store;
 
   constructor() {
     this.users = new Map();
     this.trainers = new Map();
     this.editions = new Map();
     this.tasks = new Map();
+    this.auditLogs = new Map();
     this.currentUserId = 1;
     this.currentTrainerId = 1;
     this.currentEditionId = 1;
     this.currentTaskId = 1;
+    this.currentAuditLogId = 1;
+    this.sessionStore = new MemoryStore({
+      checkPeriod: 86400000 // 24 hours
+    });
 
     // Initialize with some sample data
     this.seedData();
@@ -84,11 +108,47 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
+    const user: User = { 
+      ...insertUser, 
+      id,
+      fullName: insertUser.fullName || null,
+      email: insertUser.email || null,
+      role: insertUser.role || "viewer",
+      createdAt: new Date()  
+    };
     this.users.set(id, user);
     return user;
+  }
+  
+  async createAuditLog(log: InsertAuditLog): Promise<AuditLog> {
+    const id = this.currentAuditLogId++;
+    const auditLog: AuditLog = {
+      ...log,
+      id,
+      timestamp: new Date()
+    };
+    this.auditLogs.set(id, auditLog);
+    return auditLog;
+  }
+  
+  async getAuditLogs(entityType?: string, entityId?: number): Promise<AuditLog[]> {
+    let logs = Array.from(this.auditLogs.values());
+    
+    if (entityType) {
+      logs = logs.filter(log => log.entityType === entityType);
+    }
+    
+    if (entityId) {
+      logs = logs.filter(log => log.entityId === entityId);
+    }
+    
+    return logs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   }
 
   // Trainer methods
@@ -489,7 +549,26 @@ function adjustDate(originalDate: Date, originalStartDate: Date, newStartDate: D
   return new Date(originalDate.getTime() + differenceInMs);
 }
 
+// Using dynamic import for PostgresSessionStore
+function createPostgresSessionStore(session: any) {
+  return async function() {
+    const { default: connectPg } = await import('connect-pg-simple');
+    return connectPg(session);
+  };
+}
+
 export class DatabaseStorage implements IStorage {
+  sessionStore: session.Store;
+  
+  constructor() {
+    // Use the memory store temporarily for session storage
+    // We'll avoid session setup issues in the constructor
+    const MemoryStore = createMemoryStore(session);
+    this.sessionStore = new MemoryStore({
+      checkPeriod: 86400000 // 24 hours
+    });
+  }
+  
   async getUser(id: number): Promise<User | undefined> {
     const { db } = await import("./db");
     const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -501,11 +580,37 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db.select().from(users).where(eq(users.username, username));
     return user || undefined;
   }
+  
+  async getAllUsers(): Promise<User[]> {
+    const { db } = await import("./db");
+    return db.select().from(users);
+  }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const { db } = await import("./db");
     const [user] = await db.insert(users).values(insertUser).returning();
     return user;
+  }
+  
+  async createAuditLog(log: InsertAuditLog): Promise<AuditLog> {
+    const { db } = await import("./db");
+    const [auditLog] = await db.insert(auditLogs).values(log).returning();
+    return auditLog;
+  }
+  
+  async getAuditLogs(entityType?: string, entityId?: number): Promise<AuditLog[]> {
+    const { db } = await import("./db");
+    let query = db.select().from(auditLogs).orderBy(auditLogs.timestamp);
+    
+    if (entityType) {
+      query = query.where(eq(auditLogs.entityType, entityType));
+    }
+    
+    if (entityId) {
+      query = query.where(eq(auditLogs.entityId, entityId));
+    }
+    
+    return query;
   }
   
   // Trainer methods
