@@ -47,6 +47,7 @@ const formSchema = z.object({
   trainingType: z.string().min(1, "Training type is required"),
   startDate: z.date(),
   tasksStartDate: z.date(),
+  useTemplateTasks: z.boolean().default(true),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -299,6 +300,32 @@ export default function CreateEditionForm({
                       When task planning should begin (usually 5 weeks before start)
                     </FormDescription>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="useTemplateTasks"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2 flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 mt-2">
+                    <FormControl>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={field.value}
+                          onChange={field.onChange}
+                          id="useTemplateTasks"
+                          className="h-4 w-4 text-primary rounded border-gray-300 focus:ring-primary"
+                        />
+                      </div>
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Use template tasks</FormLabel>
+                      <FormDescription>
+                        Create this edition with predefined template tasks
+                      </FormDescription>
+                    </div>
                   </FormItem>
                 )}
               />
