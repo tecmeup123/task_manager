@@ -19,6 +19,13 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
 
+  // Trainer methods
+  getAllTrainers(): Promise<Trainer[]>;
+  getTrainer(id: number): Promise<Trainer | undefined>;
+  createTrainer(trainer: InsertTrainer): Promise<Trainer>;
+  updateTrainer(id: number, trainer: Partial<Trainer>): Promise<Trainer>;
+  deleteTrainer(id: number): Promise<boolean>;
+
   // Edition methods
   getAllEditions(): Promise<Edition[]>;
   getEdition(id: number): Promise<Edition | undefined>;
@@ -42,17 +49,21 @@ export interface IStorage {
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
+  private trainers: Map<number, Trainer>;
   private editions: Map<number, Edition>;
   private tasks: Map<number, Task>;
   private currentUserId: number;
+  private currentTrainerId: number;
   private currentEditionId: number;
   private currentTaskId: number;
 
   constructor() {
     this.users = new Map();
+    this.trainers = new Map();
     this.editions = new Map();
     this.tasks = new Map();
     this.currentUserId = 1;
+    this.currentTrainerId = 1;
     this.currentEditionId = 1;
     this.currentTaskId = 1;
 
@@ -75,6 +86,42 @@ export class MemStorage implements IStorage {
     const user: User = { ...insertUser, id };
     this.users.set(id, user);
     return user;
+  }
+
+  // Trainer methods
+  async getAllTrainers(): Promise<Trainer[]> {
+    return Array.from(this.trainers.values());
+  }
+
+  async getTrainer(id: number): Promise<Trainer | undefined> {
+    return this.trainers.get(id);
+  }
+
+  async createTrainer(trainer: InsertTrainer): Promise<Trainer> {
+    const id = this.currentTrainerId++;
+    const newTrainer: Trainer = { 
+      ...trainer, 
+      id, 
+      status: trainer.status || "active",
+      createdAt: new Date()
+    };
+    this.trainers.set(id, newTrainer);
+    return newTrainer;
+  }
+
+  async updateTrainer(id: number, trainerData: Partial<Trainer>): Promise<Trainer> {
+    const trainer = this.trainers.get(id);
+    if (!trainer) {
+      throw new Error(`Trainer with id ${id} not found`);
+    }
+    
+    const updatedTrainer = { ...trainer, ...trainerData };
+    this.trainers.set(id, updatedTrainer);
+    return updatedTrainer;
+  }
+
+  async deleteTrainer(id: number): Promise<boolean> {
+    return this.trainers.delete(id);
   }
 
   // Edition methods
@@ -456,6 +503,45 @@ export class DatabaseStorage implements IStorage {
     const { db } = await import("./db");
     const [user] = await db.insert(users).values(insertUser).returning();
     return user;
+  }
+  
+  // Trainer methods
+  async getAllTrainers(): Promise<Trainer[]> {
+    const { db } = await import("./db");
+    return db.select().from(trainers);
+  }
+  
+  async getTrainer(id: number): Promise<Trainer | undefined> {
+    const { db } = await import("./db");
+    const [trainer] = await db.select().from(trainers).where(eq(trainers.id, id));
+    return trainer || undefined;
+  }
+  
+  async createTrainer(trainer: InsertTrainer): Promise<Trainer> {
+    const { db } = await import("./db");
+    const [newTrainer] = await db.insert(trainers).values(trainer).returning();
+    return newTrainer;
+  }
+  
+  async updateTrainer(id: number, trainerData: Partial<Trainer>): Promise<Trainer> {
+    const { db } = await import("./db");
+    const [updatedTrainer] = await db
+      .update(trainers)
+      .set(trainerData)
+      .where(eq(trainers.id, id))
+      .returning();
+    
+    if (!updatedTrainer) {
+      throw new Error(`Trainer with id ${id} not found`);
+    }
+    
+    return updatedTrainer;
+  }
+  
+  async deleteTrainer(id: number): Promise<boolean> {
+    const { db } = await import("./db");
+    const result = await db.delete(trainers).where(eq(trainers.id, id)).returning();
+    return result.length > 0;
   }
 
   async getAllEditions(): Promise<Edition[]> {

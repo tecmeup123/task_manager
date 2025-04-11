@@ -17,6 +17,25 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
+// Trainer model
+export const trainers = pgTable("trainers", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  email: varchar("email", { length: 100 }),
+  role: varchar("role", { length: 50 }),
+  department: varchar("department", { length: 50 }),
+  status: varchar("status", { length: 20 }).default("active"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertTrainerSchema = createInsertSchema(trainers).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertTrainer = z.infer<typeof insertTrainerSchema>;
+export type Trainer = typeof trainers.$inferSelect;
+
 // Training management models
 export const editions = pgTable("editions", {
   id: serial("id").primaryKey(),
@@ -88,3 +107,11 @@ export const trainingTypeEnum = z.enum([
 ]);
 
 export type TrainingType = z.infer<typeof trainingTypeEnum>;
+
+// Trainer status enum
+export const trainerStatusEnum = z.enum([
+  "active",
+  "inactive",
+]);
+
+export type TrainerStatus = z.infer<typeof trainerStatusEnum>;
