@@ -98,7 +98,7 @@ export default function Home() {
               <Layers className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Total Editions</p>
+              <p className="text-sm font-medium text-muted-foreground">Ongoing Training Sessions</p>
               {isLoading ? (
                 <Skeleton className="h-7 w-16 mt-1" />
               ) : (
@@ -108,33 +108,44 @@ export default function Home() {
           </CardContent>
         </Card>
         
+        {/* Tasks this week */}
         <Card>
           <CardContent className="p-4 flex items-center">
             <div className="bg-blue-100 rounded-full p-3 mr-4">
               <ListTodo className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Total Tasks</p>
+              <p className="text-sm font-medium text-muted-foreground">Tasks This Week</p>
               {isLoading ? (
                 <Skeleton className="h-7 w-16 mt-1" />
               ) : (
-                <p className="text-2xl font-bold">{taskStats?.total || 0}</p>
+                <p className="text-2xl font-bold">
+                  {tasks ? tasks.filter((task: any) => 
+                    parseInt(task.week) === currentEdition?.currentWeek
+                  ).length : 0}
+                </p>
               )}
             </div>
           </CardContent>
         </Card>
         
+        {/* Completed tasks this week */}
         <Card>
           <CardContent className="p-4 flex items-center">
             <div className="bg-green-100 rounded-full p-3 mr-4">
               <CheckCircle className="h-6 w-6 text-green-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Completed</p>
+              <p className="text-sm font-medium text-muted-foreground">Completed This Week</p>
               {isLoading ? (
                 <Skeleton className="h-7 w-16 mt-1" />
               ) : (
-                <p className="text-2xl font-bold">{taskStats?.completed || 0}</p>
+                <p className="text-2xl font-bold">
+                  {tasks ? tasks.filter((task: any) => 
+                    parseInt(task.week) === currentEdition?.currentWeek &&
+                    task.status === 'Done'
+                  ).length : 0}
+                </p>
               )}
             </div>
           </CardContent>
