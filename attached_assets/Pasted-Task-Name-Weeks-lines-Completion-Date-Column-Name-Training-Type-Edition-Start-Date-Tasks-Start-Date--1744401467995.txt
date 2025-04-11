@@ -1,0 +1,175 @@
+Task	Name	Weeks	lines	Completion Date Column Name	Training Type	Edition	Start Date	Tasks Start Date	Technical  Trainer Team	Status	Week Status		Modalidade Treino	
+ASC	Joaquim Matos \ Jorge Neto	Week -5	2	Week -5 Completion date		N/A			Miguel	Done	PAST WEEKS		GLR	Guided Learning Route
+GUI	Pedro Tinoco	Week -4	3	Week -4 Completion date	GLR	2301-A Customers			Afonso		CURRENT WEEK		SLR	Self Learning Route
+IoT	Micael Queiroz	Week -3	4	Week -3 Completion date	GLR	2301-A Partners			Telmo		FUTURE WEEKS			
+Administrator	Luis Pereira	Week -2	5	Week -2 Completion date	GLR	2301-B Customers			Luis					
+Enviroment	Platform Engineering 	Week -1	6	Week -1 Completion date	GLR	2301-B Partners								
+Modeler	Miguel\ Afonso	Week 1	7	Week 1 Completion date	GLR	2302-A Customers								
+Trainers	"Joaquim Matos \ Jorge Neto
+Pedro Tinoco
+Micael Queiroz \ 
+Miguel\ Afonso\ Telmo\ Luis"	Week 2	8	Week 2 Completion date	GLR	2302-A Partners								
+E-learning Q&A	"Luis Pereira
+Miguel\ Afonso"	Week 3	9	Week 3 Completion date	GLR	2302-B Customers								
+Hands-on Q&A	"Luis Pereira
+Micael Queiroz
+Telmo Silva\ Afonso"	Week 4	10	Week 4 Completion date	GLR	2302-B Partners								
+Organizer	Miguel\ Afonso\ Telmo\ Luis	Week 5	11	Week 5 Completion date	GLR	2303-A Customers								
+		Week 6	12	Week 6 Completion date	GLR	2303-A Partners								
+		Week 7	13	Week 7 Completion date	GLR	2303-B Customers								
+		Week 8	14	Week 8 Completion date	GLR	2303-B Partners								
+		N/A	15		GLR	2304-A Customers								
+			16		GLR	2304-A Partners								
+			17		GLR	2304-B Customers								
+			18		GLR	2304-B Partners								
+			19		GLR	2305-A Customers								
+			20		GLR	2305-A Partners								
+			21		GLR	2305-B Customers								
+			22		GLR	2305-B Partners								
+			23		GLR	2306-A Customers								
+			24		GLR	2306-A Partners								
+			25		GLR	2306-B Customers								
+			26		GLR	2306-B Partners								
+			27		GLR	2307-A Customers								
+			28		GLR	2307-A Partners								
+			29		GLR	2307-B Customers								
+			30		GLR	2307-B Partners								
+			31		GLR	2308-A Customers								
+			32		GLR	2308-A Partners								
+			33		GLR	2308-B Customers								
+			34		GLR	2308-B Partners								
+			35		GLR	2309-A Customers	9/4/2023	7/31/2023						
+			36		GLR	2309-B Partners	9/11/2023	8/7/2023						
+			37		GLR	2310-A Partners	10/2/2023	8/28/2023						
+			38		GLR	2310-B Partners	10/16/2023	9/11/2023						
+			39		GLR	2311-A Partners	11/6/2023	10/2/2023						
+			40		GLR	2311-B Customers	11/13/2023	10/9/2023						
+			41		GLR	2312-A Partners	12/4/2023	10/30/2023						
+			42		SLR	2311-PILOT	11/6/2023	10/2/2023						
+			43		GLR	2402-A Customers	2/19/2024	1/15/2024						
+			44		SLR	2402-B Partners	1/15/2024	12/11/2023						
+			45		GLR	2403-A Customers	3/18/2024	2/12/2024						
+			46		SLR	2403-B Partners	2/5/2024	1/1/2024						
+			47		SLR	2404-B Partners	3/19/2024	2/13/2024						
+			48		GLR	2405-A	5/20/2024	4/15/2024						
+			49		SLR	2405-B	4/22/2024	3/18/2024						
+			50		GLR	2406-A	6/17/2024	5/13/2024						
+			51		SLR	2406-B	5/13/2024	4/8/2024						
+			52		GLR	2406-A	6/17/2024	5/13/2024						
+			53		SLR	2407-B	6/17/2024	6/17/2024						
+			54		GLR	2408-A	8/19/2024	7/15/2024						
+			55		SLR	2408-B	8/26/2024	7/22/2024						
+			56		SLR	2409-B	9/25/2024	8/21/2024						
+			57		GLR	2409-A	9/16/2024	8/12/2024						
+			58		GLR	2410-A	10/21/2024	9/16/2024						
+			59		SLR	2410-B	10/30/2024	9/25/2024						
+			60		GLR	2411-A	11/18/2024	10/14/2024						
+			61		SLR	2411-B	11/27/2024	10/23/2024						
+			62		SLR	2412-B	12/18/2024	11/13/2024						
+			63		GLR	2501-A	1/20/2025	12/16/2024						
+			64		SLR	2501-B	1/29/2025	12/25/2024						
+			65		GLR	2502-A	2/17/2025	1/13/2025						
+			66		SLR	2502-B	2/26/2025	1/22/2025						
+			67		SLR	2503-B	3/26/2025	2/19/2025						
+			68		GLR	2503-A	3/17/2025	2/10/2025						
+			69		SLR	2504-B	4/23/2025	3/19/2025						
+			70		GLR	2504-A	4/21/2025	3/17/2025						
+			71		GLR	2505-A	5/19/2025	4/14/2025						
+			72		SLR	2505-B	5/28/2025	4/23/2025						
+			73											
+			74											
+			75											
+			76											
+			77											
+			78											
+			79											
+			80											
+			81											
+			82											
+			83											
+			84											
+			85											
+			86											
+			87											
+			88											
+			89											
+			90											
+			91											
+			92											
+			93											
+			94											
+			95											
+			96											
+			97											
+			98											
+			99											
+			100											
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														
+														

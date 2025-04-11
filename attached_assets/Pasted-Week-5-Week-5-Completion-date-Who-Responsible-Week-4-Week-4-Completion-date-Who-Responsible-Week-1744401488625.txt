@@ -1,0 +1,78 @@
+Week -5	Week -5 Completion date	Who	Responsible	Week -4	Week -4 Completion date	Who	Responsible	Week -3	Week -3 Completion date	Who	Responsible	Week -2	Week -2 Completion date	Who	Responsible	Week -1	Week -1 Completion date	Who	Responsible	Week 1	Week 1 Completion date	Who	Responsible	Week 2	Week 2 Completion date	Who	Responsible	Week 3	Week 3 Completion date	Who	Responsible	Week 4	Week 4 Completion date	who	Responsible	Week 5	Week 5 Completion date	who	Responsible	Week 6	Week 6 Completion date	who	Responsible	Week 7	Week 7 Completion date	who	Responsible	Week 8	Week 8 Completion date	who	Responsible
+Create groups (e-learning platform)		Organizer	Miguel\ Afonso\ Telmo\ Luis	Send welcome to e-learning email (include group key)		Organizer	Miguel\ Afonso\ Telmo\ Luis	Send welcome to e-learning email (include group key)		Organizer	Miguel\ Afonso\ Telmo\ Luis	"Include links of the exams, mailing and edition folder 
+in the Training Task Force (Teams group) @evaluation@ tab"		Organizer	Miguel\ Afonso\ Telmo\ Luis	Update mailing list (names; groups information; schedule; edition)		Organizer	Miguel\ Afonso\ Telmo\ Luis	Q&A 1 - e-learning	Inflexible	E-learning Q&A	"Luis Pereira
+Miguel\ Afonso"	Continue Hands-on access exam part I evaluation period		Trainers	"Joaquim Matos \ Jorge Neto
+Pedro Tinoco
+Micael Queiroz \ 
+Miguel\ Afonso\ Telmo\ Luis"	Set HAE part I & part II to shelf group on Talent LMS		Organizer	Miguel\ Afonso\ Telmo\ Luis	Hands-on Welcome session	Inflexible	Organizer	Miguel\ Afonso\ Telmo\ Luis	Q&A 2 - Hands-on	Inflexible	Hands-on Q&A	"Luis Pereira
+Micael Queiroz
+Telmo Silva\ Afonso"	Mailing survey Hands-on stage & Download previous edition surveys		Organizer	Miguel\ Afonso\ Telmo\ Luis	Final exam evaluation	Inflexible	Trainers	"Joaquim Matos \ Jorge Neto
+Pedro Tinoco
+Micael Queiroz \ 
+Miguel\ Afonso\ Telmo\ Luis"	Update mailing list with grades (Final exam)		Organizer	Miguel\ Afonso\ Telmo\ Luis
+Create mailing list (names; groups information; schedule; edition)		Organizer	Miguel\ Afonso\ Telmo\ Luis			Organizer	Miguel\ Afonso\ Telmo\ Luis	Remove date from registration form		Organizer	Miguel\ Afonso\ Telmo\ Luis	Send mail announcing start of the e-learning stage with Q&A sessions		Organizer	Miguel\ Afonso\ Telmo\ Luis	Verify if the e-learning group elements are correct		Organizer	Miguel\ Afonso\ Telmo\ Luis	Hands-on Access Exam part I (exam dates - only for trainers information, no action needed)	Inflexible	Trainers	"Joaquim Matos \ Jorge Neto
+Pedro Tinoco
+Micael Queiroz \ 
+Miguel\ Afonso\ Telmo\ Luis"	Q&A 2 - e-learning	Inflexible	E-learning Q&A	"Luis Pereira
+Miguel\ Afonso"	Finish Hands-on access exam evaluation (part I and part II)	Inflexible	Trainers	"Joaquim Matos \ Jorge Neto
+Pedro Tinoco
+Micael Queiroz \ 
+Miguel\ Afonso\ Telmo\ Luis"	Q&A 1 - Hands-on	Inflexible	Hands-on Q&A	"Luis Pereira
+Micael Queiroz
+Telmo Silva\ Afonso"	Q&A 3 - Hands-on	Inflexible	Hands-on Q&A	"Luis Pereira
+Micael Queiroz
+Telmo Silva\ Afonso"	Send exam information to trainees		Organizer	Miguel\ Afonso\ Telmo\ Luis					Send grades by email		Organizer	Miguel\ Afonso\ Telmo\ Luis
+Clone\update Hands-on access exam  (part I & II) and define time limit		Organizer	Miguel\ Afonso\ Telmo\ Luis			Organizer	Miguel\ Afonso\ Telmo\ Luis	Request Marketing team to remove schedule from CMF site		Organizer	Miguel\ Afonso\ Telmo\ Luis	Send Elearning Q&A Session invites		Organizer	Miguel\ Afonso\ Telmo\ Luis	Change Keygroup		Organizer	Miguel\ Afonso\ Telmo\ Luis	Start Hands-on access exam part I evaluation period		Trainers	"Joaquim Matos \ Jorge Neto
+Pedro Tinoco
+Micael Queiroz \ 
+Miguel\ Afonso\ Telmo\ Luis"	Hands-on Access Exam part II (exam dates - only for trainers information, no action needed)	Inflexible	Trainers	"Joaquim Matos \ Jorge Neto
+Pedro Tinoco
+Micael Queiroz \ 
+Miguel\ Afonso\ Telmo\ Luis"	Update mailing list with grades (HAE)		Organizer	Miguel\ Afonso\ Telmo\ Luis	Send changes in the Final exam to Training Team - until the end of the week		Trainers	"Joaquim Matos \ Jorge Neto
+Pedro Tinoco
+Micael Queiroz \ 
+Miguel\ Afonso\ Telmo\ Luis"	Maciel\Jorge Marques reset training environments next week (alert)		Enviroment	Platform Engineering 	Send VM's and practice exam information for Administrators		Organizer	Miguel\ Afonso\ Telmo\ Luis					Update the result analysis.xls and send it to (Luís Ponte; Jorge Bertocchini;  Pedro Bastos; Will Trogdon; Pedro Bruno Rodrigues; Rogério Ferreira; Óscar Martins; Product Training; - CC Francisco Lobo)		Organizer	Miguel\ Afonso\ Telmo\ Luis
+Assign Hands-on Access Exam  (part I & II) to group		Organizer	Miguel\ Afonso\ Telmo\ Luis							Organizer	Miguel\ Afonso\ Telmo\ Luis							Organizer	Miguel\ Afonso\ Telmo\ Luis					Start Hands-on access exam part II evaluation period		Trainers	"Joaquim Matos \ Jorge Neto
+Pedro Tinoco
+Micael Queiroz \ 
+Miguel\ Afonso\ Telmo\ Luis"	Send grades email		Organizer	Miguel\ Afonso\ Telmo\ Luis					Create final exam in the e-learning platform and define its schedule		Organizer	Miguel\ Afonso\ Telmo\ Luis	Reset training environments for exam (upload Master Data and disable trainee and testuser)	Inflexible	Enviroment	Platform Engineering 					Issue badges		Organizer	Miguel\ Afonso\ Telmo\ Luis
+Send welcome to training program\or failed to enter		Organizer	Miguel\ Afonso\ Telmo\ Luis							Organizer	Miguel\ Afonso\ Telmo\ Luis													Trainers should send changes in the final exam (2 weeks)		Trainers	"Joaquim Matos \ Jorge Neto
+Pedro Tinoco
+Micael Queiroz \ 
+Miguel\ Afonso\ Telmo\ Luis"	Delete from Talent LMS Groups users who failed the exam (HAE) and verify if all group elements are correct		Organizer	Miguel\ Afonso\ Telmo\ Luis					Include links of the exam, mailing and edition folder to trainers		Organizer	Miguel\ Afonso\ Telmo\ Luis	Send Modelers environment information - after Jorge Marques\Maciel it is ok and Training teams checked the environments		Organizer	Miguel\ Afonso\ Telmo\ Luis					Download survey		Organizer	Miguel Carvalho \ Afonso Domingues \ Telmo Silva
+Trainers should send changes in the e-learning assignment to Training Team		Organizer	Miguel\ Afonso\ Telmo\ Luis																					Alert: Maciel\Jorge Marques create training environments next week (Wednesday)		Enviroment	Platform Engineering 	Update users list in mailing exam tab in excel mailing list file		Organizer	Miguel\ Afonso\ Telmo\ Luis					Assign exams to the group and assign them to the trainess		Organizer	Miguel\ Afonso\ Telmo\ Luis	Theoretical exam (exam dates - only for trainers information, no action needed)		Trainers	"Joaquim Matos \ Jorge Neto
+Pedro Tinoco
+Micael Queiroz \ 
+Miguel\ Afonso\ Telmo\ Luis"								
+		Trainers	"Joaquim Matos \ Jorge Neto
+Pedro Tinoco
+Micael Queiroz \ 
+Miguel\ Afonso\ Telmo\ Luis"																					Send mailing survey of the e-learning stage		Organizer	Miguel\ Afonso\ Telmo\ Luis	Send information to Maciel\Jorge Marques to create the cloud environments		Organizer	Miguel\ Afonso\ Telmo\ Luis					Mailing survey Hands-on stage & Download previous edition surveys		Organizer	Miguel\ Afonso\ Telmo\ Luis	Enable users in cloud environment		Organizer	Miguel\ Afonso\ Telmo\ Luis								
+																												Send mail announcing start of the hands-on stage with Q&A sessions		Organizer	Miguel\ Afonso\ Telmo\ Luis					Send exam information to trainees		Organizer	Miguel\ Afonso\ Telmo\ Luis	Practical exam (exam dates - only for trainers information, no action needed)		Trainers	"Joaquim Matos \ Jorge Neto
+Pedro Tinoco
+Micael Queiroz \ 
+Miguel\ Afonso\ Telmo\ Luis"								
+																												Schedule Hands-on sessions - schedule invitation		Organizer	Miguel\ Afonso\ Telmo\ Luis					Send VM's and practice exam information for Administrators		Organizer	Miguel\ Afonso\ Telmo\ Luis	Set theoretical and practical exam to shelf group on Talent LMS		Organizer	Miguel\ Afonso\ Telmo\ Luis								
+																												Assign hands-on courses to the corresponding group and assign them to the trainees		Organizer	Miguel\ Afonso\ Telmo\ Luis									Disable users in cloud environment		Organizer	Miguel\ Afonso\ Telmo\ Luis								
+																												Create cloud environments		Enviroment	Platform Engineering 																				
+																												After cloud environments creation send mailing credentials to users		Organizer	Miguel\ Afonso\ Telmo\ Luis																				
+																																																			
+																																																			
+																																																			
+																																																			
+																																																			
+																																																			
+																																																			
+																																																			
+																																																			
+																																																			
+																																																			
+																																																			
+																																																			
+																																																			
+																																																			
+																																																			
+																																																			
+																																																			
+																																																			
+																																																			
