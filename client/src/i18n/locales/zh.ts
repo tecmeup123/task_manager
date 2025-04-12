@@ -97,6 +97,20 @@ const zh = {
     'tasks.durationPlaceholder': '例如：0:30:00',
     'tasks.pickDate': '选择日期',
     'tasks.selectWeek': '选择周',
+    'tasks.selectTrainingType': '选择培训类型',
+    'tasks.selectOwner': '选择负责人',
+    'tasks.selectAssignment': '选择分配',
+    'tasks.selectStatus': '选择状态',
+    'tasks.assignedToRole': '分配给角色',
+    'tasks.assignToUser': '分配给用户',
+    'tasks.assignToSpecificUser': '分配给特定用户',
+    'tasks.userAssignmentNotification': '分配时用户将收到通知',
+    'tasks.addNotesPlaceholder': '添加关于此任务的备注...',
+    'tasks.activityHistory': '活动历史',
+    'tasks.by': '由',
+    'tasks.inflexible': '不灵活（固定日期）',
+    'tasks.due': '截止日期',
+    'tasks.noDueDate': '没有截止日期',
     'tasks.update': '更新任务',
     'tasks.status': '状态',
     'tasks.assignedTo': '分配给',
@@ -110,7 +124,6 @@ const zh = {
     'tasks.deleteSuccess': '任务删除成功',
     'tasks.error': '处理任务时出错',
     'tasks.backToList': '返回任务列表',
-    'tasks.due': '截止日期',
     
     // Trainers
     'trainers.title': '培训师',
@@ -186,6 +199,11 @@ const zh = {
     'status.done': '已完成',
     'status.upcoming': '即将到来',
     'status.finished': '已结束',
+    
+    // Common Elements
+    'common.none': '无',
+    'common.loadingUsers': '加载用户中...',
+    'common.noUsersAvailable': '没有可用用户',
     
     // Training Types
     'trainingType.glr': '引导式学习路线',
