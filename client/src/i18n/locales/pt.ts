@@ -25,6 +25,7 @@ const pt = {
     'dashboard.welcome': 'Bem-vindo, {{name}}',
     'dashboard.overdueTasks': 'Tarefas Atrasadas',
     'dashboard.upcomingTasks': 'Próximas Tarefas',
+    'dashboard.ongoingTrainingSessions': 'Sessões de Treinamento em Andamento',
     
     // Settings
     'settings.title': 'Configurações',
