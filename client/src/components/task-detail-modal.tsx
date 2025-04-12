@@ -246,7 +246,7 @@ export default function TaskDetailModal({
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select week" />
+                          <SelectValue placeholder={t('tasks.selectWeek')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -333,14 +333,14 @@ export default function TaskDetailModal({
                 name="trainingType"
                 render={({ field }) => (
                   <FormItem className="md:col-span-1">
-                    <FormLabel>Training Type</FormLabel>
+                    <FormLabel>{t('tasks.trainingType')}</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select training type" />
+                          <SelectValue placeholder={t('tasks.selectTrainingType')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -366,7 +366,7 @@ export default function TaskDetailModal({
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel>
-                        Inflexible (task has fixed date/time)
+                        {t('tasks.inflexible')}
                       </FormLabel>
                     </div>
                   </FormItem>
@@ -378,7 +378,7 @@ export default function TaskDetailModal({
                 name="owner"
                 render={({ field }) => (
                   <FormItem className="md:col-span-1">
-                    <FormLabel>Owner</FormLabel>
+                    <FormLabel>{t('tasks.owner')}</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value || ""}
@@ -415,7 +415,7 @@ export default function TaskDetailModal({
                 name="assignedTo"
                 render={({ field }) => (
                   <FormItem className="md:col-span-1">
-                    <FormLabel>Assigned To (Role/Group)</FormLabel>
+                    <FormLabel>{t('tasks.assignedToRole')}</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value || ""}
@@ -443,7 +443,7 @@ export default function TaskDetailModal({
                 name="assignedUserId"
                 render={({ field }) => (
                   <FormItem className="md:col-span-1">
-                    <FormLabel>Assign to User</FormLabel>
+                    <FormLabel>{t('tasks.assignToUser')}</FormLabel>
                     <Select
                       onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
                       value={field.value?.toString() || ""}
@@ -472,7 +472,7 @@ export default function TaskDetailModal({
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      User assignment will send a notification
+                      {t('tasks.userAssignmentNotification')}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -484,7 +484,7 @@ export default function TaskDetailModal({
                 name="status"
                 render={({ field }) => (
                   <FormItem className="md:col-span-1">
-                    <FormLabel>Status</FormLabel>
+                    <FormLabel>{t('tasks.status')}</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
@@ -513,7 +513,7 @@ export default function TaskDetailModal({
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Task Notes</FormLabel>
+                  <FormLabel>{t('tasks.notes')}</FormLabel>
                   <FormControl>
                     <Textarea 
                       {...field} 
