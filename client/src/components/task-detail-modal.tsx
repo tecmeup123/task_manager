@@ -173,11 +173,17 @@ export default function TaskDetailModal({
                     variant={
                       task?.status === "Done" ? "success" : 
                       task?.status === "In Progress" ? "default" : 
-                      task?.status === "Not Started" ? "outline" :
+                      task?.status === "Not Started" ? "secondary" :
                       task?.status === "Blocked" ? "destructive" :
                       "secondary"
                     }
-                    className="text-white"
+                    className={
+                      task?.status === "Done" ? "bg-green-600 text-white font-medium" : 
+                      task?.status === "In Progress" ? "bg-blue-600 text-white font-medium" : 
+                      task?.status === "Not Started" ? "bg-slate-600 text-white font-medium" :
+                      task?.status === "Blocked" ? "bg-red-600 text-white font-medium" :
+                      "bg-slate-600 text-white font-medium"
+                    }
                   >
                     {task?.status || "Not Started"}
                   </Badge>

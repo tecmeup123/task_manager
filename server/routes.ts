@@ -1025,6 +1025,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newAssignedUserId = req.body.assignedUserId !== undefined ? req.body.assignedUserId : previousAssignedUserId;
       const newAssignedTo = req.body.assignedTo !== undefined ? req.body.assignedTo : previousAssignedTo;
       
+      // Debug log for assignment changes
+      console.log("Task assignment changes:", {
+        previousAssignedUserId,
+        newAssignedUserId,
+        previousAssignedTo,
+        newAssignedTo
+      });
+      
       // Verify assignedUserId is valid if provided and not null
       if (newAssignedUserId !== null && newAssignedUserId !== undefined) {
         const assignedUser = await storage.getUser(newAssignedUserId);
@@ -1088,8 +1096,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const editionCode = edition ? edition.code : "Unknown";
         
         // If task is newly assigned to a user via assignedUserId
-        if (newAssignedUserId && newAssignedUserId !== previousAssignedUserId) {
+        if (newAssignedUserId && (previousAssignedUserId === null || newAssignedUserId !== previousAssignedUserId)) {
           // Create notification for the assigned user
+          console.log("Creating task assignment notification for userId:", newAssignedUserId);
           await storage.createNotification({
             userId: newAssignedUserId,
             type: "task_assigned",
@@ -1103,13 +1112,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         // If task is newly assigned to a user via assignedTo field
-        if (assignToUserId && newAssignedTo !== previousAssignedTo) {
+        if (assignToUserId && (previousAssignedTo === null || newAssignedTo !== previousAssignedTo)) {
           // Create notification for the assigned user
+          console.log("Creating task assignment notification for user matched by role:", assignToUserId);
           await storage.createNotification({
             userId: assignToUserId,
             type: "task_assigned",
             title: "Task Assigned",
-            message: `You have been assigned to task "${task.name}" (${editionCode})`,
+            message: `You have been assigned to task "${task.name}" (${editionCode}) via role ${newAssignedTo}`,
             entityType: "task",
             entityId: task.id,
             actionUrl: `/tasks/${task.id}`,
