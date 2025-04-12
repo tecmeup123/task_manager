@@ -164,11 +164,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const includeRead = req.query.includeRead === 'true';
       const userId = req.user!.id;
       
+      console.log(`Fetching notifications for user ${userId}, limit: ${limit}, includeRead: ${includeRead}`);
       const notifications = await storage.getUserNotifications(userId, limit, includeRead);
+      console.log(`Found ${notifications.length} notifications for user ${userId}`);
+      
       res.json(notifications);
     } catch (error) {
       console.error("Error fetching notifications:", error);
       res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
+  
+  // Test endpoint to create a notification (for debugging)
+  app.post("/api/notifications/test", requireAuth, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      
+      // Create a test notification
+      const notification = await storage.createNotification({
+        userId,
+        type: "task_assigned",
+        title: "Test Notification",
+        message: "This is a test notification to verify notification system functionality",
+        entityType: "task",
+        entityId: 1, // Dummy ID
+        actionUrl: "/tasks",
+        metadata: { test: true }
+      });
+      
+      console.log("Created test notification:", notification);
+      res.json({ success: true, notification });
+    } catch (error) {
+      console.error("Error creating test notification:", error);
+      res.status(500).json({ message: "Failed to create test notification" });
     }
   });
   
