@@ -5,6 +5,7 @@ import { z } from "zod";
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { User } from "@shared/schema";
+import { EmojiReactions } from "@/components/emoji-reactions";
 import {
   Dialog,
   DialogContent,

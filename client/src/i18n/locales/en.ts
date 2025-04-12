@@ -275,7 +275,18 @@ const en = {
     'onboarding_complete_description': 'You\'ve completed the onboarding tour and are ready to start managing your training sessions like a pro!',
     'whats_next': 'What\'s Next?',
     'onboarding_next_steps': 'Start by creating a new edition or explore tasks in existing editions.',
-    'onboarding_restart_hint': 'You can restart this tour anytime from the help menu if needed.'
+    'onboarding_restart_hint': 'You can restart this tour anytime from the help menu if needed.',
+    
+    // Emoji Reactions
+    'addReaction': 'Add Reaction',
+    'removeReaction': 'Remove Reaction',
+    'reactions': 'Reactions',
+    'reactionAdded': 'Reaction added',
+    'reactionRemoved': 'Reaction removed',
+    'error': 'Error',
+    'reactionsCount': '{{count}} reactions',
+    'reactWithEmoji': 'React with emoji',
+    'pickAnEmoji': 'Pick an emoji'
   }
 };
 
