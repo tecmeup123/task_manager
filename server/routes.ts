@@ -145,11 +145,17 @@ function createAuditLog(entityType: string, action: string) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Serve static files from the uploads directory
+  const uploadDir = path.join(process.cwd(), "public/uploads");
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+  app.use('/uploads', express.static(uploadDir));
+  
   // Set up authentication
   setupAuth(app);
   
-  // Serve static files from public directory
-  app.use('/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
+  // Note: The uploads directory is already served at line 153
   
   // Notification endpoints
   app.get("/api/notifications", requireAuth, async (req, res) => {
