@@ -158,16 +158,6 @@ export default function TaskDetailModal({
       <DialogContent className="sm:max-w-md md:max-w-2xl">
         <DialogHeader className="flex flex-row items-center justify-start">
           <div className="flex items-center">
-            <Button
-              type="button" 
-              variant="ghost" 
-              size="icon"
-              onClick={() => onClose()}
-              className="mr-2 h-8 w-8 p-0"
-              aria-label="Back to task list"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
             <DialogTitle>Task Detail: {task?.taskCode || ""}</DialogTitle>
           </div>
         </DialogHeader>
@@ -562,7 +552,7 @@ export default function TaskDetailModal({
                 className="flex items-center"
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
-                Back
+                Back to Task List
               </Button>
               <Button type="submit">Update Task</Button>
             </DialogFooter>
