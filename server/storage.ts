@@ -13,10 +13,6 @@ import {
   InsertNotification,
   Resource,
   InsertResource,
-  TaskReaction,
-  InsertTaskReaction,
-  CommentReaction,
-  InsertCommentReaction,
   Mention,
   InsertMention,
   TaskComment,
@@ -29,9 +25,7 @@ import {
   notifications,
   resources,
   mentions,
-  taskComments,
-  taskReactions,
-  commentReactions
+  taskComments
 } from "@shared/schema";
 import { add, format, parseISO, isBefore, subWeeks } from "date-fns";
 import { and, eq, count } from "drizzle-orm";
@@ -104,18 +98,6 @@ export interface IStorage {
   updateTaskComment(id: number, comment: Partial<TaskComment>): Promise<TaskComment>;
   deleteTaskComment(id: number): Promise<boolean>;
   
-  // Task reaction methods
-  addTaskReaction(reaction: InsertTaskReaction): Promise<TaskReaction>;
-  getTaskReactions(taskId: number): Promise<TaskReaction[]>;
-  getUserTaskReaction(taskId: number, userId: number, emoji: string): Promise<TaskReaction | undefined>;
-  removeTaskReaction(id: number): Promise<boolean>;
-  
-  // Comment reaction methods
-  addCommentReaction(reaction: InsertCommentReaction): Promise<CommentReaction>;
-  getCommentReactions(commentId: number): Promise<CommentReaction[]>;
-  getUserCommentReaction(commentId: number, userId: number, emoji: string): Promise<CommentReaction | undefined>;
-  removeCommentReaction(id: number): Promise<boolean>;
-  
   // Helper method to duplicate edition with tasks
   duplicateEdition(editionId: number, newEditionData: InsertEdition): Promise<Edition>;
 }
@@ -144,10 +126,6 @@ export class MemStorage implements IStorage {
   private currentResourceId: number;
   private currentMentionId: number;
   private currentTaskCommentId: number;
-  private taskReactions: Map<number, TaskReaction>;
-  private currentTaskReactionId: number;
-  private commentReactions: Map<number, CommentReaction>;
-  private currentCommentReactionId: number;
   sessionStore: session.Store;
 
   constructor() {
@@ -160,8 +138,6 @@ export class MemStorage implements IStorage {
     this.resources = new Map();
     this.mentions = new Map();
     this.taskComments = new Map();
-    this.taskReactions = new Map();
-    this.commentReactions = new Map();
     this.currentUserId = 1;
     this.currentTrainerId = 1;
     this.currentEditionId = 1;
@@ -171,8 +147,6 @@ export class MemStorage implements IStorage {
     this.currentResourceId = 1;
     this.currentMentionId = 1;
     this.currentTaskCommentId = 1;
-    this.currentTaskReactionId = 1;
-    this.currentCommentReactionId = 1;
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000 // 24 hours
     });
@@ -652,68 +626,6 @@ export class MemStorage implements IStorage {
   async deleteTaskComment(id: number): Promise<boolean> {
     return this.taskComments.delete(id);
   }
-  
-
-  
-  // Task Reaction methods
-  async addTaskReaction(reaction: InsertTaskReaction): Promise<TaskReaction> {
-    const id = this.currentTaskReactionId++;
-    const newReaction: TaskReaction = {
-      ...reaction,
-      id,
-      createdAt: new Date()
-    };
-    this.taskReactions.set(id, newReaction);
-    return newReaction;
-  }
-  
-  async getTaskReactions(taskId: number): Promise<TaskReaction[]> {
-    return Array.from(this.taskReactions.values())
-      .filter(reaction => reaction.taskId === taskId);
-  }
-  
-  async getUserTaskReaction(taskId: number, userId: number, emoji: string): Promise<TaskReaction | undefined> {
-    return Array.from(this.taskReactions.values())
-      .find(reaction => 
-        reaction.taskId === taskId && 
-        reaction.userId === userId &&
-        reaction.emoji === emoji
-      );
-  }
-  
-  async removeTaskReaction(id: number): Promise<boolean> {
-    return this.taskReactions.delete(id);
-  }
-  
-  // Comment Reaction methods
-  async addCommentReaction(reaction: InsertCommentReaction): Promise<CommentReaction> {
-    const id = this.currentCommentReactionId++;
-    const newReaction: CommentReaction = {
-      ...reaction,
-      id,
-      createdAt: new Date()
-    };
-    this.commentReactions.set(id, newReaction);
-    return newReaction;
-  }
-  
-  async getCommentReactions(commentId: number): Promise<CommentReaction[]> {
-    return Array.from(this.commentReactions.values())
-      .filter(reaction => reaction.commentId === commentId);
-  }
-  
-  async getUserCommentReaction(commentId: number, userId: number, emoji: string): Promise<CommentReaction | undefined> {
-    return Array.from(this.commentReactions.values())
-      .find(reaction => 
-        reaction.commentId === commentId && 
-        reaction.userId === userId &&
-        reaction.emoji === emoji
-      );
-  }
-  
-  async removeCommentReaction(id: number): Promise<boolean> {
-    return this.commentReactions.delete(id);
-  }
 
   // Seed some initial data
   private seedData() {
@@ -1153,72 +1065,6 @@ export class DatabaseStorage implements IStorage {
   async deleteTaskComment(id: number): Promise<boolean> {
     const { db } = await import("./db");
     const result = await db.delete(taskComments).where(eq(taskComments.id, id)).returning();
-    return result.length > 0;
-  }
-
-  // Task reaction methods
-  async addTaskReaction(reaction: InsertTaskReaction): Promise<TaskReaction> {
-    const { db } = await import("./db");
-    const [newReaction] = await db.insert(taskReactions).values(reaction).returning();
-    return newReaction;
-  }
-  
-  async getTaskReactions(taskId: number): Promise<TaskReaction[]> {
-    const { db, eq, desc } = await import("./db");
-    return db.select()
-      .from(taskReactions)
-      .where(eq(taskReactions.taskId, taskId))
-      .orderBy(desc(taskReactions.createdAt));
-  }
-  
-  async getUserTaskReaction(taskId: number, userId: number, emoji: string): Promise<TaskReaction | undefined> {
-    const { db, eq, and } = await import("./db");
-    const [reaction] = await db.select()
-      .from(taskReactions)
-      .where(and(
-        eq(taskReactions.taskId, taskId),
-        eq(taskReactions.userId, userId),
-        eq(taskReactions.emoji, emoji)
-      ));
-    return reaction || undefined;
-  }
-  
-  async removeTaskReaction(id: number): Promise<boolean> {
-    const { db } = await import("./db");
-    const result = await db.delete(taskReactions).where(eq(taskReactions.id, id)).returning();
-    return result.length > 0;
-  }
-  
-  // Comment reaction methods
-  async addCommentReaction(reaction: InsertCommentReaction): Promise<CommentReaction> {
-    const { db } = await import("./db");
-    const [newReaction] = await db.insert(commentReactions).values(reaction).returning();
-    return newReaction;
-  }
-  
-  async getCommentReactions(commentId: number): Promise<CommentReaction[]> {
-    const { db, eq, desc } = await import("./db");
-    return db.select()
-      .from(commentReactions)
-      .where(eq(commentReactions.commentId, commentId))
-      .orderBy(desc(commentReactions.createdAt));
-  }
-  
-  async getUserCommentReaction(commentId: number, userId: number, emoji: string): Promise<CommentReaction | undefined> {
-    const { db, eq, and } = await import("./db");
-    const [reaction] = await db.select()
-      .from(commentReactions)
-      .where(and(
-        eq(commentReactions.commentId, commentId),
-        eq(commentReactions.userId, userId),
-        eq(commentReactions.emoji, emoji)
-      ));
-    return reaction || undefined;
-  }
-  
-  async removeCommentReaction(id: number): Promise<boolean> {
-    const { db } = await import("./db");
-    const result = await db.delete(commentReactions).where(eq(commentReactions.id, id)).returning();
     return result.length > 0;
   }
   

@@ -187,27 +187,10 @@ export const notificationTypeEnum = z.enum([
   "task_updated",
   "due_date_approaching",
   "edition_created",
-  "task_completed",
-  "reaction_added"
+  "task_completed"
 ]);
 
 export type NotificationType = z.infer<typeof notificationTypeEnum>;
-
-// Emoji reaction types
-export const emojiReactionTypeEnum = z.enum([
-  "👍", // thumbs up
-  "👎", // thumbs down
-  "❤️", // heart
-  "🎉", // celebration
-  "👀", // eyes
-  "🔥", // fire
-  "🚀", // rocket
-  "⚡", // lightning
-  "✅", // check mark
-  "⏰", // clock
-]);
-
-export type EmojiReactionType = z.infer<typeof emojiReactionTypeEnum>;
 
 // Resource types
 export const resourceTypeEnum = z.enum([
@@ -304,37 +287,3 @@ export const insertNotificationSchema = createInsertSchema(notifications).omit({
 
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type Notification = typeof notifications.$inferSelect;
-
-// Emoji reactions table for tasks
-export const taskReactions = pgTable("task_reactions", {
-  id: serial("id").primaryKey(),
-  taskId: integer("task_id").notNull().references(() => tasks.id),
-  userId: integer("user_id").notNull().references(() => users.id),
-  emoji: text("emoji").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-export const insertTaskReactionSchema = createInsertSchema(taskReactions).omit({
-  id: true,
-  createdAt: true,
-});
-
-export type InsertTaskReaction = z.infer<typeof insertTaskReactionSchema>;
-export type TaskReaction = typeof taskReactions.$inferSelect;
-
-// Emoji reactions table for comments
-export const commentReactions = pgTable("comment_reactions", {
-  id: serial("id").primaryKey(),
-  commentId: integer("comment_id").notNull().references(() => taskComments.id),
-  userId: integer("user_id").notNull().references(() => users.id),
-  emoji: text("emoji").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-export const insertCommentReactionSchema = createInsertSchema(commentReactions).omit({
-  id: true,
-  createdAt: true,
-});
-
-export type InsertCommentReaction = z.infer<typeof insertCommentReactionSchema>;
-export type CommentReaction = typeof commentReactions.$inferSelect;

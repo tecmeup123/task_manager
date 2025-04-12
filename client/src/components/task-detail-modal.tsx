@@ -5,7 +5,6 @@ import { z } from "zod";
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { User } from "@shared/schema";
-import { EmojiReactions } from "@/components/emoji-reactions";
 import {
   Dialog,
   DialogContent,
@@ -543,16 +542,6 @@ export default function TaskDetailModal({
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
-            
-            {/* Emoji Reactions Section */}
-            <div>
-              <h3 className="text-sm font-medium mb-2">Reactions</h3>
-              <div className="p-3 bg-neutral-50 rounded-lg border border-neutral-200">
-                {task?.id && (
-                  <EmojiReactions entityType="task" entityId={task.id} />
-                )}
               </div>
             </div>
 
