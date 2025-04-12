@@ -142,11 +142,11 @@ function WelcomeStep() {
         </div>
       </motion.div>
       
-      <motion.h2 variants={itemVariants} className="text-2xl font-bold mb-4">
+      <motion.h2 variants={itemVariants} className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4">
         {t("welcome_to_training_app")}
       </motion.h2>
       
-      <motion.p variants={itemVariants} className="text-gray-600 mb-6">
+      <motion.p variants={itemVariants} className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
         {t("onboarding_welcome_description")}
       </motion.p>
       
@@ -182,24 +182,24 @@ function DashboardStep() {
       exit="exit"
     >
       <motion.div variants={itemVariants}>
-        <div className="flex justify-center mb-4">
-          <Zap className="h-16 w-16 text-primary" />
+        <div className="flex justify-center mb-3 sm:mb-4">
+          <Zap className="h-12 w-12 sm:h-16 sm:w-16 text-primary" />
         </div>
       </motion.div>
       
-      <motion.h2 variants={itemVariants} className="text-2xl font-bold mb-4 text-center">
+      <motion.h2 variants={itemVariants} className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4 text-center">
         {t("dashboard_overview")}
       </motion.h2>
       
-      <motion.div variants={itemVariants} className="mb-6 text-center">
-        <p className="text-gray-600">
+      <motion.div variants={itemVariants} className="mb-4 sm:mb-6 text-center">
+        <p className="text-sm sm:text-base text-gray-600">
           {t("dashboard_description")}
         </p>
       </motion.div>
       
-      <motion.div variants={itemVariants} className="bg-gray-50 rounded-lg p-4 mb-4">
-        <h3 className="font-semibold mb-2">{t("key_features")}:</h3>
-        <ul className="space-y-2 pl-5 list-disc text-gray-700">
+      <motion.div variants={itemVariants} className="bg-gray-50 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4">
+        <h3 className="font-semibold text-sm sm:text-base mb-1 sm:mb-2">{t("key_features")}:</h3>
+        <ul className="space-y-1 sm:space-y-2 pl-4 sm:pl-5 list-disc text-sm sm:text-base text-gray-700">
           <motion.li variants={itemVariants}>{t("dashboard_feature_1")}</motion.li>
           <motion.li variants={itemVariants}>{t("dashboard_feature_2")}</motion.li>
           <motion.li variants={itemVariants}>{t("dashboard_feature_3")}</motion.li>
@@ -231,17 +231,17 @@ function TasksStep() {
       exit="exit"
     >
       <motion.div variants={itemVariants}>
-        <div className="flex justify-center mb-4">
-          <ListChecks className="h-16 w-16 text-primary" />
+        <div className="flex justify-center mb-3 sm:mb-4">
+          <ListChecks className="h-12 w-12 sm:h-16 sm:w-16 text-primary" />
         </div>
       </motion.div>
       
-      <motion.h2 variants={itemVariants} className="text-2xl font-bold mb-4 text-center">
+      <motion.h2 variants={itemVariants} className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4 text-center">
         {t("tasks_management")}
       </motion.h2>
       
-      <motion.div variants={itemVariants} className="mb-6 text-center">
-        <p className="text-gray-600">
+      <motion.div variants={itemVariants} className="mb-4 sm:mb-6 text-center">
+        <p className="text-sm sm:text-base text-gray-600">
           {t("tasks_description")}
         </p>
       </motion.div>
@@ -310,12 +310,12 @@ function EditionsStep() {
         </div>
       </motion.div>
       
-      <motion.h2 variants={itemVariants} className="text-2xl font-bold mb-4 text-center">
+      <motion.h2 variants={itemVariants} className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4 text-center">
         {t("editions_management")}
       </motion.h2>
       
-      <motion.div variants={itemVariants} className="mb-6 text-center">
-        <p className="text-gray-600">
+      <motion.div variants={itemVariants} className="mb-4 sm:mb-6 text-center">
+        <p className="text-sm sm:text-base text-gray-600">
           {t("editions_description")}
         </p>
       </motion.div>
@@ -365,12 +365,12 @@ function SettingsStep() {
         </div>
       </motion.div>
       
-      <motion.h2 variants={itemVariants} className="text-2xl font-bold mb-4 text-center">
+      <motion.h2 variants={itemVariants} className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4 text-center">
         {t("customize_your_experience")}
       </motion.h2>
       
-      <motion.div variants={itemVariants} className="mb-6 text-center">
-        <p className="text-gray-600">
+      <motion.div variants={itemVariants} className="mb-4 sm:mb-6 text-center">
+        <p className="text-sm sm:text-base text-gray-600">
           {t("settings_description")}
         </p>
       </motion.div>
@@ -395,11 +395,11 @@ function SettingsStep() {
       
       <motion.div 
         variants={itemVariants}
-        className="bg-purple-50 border border-purple-200 text-purple-800 p-4 rounded-lg"
+        className="bg-purple-50 border border-purple-200 text-purple-800 p-3 sm:p-4 rounded-lg text-sm sm:text-base"
       >
         <p className="flex items-center">
-          <span className="mr-2">🔑</span>
-          {t("settings_security_tip")}
+          <span className="mr-2 flex-shrink-0">🔑</span>
+          <span>{t("settings_security_tip")}</span>
         </p>
       </motion.div>
     </motion.div>
@@ -470,17 +470,17 @@ function CompleteStep() {
         ))}
       </motion.div>
       
-      <motion.h2 variants={itemVariants} className="text-2xl font-bold mb-4">
+      <motion.h2 variants={itemVariants} className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4">
         {t("youre_all_set")}!
       </motion.h2>
       
-      <motion.p variants={itemVariants} className="text-gray-600 mb-8">
+      <motion.p variants={itemVariants} className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-8">
         {t("onboarding_complete_description")}
       </motion.p>
       
-      <motion.div variants={itemVariants} className="bg-green-50 border border-green-200 text-green-800 p-4 rounded-lg mb-6">
-        <h3 className="font-semibold mb-2">{t("whats_next")}</h3>
-        <p>{t("onboarding_next_steps")}</p>
+      <motion.div variants={itemVariants} className="bg-green-50 border border-green-200 text-green-800 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
+        <h3 className="font-semibold text-sm sm:text-base mb-1 sm:mb-2">{t("whats_next")}</h3>
+        <p className="text-sm sm:text-base">{t("onboarding_next_steps")}</p>
       </motion.div>
       
       <motion.p variants={itemVariants} className="text-sm text-gray-500 italic">
