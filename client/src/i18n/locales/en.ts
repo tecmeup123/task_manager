@@ -121,6 +121,7 @@ const en = {
     'tasks.create': 'Create Task',
     'tasks.edit': 'Edit Task',
     'tasks.view': 'View Task',
+    'tasks.details': 'Task Details',
     'tasks.name': 'Name',
     'tasks.week': 'Week',
     'tasks.trainingType': 'Training Type',

@@ -85,6 +85,7 @@ const zh = {
     'tasks.create': '创建任务',
     'tasks.edit': '编辑任务',
     'tasks.view': '查看任务',
+    'tasks.details': '任务详情',
     'tasks.name': '名称',
     'tasks.week': '周',
     'tasks.trainingType': '培训类型',

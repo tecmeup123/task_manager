@@ -63,6 +63,7 @@ const de = {
     
     // Tasks
     'tasks.title': 'Aufgaben',
+    'tasks.details': 'Aufgabendetails',
     'tasks.backToList': 'Zurück zur Aufgabenliste',
     
     // Menu Items
