@@ -740,18 +740,46 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateTask(id: number, taskData: Partial<Task>): Promise<Task> {
-    const { db } = await import("./db");
-    const [updatedTask] = await db
-      .update(tasks)
-      .set(taskData)
-      .where(eq(tasks.id, id))
-      .returning();
-    
-    if (!updatedTask) {
-      throw new Error(`Task with id ${id} not found`);
+    try {
+      const { db } = await import("./db");
+      
+      // Clean up the data - ensure null values are properly handled
+      const cleanedData: any = {};
+      for (const [key, value] of Object.entries(taskData)) {
+        // Skip undefined values
+        if (value === undefined) continue;
+        
+        // Handle dates
+        if (key === 'dueDate' || key === 'completionDate') {
+          if (value === null) {
+            cleanedData[key] = null;
+          } else if (value instanceof Date) {
+            cleanedData[key] = value;
+          } else if (typeof value === 'string') {
+            cleanedData[key] = new Date(value);
+          }
+        } else {
+          cleanedData[key] = value;
+        }
+      }
+      
+      console.log(`Cleaning task data for update: ${id}`, { before: taskData, after: cleanedData });
+      
+      const [updatedTask] = await db
+        .update(tasks)
+        .set(cleanedData)
+        .where(eq(tasks.id, id))
+        .returning();
+      
+      if (!updatedTask) {
+        throw new Error(`Task with id ${id} not found`);
+      }
+      
+      return updatedTask;
+    } catch (error) {
+      console.error(`Error in updateTask: ${id}`, error);
+      throw error;
     }
-    
-    return updatedTask;
   }
 
   async deleteTask(id: number): Promise<boolean> {

@@ -331,6 +331,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/tasks/:id", async (req, res) => {
     try {
       const id = Number(req.params.id);
+      console.log(`Updating task ${id} with data:`, req.body);
+      
       const task = await storage.getTask(id);
       if (!task) {
         return res.status(404).json({ message: "Task not found" });
@@ -341,9 +343,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         req.body.completionDate = new Date();
       }
       
-      const updatedTask = await storage.updateTask(id, req.body);
+      // Convert dates if they are strings
+      const updatedData = { ...req.body };
+      if (typeof updatedData.dueDate === 'string') {
+        updatedData.dueDate = new Date(updatedData.dueDate);
+      }
+      if (typeof updatedData.completionDate === 'string') {
+        updatedData.completionDate = new Date(updatedData.completionDate);
+      }
+      
+      const updatedTask = await storage.updateTask(id, updatedData);
+      console.log(`Task ${id} updated successfully:`, updatedTask);
       res.json(updatedTask);
     } catch (error) {
+      console.error(`Error updating task ${req.params.id}:`, error);
       res.status(500).json({ message: "Failed to update task" });
     }
   });
