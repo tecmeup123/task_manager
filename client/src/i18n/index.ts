@@ -29,6 +29,12 @@ i18n
       de,
       pt,
     },
+    // Set detection order to prioritize localStorage
+    detection: {
+      order: ['localStorage', 'navigator'],
+      lookupLocalStorage: 'i18nextLng',
+      caches: ['localStorage']
+    }
   });
 
 export default i18n;

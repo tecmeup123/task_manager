@@ -1067,11 +1067,10 @@ export default function Settings() {
                       setLanguage(value);
                       setIsAccountSettingsChanged(true);
                       
-                      // Also change the active language immediately and store in localStorage
-                      import('i18next').then(i18n => {
-                        i18n.default.changeLanguage(value);
-                        localStorage.setItem('i18nextLng', value);
-                      });
+                      // Use the i18n instance from useTranslation hook
+                      i18n.changeLanguage(value);
+                      // Store in localStorage
+                      localStorage.setItem('i18nextLng', value);
                     }}
                   >
                     <SelectTrigger id="language">
