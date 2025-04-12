@@ -351,8 +351,8 @@ export default function Home() {
                 <Skeleton className="h-12 w-full" />
               </>
             ) : overdueTasks.length > 0 ? (
-              <div className="space-y-4">
-                {overdueTasks.slice(0, 5).map((task: any) => (
+              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                {overdueTasks.map((task: any) => (
                   <div key={task.id} className="flex justify-between items-start border-b pb-3">
                     <div className="flex items-start gap-3">
                       <div className="bg-red-100 p-2 rounded-md mt-1">
@@ -427,8 +427,8 @@ export default function Home() {
                 <Skeleton className="h-12 w-full" />
               </>
             ) : upcomingTasks.length > 0 ? (
-              <div className="space-y-4">
-                {upcomingTasks.slice(0, 5).map((task: any) => (
+              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                {upcomingTasks.map((task: any) => (
                   <div key={task.id} className="flex justify-between items-start border-b pb-3">
                     <div className="flex items-start gap-3">
                       <div className="bg-amber-100 p-2 rounded-md mt-1">
