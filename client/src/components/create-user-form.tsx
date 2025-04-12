@@ -39,6 +39,7 @@ const formSchema = z.object({
   role: z.enum(["admin", "editor", "viewer"], {
     required_error: "Please select a role",
   }),
+  password: z.string().min(8, "Password must be at least 8 characters").optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -59,6 +60,7 @@ export default function CreateUserForm({ isOpen, onClose }: CreateUserFormProps)
       fullName: "",
       email: "",
       role: "viewer",
+      password: "ChangeMe123!", // Default initial password
     },
   });
 
@@ -71,7 +73,7 @@ export default function CreateUserForm({ isOpen, onClose }: CreateUserFormProps)
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
       toast({
         title: "User created",
-        description: "User has been created successfully with a generic password.",
+        description: "User has been created successfully. They will be required to change their password on first login.",
         variant: "default",
       });
       onClose();
@@ -162,6 +164,23 @@ export default function CreateUserForm({ isOpen, onClose }: CreateUserFormProps)
                       <SelectItem value="viewer">Viewer</SelectItem>
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Initial Password</FormLabel>
+                  <FormControl>
+                    <Input type="text" placeholder="Initial password" {...field} />
+                  </FormControl>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    This is the initial password. The user will be required to change it on first login.
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
