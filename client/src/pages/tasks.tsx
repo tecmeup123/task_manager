@@ -167,7 +167,12 @@ export default function Tasks() {
   const totalTasks = tasks ? tasks.length : 0;
   const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
-  // Determine current week status
+  // Determine week progress statuses
+  const pastWeeks = Math.max(0, (currentEdition?.currentWeek || 1) - 1);
+  const futureWeeks = Math.max(0, 8 - (currentEdition?.currentWeek || 1));
+  const isStarted = currentEdition?.currentWeek && currentEdition.currentWeek > 0;
+  
+  // Used for the progress indicator badges
   const weekStatuses = ["PAST WEEKS", "CURRENT WEEK", "FUTURE WEEKS"];
 
   const isLoading = editionsLoading || tasksLoading;
@@ -306,30 +311,51 @@ export default function Tasks() {
             </>
           ) : currentEdition ? (
             <>
-              <div className="flex items-center">
-                <div className="flex-1 bg-neutral-200 rounded-full h-2.5 mr-2">
-                  <div
-                    className="bg-green-500 h-2.5 rounded-full"
-                    style={{ width: `${progressPercentage}%` }}
-                  ></div>
+              {/* Progress bar - similar to the screenshot */}
+              <div className="space-y-4">
+                {/* Week indicator and progress bar */}
+                <div className="flex items-center justify-between">
+                  <div className="flex-1 bg-neutral-200 rounded-full h-2.5 mr-4">
+                    <div
+                      className="bg-green-500 h-2.5 rounded-full"
+                      style={{ width: `${(currentEdition.currentWeek / 8) * 100}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-sm font-medium whitespace-nowrap">
+                    Week {currentEdition.currentWeek} / 8
+                  </span>
                 </div>
-                <span className="text-sm font-medium">
-                  Week {currentEdition.currentWeek} / 8
-                </span>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {weekStatuses.map(status => {
-                  const isCurrentWeek = status === "CURRENT WEEK";
-                  return (
-                    <Badge
-                      key={status}
-                      variant={isCurrentWeek ? "default" : "outline"}
-                      className={isCurrentWeek ? "" : "text-neutral-700 opacity-60"}
-                    >
-                      {status}
-                    </Badge>
-                  );
-                })}
+                
+                {/* Week status buttons - using the design from screenshot */}
+                <div className="flex gap-1 rounded-lg border border-neutral-200 p-1 w-full">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`flex-1 rounded-md ${
+                      pastWeeks > 0 ? "text-neutral-500" : "text-neutral-400"
+                    }`}
+                    disabled={pastWeeks === 0}
+                  >
+                    PAST WEEKS
+                  </Button>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="flex-1 rounded-md bg-neutral-900 text-white"
+                  >
+                    CURRENT WEEK
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`flex-1 rounded-md ${
+                      futureWeeks > 0 ? "text-neutral-500" : "text-neutral-400"
+                    }`}
+                    disabled={futureWeeks === 0}
+                  >
+                    FUTURE WEEKS
+                  </Button>
+                </div>
               </div>
             </>
           ) : (
