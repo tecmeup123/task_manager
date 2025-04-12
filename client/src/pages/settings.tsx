@@ -1270,7 +1270,7 @@ export default function Settings() {
                 {t('settings.securitySettings')}
               </CardTitle>
               <CardDescription>
-                Manage your password and security preferences
+                {t('settings.securityDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -1435,7 +1435,7 @@ export default function Settings() {
                 {t('settings.dataManagement')}
               </CardTitle>
               <CardDescription>
-                Manage system data and backups
+                {t('settings.dataDescription')}
               </CardDescription>
             </CardHeader>
         <CardContent>

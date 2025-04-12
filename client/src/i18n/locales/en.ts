@@ -166,6 +166,7 @@ const en = {
     'settings.accountDescription': 'Manage your account details and preferences',
     'settings.notificationDescription': 'Configure how and when you receive notifications',
     'settings.securityDescription': 'Manage your password and security preferences',
+    'settings.dataDescription': 'Manage system data and backups',
     'settings.dashboardSettings': 'Dashboard Settings',
     'settings.taskSettings': 'Task Settings',
     'settings.accountSettings': 'Account Settings',

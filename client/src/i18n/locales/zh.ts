@@ -205,6 +205,12 @@ const zh = {
     'menu_current_editions': '当前版本',
     'app.footer': '培训团队任务管理器 ♥️ 制作',
     
+    // Settings
+    'settings.accountDescription': '管理您的账户详细信息和偏好设置',
+    'settings.notificationDescription': '配置如何以及何时接收通知',
+    'settings.securityDescription': '管理您的密码和安全偏好设置',
+    'settings.dataDescription': '管理系统数据和备份',
+    
     // Notifications
     'notifications.title': '通知',
     'notifications.markAllAsRead': '标记所有为已读',
