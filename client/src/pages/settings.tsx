@@ -795,6 +795,7 @@ export default function Settings() {
             <TabsTrigger value="account" className="text-xs px-1 py-1 md:text-sm md:px-3">Account</TabsTrigger>
             <TabsTrigger value="notifications" className="text-xs px-1 py-1 md:text-sm md:px-3">Notif.</TabsTrigger>
             <TabsTrigger value="security" className="text-xs px-1 py-1 md:text-sm md:px-3">Security</TabsTrigger>
+            <TabsTrigger value="data" className="text-xs px-1 py-1 md:text-sm md:px-3">Data</TabsTrigger>
           </TabsList>
         </div>
         
@@ -1417,18 +1418,18 @@ export default function Settings() {
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Database className="h-5 w-5 mr-2" />
-            Data Management
-          </CardTitle>
-          <CardDescription>
-            Manage system data and backups
-          </CardDescription>
-        </CardHeader>
+        
+        <TabsContent value="data" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Database className="h-5 w-5 mr-2" />
+                Data Management
+              </CardTitle>
+              <CardDescription>
+                Manage system data and backups
+              </CardDescription>
+            </CardHeader>
         <CardContent>
           <div className="flex flex-col space-y-6">
             <div className="space-y-4">
@@ -1582,7 +1583,9 @@ export default function Settings() {
             </div>
           </div>
         </CardContent>
-      </Card>
+          </Card>
+        </TabsContent>
+      </Tabs>
       
       {/* Add invisible spacing div at the bottom for mobile */}
       <div className="h-12 md:hidden" />
