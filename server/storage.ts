@@ -121,6 +121,8 @@ export class MemStorage implements IStorage {
       fullName: insertUser.fullName || null,
       email: insertUser.email || null,
       role: insertUser.role || "viewer",
+      forcePasswordChange: insertUser.forcePasswordChange !== undefined ? insertUser.forcePasswordChange : false,
+      passwordChangeRequired: insertUser.passwordChangeRequired !== undefined ? insertUser.passwordChangeRequired : false,
       createdAt: new Date()  
     };
     this.users.set(id, user);

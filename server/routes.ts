@@ -139,7 +139,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedUser = await storage.updateUser(user.id, {
         password: hashedPassword,
         forcePasswordChange: false,
-        passwordChangeRequired: false,
+        ...(user.passwordChangeRequired !== undefined ? { passwordChangeRequired: false } : {}),
       });
       
       // Create audit log for password change
@@ -148,7 +148,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         entityType: "user",
         entityId: user.id,
         userId: user.id,
-        timestamp: new Date(),
         previousState: { passwordChanged: false },
         newState: { passwordChanged: true },
         notes: "User changed password",
