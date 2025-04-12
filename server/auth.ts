@@ -101,7 +101,15 @@ export function setupAuth(app: Express) {
         if (err) return next(err);
         const safeUser = { ...user };
         delete safeUser.password;
-        return res.status(200).json(safeUser);
+        
+        // Check if this user needs to change their password
+        const passwordChangeRequired = user.forcePasswordChange === true;
+        
+        // Return information about password change requirement along with user data
+        return res.status(200).json({
+          ...safeUser,
+          passwordChangeRequired
+        });
       });
     })(req, res, next);
   });
@@ -117,7 +125,14 @@ export function setupAuth(app: Express) {
     if (!req.isAuthenticated()) return res.status(401).send();
     const safeUser = { ...req.user };
     delete safeUser.password;
-    res.json(safeUser);
+    
+    // Check if this user needs to change their password
+    const passwordChangeRequired = req.user.forcePasswordChange === true;
+    
+    res.json({
+      ...safeUser,
+      passwordChangeRequired
+    });
   });
 
   app.get("/api/users", async (req, res, next) => {
@@ -135,6 +150,58 @@ export function setupAuth(app: Express) {
       
       res.json(safeUsers);
     } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Change password endpoint
+  app.post("/api/change-password", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const { currentPassword, newPassword } = req.body;
+      
+      // Verify current password
+      const user = await storage.getUser(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const isPasswordValid = await comparePasswords(currentPassword, user.password);
+      if (!isPasswordValid) {
+        return res.status(400).json({ message: "Current password is incorrect" });
+      }
+      
+      // Hash and update the new password
+      const hashedPassword = await hashPassword(newPassword);
+      const updatedUser = await storage.updateUser(user.id, { 
+        password: hashedPassword,
+        forcePasswordChange: false 
+      });
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.user.id,
+        entityType: "user",
+        entityId: req.user.id,
+        action: "update",
+        previousState: { ...user, password: "[REDACTED]" },
+        newState: { ...updatedUser, password: "[REDACTED]" },
+        notes: "Password changed by user"
+      });
+      
+      // Return updated user
+      const safeUser = { ...updatedUser };
+      delete safeUser.password;
+      
+      res.json({
+        ...safeUser,
+        passwordChangeRequired: false
+      });
+    } catch (error) {
+      console.error("Error changing password:", error);
       next(error);
     }
   });
