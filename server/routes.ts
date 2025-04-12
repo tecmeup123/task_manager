@@ -45,6 +45,14 @@ const avatarUpload = multer({
   }
 });
 
+// Middleware to check if user is authenticated
+function requireAuth(req: Request, res: Response, next: NextFunction) {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Authentication required" });
+  }
+  next();
+}
+
 // Middleware to check for admin role
 function requireAdmin(req: Request, res: Response, next: NextFunction) {
   if (!req.isAuthenticated()) {
@@ -987,6 +995,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching audit logs:", error);
       res.status(500).json({ message: "Failed to fetch audit logs" });
+    }
+  });
+
+  // Notification routes
+  app.get("/api/notifications", requireAuth, async (req, res) => {
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
+    const includeRead = req.query.includeRead === 'true';
+    
+    try {
+      const notifications = await storage.getUserNotifications(req.user!.id, limit, includeRead);
+      res.json(notifications);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
+  
+  app.get("/api/notifications/count", requireAuth, async (req, res) => {
+    try {
+      const count = await storage.getUnreadNotificationCount(req.user!.id);
+      res.json({ count });
+    } catch (error) {
+      console.error("Error counting notifications:", error);
+      res.status(500).json({ message: "Failed to count notifications" });
+    }
+  });
+  
+  app.post("/api/notifications/mark-read/:id", requireAuth, async (req, res) => {
+    try {
+      const notification = await storage.getNotification(parseInt(req.params.id));
+      
+      // Check if notification exists and belongs to the user
+      if (!notification || notification.userId !== req.user!.id) {
+        return res.status(404).json({ message: "Notification not found" });
+      }
+      
+      const updatedNotification = await storage.markNotificationAsRead(parseInt(req.params.id));
+      res.json(updatedNotification);
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      res.status(500).json({ message: "Failed to mark notification as read" });
+    }
+  });
+  
+  app.post("/api/notifications/mark-all-read", requireAuth, async (req, res) => {
+    try {
+      const success = await storage.markAllNotificationsAsRead(req.user!.id);
+      res.json({ success });
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+      res.status(500).json({ message: "Failed to mark all notifications as read" });
     }
   });
 
