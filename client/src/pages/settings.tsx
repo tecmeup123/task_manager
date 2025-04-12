@@ -353,7 +353,7 @@ export default function Settings() {
           owner: "Lead Trainer",
           status: "Not Started",
           inflexible: true,
-          notes: "Must be completed before sending welcome emails"
+          notes: "Must be completed before participant onboarding"
         }
       ],
       "Week -4": [
@@ -374,7 +374,7 @@ export default function Settings() {
         {
           taskCode: "WM3T01",
           week: "Week -3",
-          name: "Send welcome to e-learning email",
+          name: "Prepare welcome resources for participants",
           duration: "0:15:00",
           trainingType: "ALL",
           assignedTo: "Organizer",
@@ -388,7 +388,7 @@ export default function Settings() {
         {
           taskCode: "WM2T01",
           week: "Week -2",
-          name: "Send welcome to e-learning email",
+          name: "Share training resources with participants",
           duration: "0:15:00",
           trainingType: "ALL",
           assignedTo: "Organizer",
@@ -428,7 +428,7 @@ export default function Settings() {
         {
           taskCode: "W00T02",
           week: "Week 0",
-          name: "Send mail announcing start of the e-learning stage with Q&A sessions",
+          name: "Announce start of the e-learning stage with Q&A sessions",
           duration: "0:15:00",
           trainingType: "ALL",
           assignedTo: "Organizer",
@@ -480,7 +480,7 @@ export default function Settings() {
         {
           taskCode: "W02T02",
           week: "Week 2",
-          name: "Send reminder about assignments due",
+          name: "Post reminder about assignments due",
           duration: "0:15:00",
           trainingType: "ALL",
           assignedTo: "Organizer",
