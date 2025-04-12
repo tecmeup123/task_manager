@@ -1102,17 +1102,7 @@ export default function Settings() {
                   </Select>
                 </div>
                 
-                <div className="flex items-center space-x-2">
-                  <Switch 
-                    id="theme-switch" 
-                    checked={useDarkTheme}
-                    onCheckedChange={(value) => {
-                      setUseDarkTheme(value);
-                      setIsAccountSettingsChanged(true);
-                    }}
-                  />
-                  <Label htmlFor="theme-switch">Use Dark Theme</Label>
-                </div>
+                {/* Dark theme toggle removed as requested */}
               </div>
               
               <div className="pt-4 border-t flex justify-end">
