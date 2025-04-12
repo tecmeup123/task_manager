@@ -792,6 +792,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           }
         }
+        
+        // Update the task if changes were made
+        if (wasUpdated && newName !== task.name) {
+          console.log(`Updating task ${task.id}:`, {
+            before: task.name,
+            after: newName
+          });
+          await storage.updateTask(task.id, { name: newName });
+          updatedCount++;
+        }
       }
 
       res.json({ 
