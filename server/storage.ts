@@ -13,6 +13,10 @@ import {
   InsertNotification,
   Resource,
   InsertResource,
+  TaskReaction,
+  InsertTaskReaction,
+  CommentReaction,
+  InsertCommentReaction,
   Mention,
   InsertMention,
   TaskComment,
@@ -25,7 +29,9 @@ import {
   notifications,
   resources,
   mentions,
-  taskComments
+  taskComments,
+  taskReactions,
+  commentReactions
 } from "@shared/schema";
 import { add, format, parseISO, isBefore, subWeeks } from "date-fns";
 import { and, eq, count } from "drizzle-orm";
@@ -138,6 +144,10 @@ export class MemStorage implements IStorage {
   private currentResourceId: number;
   private currentMentionId: number;
   private currentTaskCommentId: number;
+  private taskReactions: Map<number, TaskReaction>;
+  private currentTaskReactionId: number;
+  private commentReactions: Map<number, CommentReaction>;
+  private currentCommentReactionId: number;
   sessionStore: session.Store;
 
   constructor() {
@@ -150,6 +160,8 @@ export class MemStorage implements IStorage {
     this.resources = new Map();
     this.mentions = new Map();
     this.taskComments = new Map();
+    this.taskReactions = new Map();
+    this.commentReactions = new Map();
     this.currentUserId = 1;
     this.currentTrainerId = 1;
     this.currentEditionId = 1;
@@ -159,6 +171,8 @@ export class MemStorage implements IStorage {
     this.currentResourceId = 1;
     this.currentMentionId = 1;
     this.currentTaskCommentId = 1;
+    this.currentTaskReactionId = 1;
+    this.currentCommentReactionId = 1;
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000 // 24 hours
     });
@@ -639,11 +653,7 @@ export class MemStorage implements IStorage {
     return this.taskComments.delete(id);
   }
   
-  // Task Reaction Properties
-  private taskReactions: Map<number, TaskReaction>;
-  private currentTaskReactionId: number;
-  private commentReactions: Map<number, CommentReaction>;
-  private currentCommentReactionId: number;
+
   
   // Task Reaction methods
   async addTaskReaction(reaction: InsertTaskReaction): Promise<TaskReaction> {
@@ -1143,6 +1153,72 @@ export class DatabaseStorage implements IStorage {
   async deleteTaskComment(id: number): Promise<boolean> {
     const { db } = await import("./db");
     const result = await db.delete(taskComments).where(eq(taskComments.id, id)).returning();
+    return result.length > 0;
+  }
+
+  // Task reaction methods
+  async addTaskReaction(reaction: InsertTaskReaction): Promise<TaskReaction> {
+    const { db } = await import("./db");
+    const [newReaction] = await db.insert(taskReactions).values(reaction).returning();
+    return newReaction;
+  }
+  
+  async getTaskReactions(taskId: number): Promise<TaskReaction[]> {
+    const { db, eq, desc } = await import("./db");
+    return db.select()
+      .from(taskReactions)
+      .where(eq(taskReactions.taskId, taskId))
+      .orderBy(desc(taskReactions.createdAt));
+  }
+  
+  async getUserTaskReaction(taskId: number, userId: number, emoji: string): Promise<TaskReaction | undefined> {
+    const { db, eq, and } = await import("./db");
+    const [reaction] = await db.select()
+      .from(taskReactions)
+      .where(and(
+        eq(taskReactions.taskId, taskId),
+        eq(taskReactions.userId, userId),
+        eq(taskReactions.emoji, emoji)
+      ));
+    return reaction || undefined;
+  }
+  
+  async removeTaskReaction(id: number): Promise<boolean> {
+    const { db } = await import("./db");
+    const result = await db.delete(taskReactions).where(eq(taskReactions.id, id)).returning();
+    return result.length > 0;
+  }
+  
+  // Comment reaction methods
+  async addCommentReaction(reaction: InsertCommentReaction): Promise<CommentReaction> {
+    const { db } = await import("./db");
+    const [newReaction] = await db.insert(commentReactions).values(reaction).returning();
+    return newReaction;
+  }
+  
+  async getCommentReactions(commentId: number): Promise<CommentReaction[]> {
+    const { db, eq, desc } = await import("./db");
+    return db.select()
+      .from(commentReactions)
+      .where(eq(commentReactions.commentId, commentId))
+      .orderBy(desc(commentReactions.createdAt));
+  }
+  
+  async getUserCommentReaction(commentId: number, userId: number, emoji: string): Promise<CommentReaction | undefined> {
+    const { db, eq, and } = await import("./db");
+    const [reaction] = await db.select()
+      .from(commentReactions)
+      .where(and(
+        eq(commentReactions.commentId, commentId),
+        eq(commentReactions.userId, userId),
+        eq(commentReactions.emoji, emoji)
+      ));
+    return reaction || undefined;
+  }
+  
+  async removeCommentReaction(id: number): Promise<boolean> {
+    const { db } = await import("./db");
+    const result = await db.delete(commentReactions).where(eq(commentReactions.id, id)).returning();
     return result.length > 0;
   }
   
