@@ -26,6 +26,15 @@ const fr = {
     'dashboard.overdueTasks': 'Tâches en Retard',
     'dashboard.upcomingTasks': 'Tâches à Venir',
     'dashboard.ongoingTrainingSessions': 'Sessions de Formation en Cours',
+    'dashboard.noOverdueTasks': 'Pas de tâches en retard',
+    'dashboard.noUpcomingTasks': 'Pas de tâches à venir',
+    'dashboard.viewAll': 'Voir Tout',
+    'dashboard.tasksThisWeek': 'Tâches Cette Semaine',
+    'dashboard.completedThisWeek': 'Complétées Cette Semaine',
+    'dashboard.currentWeeks': 'Semaines Actuelles',
+    'dashboard.activeEditions': 'Éditions Actives',
+    'dashboard.currentlyRunningEditions': 'Éditions de formation en cours',
+    'dashboard.taskManagement': 'Gestion des Tâches',
     
     // Settings
     'settings.title': 'Paramètres',

@@ -259,7 +259,7 @@ export default function Home() {
               <ListTodo className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Tasks This Week</p>
+              <p className="text-sm font-medium text-muted-foreground">{t('dashboard.tasksThisWeek')}</p>
               {isLoading ? (
                 <Skeleton className="h-7 w-16 mt-1" />
               ) : (
@@ -290,7 +290,7 @@ export default function Home() {
               <CheckCircle className="h-6 w-6 text-green-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Completed This Week</p>
+              <p className="text-sm font-medium text-muted-foreground">{t('dashboard.completedThisWeek')}</p>
               {isLoading ? (
                 <Skeleton className="h-7 w-16 mt-1" />
               ) : (
@@ -321,7 +321,7 @@ export default function Home() {
               <div className="bg-amber-100 rounded-full p-3 mr-4">
                 <Calendar className="h-6 w-6 text-amber-600" />
               </div>
-              <p className="text-sm font-medium text-muted-foreground">Current Weeks</p>
+              <p className="text-sm font-medium text-muted-foreground">{t('dashboard.currentWeeks')}</p>
             </div>
             {isLoading ? (
               <Skeleton className="h-24 w-full mt-1" />
@@ -348,8 +348,8 @@ export default function Home() {
         {/* Active Editions Card */}
         <Card className="md:col-span-1">
           <CardHeader>
-            <CardTitle>Active Editions</CardTitle>
-            <CardDescription>Currently running training editions</CardDescription>
+            <CardTitle>{t('dashboard.activeEditions')}</CardTitle>
+            <CardDescription>{t('dashboard.currentlyRunningEditions')}</CardDescription>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -394,7 +394,7 @@ export default function Home() {
       {/* Task Filtering UI */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-lg font-medium">Task Management</h3>
+          <h3 className="text-lg font-medium">{t('dashboard.taskManagement')}</h3>
           <Button 
             variant="outline" 
             size="sm" 
@@ -542,7 +542,7 @@ export default function Home() {
             <div className="flex justify-between items-center">
               <CardTitle className="text-lg flex items-center">
                 <AlertTriangle className="mr-2 h-5 w-5 text-red-500" />
-                Overdue Tasks
+                {t('dashboard.overdueTasks')}
               </CardTitle>
               <div className="flex items-center gap-2">
                 {!isLoading && overdueTasks.length > 0 && (
@@ -620,7 +620,7 @@ export default function Home() {
             <div className="flex justify-between items-center">
               <CardTitle className="text-lg flex items-center">
                 <Clock className="mr-2 h-5 w-5 text-amber-500" />
-                Upcoming Tasks
+                {t('dashboard.upcomingTasks')}
               </CardTitle>
               <div className="flex items-center gap-2">
                 {!isLoading && upcomingTasks.length > 0 && (
