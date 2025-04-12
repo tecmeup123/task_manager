@@ -583,7 +583,7 @@ export default function Home() {
                           <Badge variant="outline">{task.week}</Badge>
                           <Badge variant={getStatusColor(task.status).bg}>{task.status}</Badge>
                           <span className="text-xs text-red-500">
-                            Due: {formatDate(task.dueDate)} ({getRelativeDateDescription(task.dueDate)})
+                            {t('tasks.due')}: {formatDate(task.dueDate)} ({getRelativeDateDescription(task.dueDate)})
                           </span>
                         </div>
                       </div>
@@ -600,7 +600,7 @@ export default function Home() {
                   <div className="text-center pt-2">
                     <Link to="/tasks">
                       <Button variant="link" size="sm">
-                        View all {filteredOverdueTasks.length} overdue tasks
+                        {t('dashboard.viewAll')} {filteredOverdueTasks.length} {t('dashboard.overdueTasks').toLowerCase()}
                       </Button>
                     </Link>
                   </div>
@@ -608,7 +608,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="text-center py-6 text-muted-foreground">
-                <p>No overdue tasks</p>
+                <p>{t('dashboard.noOverdueTasks')}</p>
               </div>
             )}
           </CardContent>
@@ -661,7 +661,7 @@ export default function Home() {
                           <Badge variant="outline">{task.week}</Badge>
                           <Badge variant={getStatusColor(task.status).bg}>{task.status}</Badge>
                           <span className="text-xs text-amber-600">
-                            Due: {formatDate(task.dueDate)} ({getRelativeDateDescription(task.dueDate)})
+                            {t('tasks.due')}: {formatDate(task.dueDate)} ({getRelativeDateDescription(task.dueDate)})
                           </span>
                         </div>
                       </div>
@@ -678,7 +678,7 @@ export default function Home() {
                   <div className="text-center pt-2">
                     <Link to="/tasks">
                       <Button variant="link" size="sm">
-                        View all {filteredUpcomingTasks.length} upcoming tasks
+                        {t('dashboard.viewAll')} {filteredUpcomingTasks.length} {t('dashboard.upcomingTasks').toLowerCase()}
                       </Button>
                     </Link>
                   </div>
@@ -686,7 +686,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="text-center py-6 text-muted-foreground">
-                <p>No upcoming tasks due soon</p>
+                <p>{t('dashboard.noUpcomingTasks')}</p>
               </div>
             )}
           </CardContent>

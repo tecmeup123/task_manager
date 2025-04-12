@@ -103,6 +103,7 @@ const zh = {
     'tasks.deleteSuccess': '任务删除成功',
     'tasks.error': '处理任务时出错',
     'tasks.backToList': '返回任务列表',
+    'tasks.due': '截止日期',
     
     // Trainers
     'trainers.title': '培训师',
