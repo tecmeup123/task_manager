@@ -334,7 +334,7 @@ export default function Settings() {
         {
           taskCode: "WM5T02",
           week: "Week -5",
-          name: "Create mailing list (names; groups information; schedule; edition)",
+          name: "Create participant list (names; groups information; schedule; edition)",
           duration: "0:30:00",
           trainingType: "ALL",
           assignedTo: "Organizer",
@@ -360,7 +360,7 @@ export default function Settings() {
         {
           taskCode: "WM4T01",
           week: "Week -4",
-          name: "Trainers should send changes in the e-learning assignment to Training Team",
+          name: "Trainers should send changes in the self-learning assignment to Training Team",
           duration: "0:30:00",
           trainingType: "ALL",
           assignedTo: "Trainer",
@@ -416,7 +416,7 @@ export default function Settings() {
         {
           taskCode: "W00T01",
           week: "Week 0",
-          name: "Include links of the exam, mailing and edition folder to trainers",
+          name: "Include links of the exam, participant resources and edition folder to trainers",
           duration: "0:30:00",
           trainingType: "ALL",
           assignedTo: "Organizer",
@@ -428,7 +428,7 @@ export default function Settings() {
         {
           taskCode: "W00T02",
           week: "Week 0",
-          name: "Announce start of the e-learning stage with Q&A sessions",
+          name: "Announce start of the self-learning stage with Q&A sessions",
           duration: "0:15:00",
           trainingType: "ALL",
           assignedTo: "Organizer",
