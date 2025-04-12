@@ -218,7 +218,7 @@ export class MemStorage implements IStorage {
 
   async createEdition(edition: InsertEdition): Promise<Edition> {
     const id = this.currentEditionId++;
-    const newEdition: Edition = { ...edition, id, status: "active", currentWeek: 1 };
+    const newEdition: Edition = { ...edition, id, status: "active", currentWeek: 1, archived: false };
     this.editions.set(id, newEdition);
     return newEdition;
   }
@@ -704,7 +704,8 @@ export class DatabaseStorage implements IStorage {
     const editionWithDefaults = {
       ...edition,
       status: "active",
-      currentWeek: 1
+      currentWeek: 1,
+      archived: false
     };
     const [newEdition] = await db.insert(editions).values(editionWithDefaults).returning();
     return newEdition;
