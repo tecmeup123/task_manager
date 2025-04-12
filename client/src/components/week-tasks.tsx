@@ -32,36 +32,26 @@ export default function WeekTasks({
 
   return (
     <div 
-      className={`border-b border-neutral-200 ${weekStatus === 'CURRENT WEEK' ? 'bg-neutral-50' : ''}`}
+      className="border-b border-neutral-200"
     >
       {/* Week Header */}
       <div 
-        className={`p-3 cursor-pointer ${
-          weekStatus === 'CURRENT WEEK' 
-            ? 'bg-primary bg-opacity-5 hover:bg-primary hover:bg-opacity-10' 
-            : 'bg-neutral-50 hover:bg-neutral-100'
-        }`}
+        className="p-3 cursor-pointer bg-neutral-50 hover:bg-neutral-100"
         onClick={onToggleExpand}
       >
         <div className="flex flex-wrap items-center justify-between">
           <div className="flex items-center mr-2">
             {isExpanded ? (
               <ChevronDown 
-                className={`mr-2 flex-shrink-0 ${
-                  weekStatus === 'CURRENT WEEK' ? 'text-primary' : 'text-neutral-500'
-                }`} 
+                className="mr-2 flex-shrink-0 text-neutral-500" 
               />
             ) : (
               <ChevronRight 
-                className={`mr-2 flex-shrink-0 ${
-                  weekStatus === 'CURRENT WEEK' ? 'text-primary' : 'text-neutral-500'
-                }`} 
+                className="mr-2 flex-shrink-0 text-neutral-500" 
               />
             )}
             <span 
-              className={`font-medium whitespace-nowrap ${
-                weekStatus === 'CURRENT WEEK' ? 'text-primary' : ''
-              }`}
+              className="font-medium whitespace-nowrap"
             >
               Week {week === "undefined" ? "Unknown" : week}{weekStatus === 'CURRENT WEEK' ? " (Current)" : ""}
             </span>
@@ -70,9 +60,7 @@ export default function WeekTasks({
           <div className="flex items-center flex-wrap">
             <Badge 
               variant="outline" 
-              className={`mr-2 my-1 px-2 py-0.5 text-xs rounded-full ${
-                weekStatus === 'CURRENT WEEK' ? 'bg-primary bg-opacity-20 text-primary' : 'bg-neutral-200 text-neutral-700'
-              }`}
+              className="mr-2 my-1 px-2 py-0.5 text-xs rounded-full bg-neutral-200 text-neutral-700"
             >
               {taskCount} {taskCount === 1 ? 'task' : 'tasks'}
             </Badge>
@@ -93,7 +81,7 @@ export default function WeekTasks({
           key={task.id} 
           task={task} 
           onClick={() => onTaskClick(task)}
-          isCurrentWeek={weekStatus === 'CURRENT WEEK'}
+          isCurrentWeek={false}
         />
       ))}
     </div>

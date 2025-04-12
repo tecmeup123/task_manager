@@ -23,11 +23,7 @@ export default function TaskRow({ task, onClick, isCurrentWeek = false }: TaskRo
 
   return (
     <div 
-      className={`task-row p-3 border-t border-neutral-200 text-sm cursor-pointer ${
-        isCurrentWeek 
-          ? 'bg-neutral-100 hover:bg-neutral-200' 
-          : 'bg-neutral-50 hover:bg-neutral-100'
-      }`}
+      className="task-row p-3 border-t border-neutral-200 text-sm cursor-pointer bg-white hover:bg-neutral-50"
       onClick={onClick}
     >
       {/* Desktop View */}
