@@ -588,6 +588,9 @@ export default function Editions() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      {/* Add invisible spacing div at the bottom for mobile */}
+      <div className="h-12 md:hidden" />
     </div>
   );
 }

@@ -1583,6 +1583,9 @@ export default function Settings() {
           </div>
         </CardContent>
       </Card>
+      
+      {/* Add invisible spacing div at the bottom for mobile */}
+      <div className="h-12 md:hidden" />
     </div>
   );
 }

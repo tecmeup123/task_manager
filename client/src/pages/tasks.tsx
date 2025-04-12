@@ -411,6 +411,9 @@ export default function Tasks() {
         }}
         onSave={handleTaskSave}
       />
+      
+      {/* Add invisible spacing div at the bottom for mobile */}
+      <div className="h-12 md:hidden" />
     </div>
   );
 }
