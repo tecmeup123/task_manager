@@ -227,7 +227,7 @@ export default function AddTaskForm({
                   <FormItem className="md:col-span-1">
                     <FormLabel>Duration</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="e.g. 0:15:00" />
+                      <Input {...field} value={field.value || ''} placeholder="e.g. 0:15:00" />
                     </FormControl>
                     <FormDescription>
                       Format: h:mm:ss

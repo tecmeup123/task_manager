@@ -275,7 +275,7 @@ export default function TaskDetailModal({
                   <FormItem className="md:col-span-1">
                     <FormLabel>Duration</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="e.g. 0:15:00" />
+                      <Input {...field} value={field.value || ''} placeholder="e.g. 0:15:00" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -509,6 +509,7 @@ export default function TaskDetailModal({
                   <FormControl>
                     <Textarea 
                       {...field} 
+                      value={field.value || ''}
                       placeholder="Add notes about this task..."
                       className="min-h-[100px]"
                     />
