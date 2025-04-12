@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { User } from "@shared/schema";
 import {
   Dialog,
@@ -70,6 +71,7 @@ export default function TaskDetailModal({
   onClose,
   onSave,
 }: TaskDetailModalProps) {
+  const { t } = useTranslation();
   const [activityHistory, setActivityHistory] = useState<any[]>([
     {
       action: `Status changed to ${task.status}`,
