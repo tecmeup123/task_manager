@@ -18,8 +18,15 @@ export function LanguageSwitcher() {
   useEffect(() => {
     // Get the language from localStorage or use default
     const savedLanguage = localStorage.getItem('i18nextLng')?.split('-')[0] || 'en';
-    if (i18n.language !== savedLanguage) {
-      i18n.changeLanguage(savedLanguage);
+    
+    // Make sure we're using a supported language code
+    const supportedLanguages = ['en', 'es', 'fr', 'de', 'pt'];
+    const language = supportedLanguages.includes(savedLanguage) ? savedLanguage : 'en';
+    
+    // Only change if different - this prevents infinite loops
+    if (i18n.language !== language) {
+      console.log(`Changing language from ${i18n.language} to ${language}`);
+      i18n.changeLanguage(language);
     }
   }, [i18n]);
   

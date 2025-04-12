@@ -1508,13 +1508,10 @@ export class DatabaseStorage implements IStorage {
       console.log("Default users created.");
     }
     
-    // Check if any editions exist
-    const existingEditions = await db.select({ count: count() }).from(editions);
-    
-    // If editions already exist, don't seed
-    if (existingEditions[0].count > 0) {
-      return;
-    }
+    // We won't seed any editions by default
+    // Users should create their own editions through the UI
+    // This way deleted editions will stay deleted
+    return;
     
     // Create some sample editions
     const edition1: InsertEdition & { status: string; currentWeek: number } = {
