@@ -213,7 +213,7 @@ export default function TaskDetailModal({
                 
                 {task?.dueDate && (
                   <div className="text-xs text-muted-foreground">
-                    Due: {task.dueDate ? format(new Date(task.dueDate), "MMM d, yyyy") : "No due date"}
+                    {t('tasks.due')}: {task.dueDate ? format(new Date(task.dueDate), "MMM d, yyyy") : t('tasks.noDueDate')}
                   </div>
                 )}
               </div>

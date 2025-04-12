@@ -64,6 +64,22 @@ const de = {
     // Tasks
     'tasks.title': 'Aufgaben',
     'tasks.details': 'Aufgabendetails',
+    'tasks.name': 'Name',
+    'tasks.description': 'Beschreibung',
+    'tasks.week': 'Woche',
+    'tasks.trainingType': 'Trainingstyp',
+    'tasks.editionId': 'Ausgabe',
+    'tasks.taskCode': 'Aufgabencode',
+    'tasks.code': 'Aufgabencode',
+    'tasks.duration': 'Dauer',
+    'tasks.durationPlaceholder': 'z.B. 0:30:00',
+    'tasks.pickDate': 'Datum auswählen',
+    'tasks.selectWeek': 'Woche auswählen',
+    'tasks.update': 'Aufgabe aktualisieren',
+    'tasks.status': 'Status',
+    'tasks.assignedTo': 'Zugewiesen an',
+    'tasks.owner': 'Verantwortlicher',
+    'tasks.dueDate': 'Fälligkeitsdatum',
     'tasks.backToList': 'Zurück zur Aufgabenliste',
     
     // Menu Items
