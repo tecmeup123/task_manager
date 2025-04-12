@@ -366,14 +366,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
               <Link to="/settings">
                 <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/settings" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <Settings className="w-5 h-5 mr-3" />
-                  <span>Settings</span>
+                  <span>{t('menu_settings')}</span>
                 </div>
               </Link>
               {user && user.role === "admin" && (
                 <Link to="/users">
                   <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/users" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                     <Users className="w-5 h-5 mr-3" />
-                    <span>Users</span>
+                    <span>{t('menu_users')}</span>
                   </div>
                 </Link>
               )}
@@ -381,7 +381,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
           </nav>
           
           <div className="mt-8">
-            <h3 className="px-4 text-base font-medium text-neutral-500">Current Editions</h3>
+            <h3 className="px-4 text-base font-medium text-neutral-500">{t('menu_current_editions')}</h3>
             <div className="mt-2 space-y-1">
               {isLoading ? (
                 <>
@@ -398,7 +398,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
                   </Link>
                 ))
               ) : (
-                <div className="px-4 py-3 text-neutral-500">No editions found</div>
+                <div className="px-4 py-3 text-neutral-500">{t('editions.none_found')}</div>
               )}
             </div>
           </div>
@@ -429,7 +429,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
               <Link to="/tasks">
                 <div className={`flex items-center px-4 py-2 text-sm ${location.startsWith("/tasks") ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <ListTodo className="w-5 h-5 mr-2" />
-                  <span>Tasks</span>
+                  <span>{t('menu_tasks')}</span>
                 </div>
               </Link>
             </div>
@@ -437,19 +437,19 @@ export default function MainLayout({ children }: MainLayoutProps) {
               <Link to="/editions">
                 <div className={`flex items-center px-4 py-2 text-sm ${location === "/editions" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <GraduationCap className="w-5 h-5 mr-2" />
-                  <span>Editions</span>
+                  <span>{t('menu_editions')}</span>
                 </div>
               </Link>
             </div>
             <Link to="/settings">
               <div className={`flex items-center px-4 py-2 text-sm ${location === "/settings" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                 <Settings className="w-5 h-5 mr-2" />
-                <span>Settings</span>
+                <span>{t('menu_settings')}</span>
               </div>
             </Link>
           </nav>
           
-          <div className="px-4 py-2 mt-6 text-sm font-medium text-neutral-500 uppercase">Current Editions</div>
+          <div className="px-4 py-2 mt-6 text-sm font-medium text-neutral-500 uppercase">{t('menu_current_editions')}</div>
           <div className="px-4 py-2">
             {isLoading ? (
               <>
@@ -469,7 +469,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 </div>
               ))
             ) : (
-              <div className="text-sm text-neutral-500">No editions found</div>
+              <div className="text-sm text-neutral-500">{t('editions.none_found')}</div>
             )}
           </div>
 
