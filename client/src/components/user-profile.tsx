@@ -1,20 +1,21 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { User, CircleUser, UserCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { getInitials } from "@/lib/utils";
+import { useMutation } from "@tanstack/react-query";
 import {
   Form,
   FormControl,
@@ -24,26 +25,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Loader2, Camera, Upload, X, Check } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Define the form schema
+// Create a schema for form validation
 const profileFormSchema = z.object({
   fullName: z.string().optional(),
-  email: z.string().email().optional().or(z.literal("")),
+  email: z.string().email().optional(),
   avatarUrl: z.string().optional(),
-  avatarColor: z.string().min(4).max(9).optional(),
+  avatarColor: z.string().optional(),
   avatarShape: z.enum(["circle", "square"]).optional(),
   avatarIcon: z.enum(["user", "circleUser", "userCircle"]).optional(),
   avatarBackground: z.enum(["solid", "gradient"]).optional(),
@@ -89,11 +77,13 @@ export function UserProfile({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   // Mutation for updating profile
   const updateProfileMutation = useMutation({
     mutationFn: async (values: ProfileFormValues) => {
-      const response = await apiRequest("PATCH", "/api/user/profile", values);
-      return response.json();
+      const res = await apiRequest("PATCH", "/api/user/profile", values);
+      return await res.json();
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(["/api/user"], data);
+      queryClient.setQueryData(["/api/user"], (oldData: any) => {
+        return { ...oldData, ...data };
+      });
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
@@ -102,8 +92,8 @@ export function UserProfile({ isOpen, onClose }: { isOpen: boolean; onClose: () 
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to update profile",
+        title: "Error updating profile",
+        description: error.message,
         variant: "destructive",
       });
     },
@@ -116,69 +106,60 @@ export function UserProfile({ isOpen, onClose }: { isOpen: boolean; onClose: () 
       const formData = new FormData();
       formData.append("avatar", file);
       
-      const response = await fetch("/api/user/avatar", {
+      const res = await fetch("/api/user/avatar", {
         method: "POST",
+        credentials: "include",
         body: formData,
       });
       
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || "Failed to upload avatar");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Error uploading avatar");
       }
       
-      return response.json();
+      return await res.json();
     },
     onSuccess: (data) => {
+      // Update the avatar URL in the form
       form.setValue("avatarUrl", data.avatarUrl);
-      queryClient.setQueryData(["/api/user"], (oldData: any) => ({
-        ...oldData,
-        avatarUrl: data.avatarUrl,
-      }));
+      
+      // Update the user data in the cache
+      queryClient.setQueryData(["/api/user"], (oldData: any) => {
+        return { ...oldData, avatarUrl: data.avatarUrl };
+      });
+      
       toast({
         title: "Avatar uploaded",
         description: "Your avatar has been uploaded successfully.",
       });
+      
+      // Clear the file selection and preview
+      setSelectedFile(null);
+      setImagePreview(null);
       setIsUploading(false);
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to upload avatar",
+        title: "Error uploading avatar",
+        description: error.message,
         variant: "destructive",
       });
       setIsUploading(false);
     },
   });
 
-  // Handle file selection
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      
-      // Validate file type and size
-      const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-      if (!validTypes.includes(file.type)) {
-        toast({
-          title: "Invalid file type",
-          description: "Please select a JPEG, PNG, GIF, or WebP image.",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      // 5MB max
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "File too large",
-          description: "Image must be smaller than 5MB.",
-          variant: "destructive",
-        });
-        return;
-      }
-      
+  const onSubmit = (values: ProfileFormValues) => {
+    updateProfileMutation.mutate(values);
+  };
+
+  // Handle file selection for avatar upload
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
       setSelectedFile(file);
       
-      // Create a preview URL
+      // Create a preview URL for the selected image
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -187,327 +168,286 @@ export function UserProfile({ isOpen, onClose }: { isOpen: boolean; onClose: () 
     }
   };
 
-  // Handle avatar upload
-  const handleUploadAvatar = () => {
+  const uploadSelectedFile = () => {
     if (selectedFile) {
       uploadAvatarMutation.mutate(selectedFile);
     }
   };
 
-  // Clear selected file and preview
-  const clearSelectedFile = () => {
-    setSelectedFile(null);
-    setImagePreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+  // Render the appropriate icon based on the selected icon type
+  const renderAvatarIcon = (iconType: string) => {
+    switch (iconType) {
+      case "user":
+        return <User className="h-6 w-6" />;
+      case "circleUser":
+        return <CircleUser className="h-6 w-6" />;
+      case "userCircle":
+        return <UserCircle className="h-6 w-6" />;
+      default:
+        return <User className="h-6 w-6" />;
     }
   };
 
-  // Remove the current avatar
-  const removeAvatar = () => {
-    form.setValue("avatarUrl", "");
-    // Only trigger an update if we had an avatar URL before
-    if (user?.avatarUrl) {
-      updateProfileMutation.mutate({ avatarUrl: "" });
-    }
-  };
-
-  // Submit the form
-  const onSubmit = (values: ProfileFormValues) => {
-    updateProfileMutation.mutate(values);
-  };
+  if (!user) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Your Profile</DialogTitle>
+          <DialogTitle>Edit Profile</DialogTitle>
           <DialogDescription>
-            Update your personal information and profile picture
+            Update your profile information and customize your avatar.
           </DialogDescription>
         </DialogHeader>
-
-        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full mt-4">
+        
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="photo">Profile Photo</TabsTrigger>
-            <TabsTrigger value="details">Account Details</TabsTrigger>
+            <TabsTrigger value="photo">Photo</TabsTrigger>
+            <TabsTrigger value="info">Info</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="photo" className="mt-6">
-            <div className="flex flex-col md:flex-row gap-8">
-              <div className="flex flex-col items-center gap-4">
-                <div className="relative">
-                  <Avatar className="h-24 w-24 border-2 border-border"
-                    avatarColor={form.watch("avatarColor")}
-                    avatarShape={form.watch("avatarShape")}
-                    avatarBackground={form.watch("avatarBackground")}
-                  >
-                    {user?.avatarUrl || imagePreview ? (
-                      <AvatarImage src={imagePreview || user?.avatarUrl} />
-                    ) : (
-                      <AvatarFallback
-                        avatarColor={form.watch("avatarColor")}
-                        avatarIcon={form.watch("avatarIcon")}
-                        avatarBackground={form.watch("avatarBackground")}
-                      />
-                    )}
-                  </Avatar>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-background shadow-sm"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <Camera className="h-4 w-4" />
-                  </Button>
-                </div>
-                
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  className="hidden"
-                  accept="image/jpeg,image/png,image/gif,image/webp"
-                  onChange={handleFileChange}
-                />
-                
-                {selectedFile && (
-                  <div className="flex gap-2 mt-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={clearSelectedFile}
-                      disabled={isUploading}
-                    >
-                      <X className="h-4 w-4 mr-1" />
-                      Cancel
-                    </Button>
-                    <Button 
-                      size="sm"
-                      onClick={handleUploadAvatar}
-                      disabled={isUploading}
-                    >
-                      {isUploading ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                          Uploading...
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="h-4 w-4 mr-1" />
-                          Upload
-                        </>
-                      )}
-                    </Button>
+          {/* Photo Tab */}
+          <TabsContent value="photo" className="space-y-4 py-4">
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <div className="relative group">
+                <Avatar className="h-24 w-24 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                  {imagePreview ? (
+                    <AvatarImage src={imagePreview} alt="Preview" />
+                  ) : user.avatarUrl ? (
+                    <AvatarImage src={user.avatarUrl} alt={user.username} />
+                  ) : (
+                    <AvatarFallback className="h-24 w-24">
+                      {getInitials(user.fullName || user.username)}
+                    </AvatarFallback>
+                  )}
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 rounded-full transition-opacity">
+                    <span className="text-white text-sm">Change</span>
                   </div>
-                )}
-                
-                {!selectedFile && user?.avatarUrl && (
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={removeAvatar}
-                  >
-                    <X className="h-4 w-4 mr-1" />
-                    Remove Photo
-                  </Button>
-                )}
+                </Avatar>
               </div>
               
-              <div className="flex-1">
-                <Form {...form}>
-                  <form className="space-y-6">
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-medium">Avatar Appearance</h3>
-                      <Separator />
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="avatarColor"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Color</FormLabel>
-                              <Select
-                                value={field.value}
-                                onValueChange={field.onChange}
-                              >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select a color" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {colorOptions.map((color) => (
-                                    <SelectItem
-                                      key={color.value}
-                                      value={color.value}
-                                    >
-                                      <div className="flex items-center">
-                                        <div
-                                          className="h-4 w-4 rounded-full mr-2"
-                                          style={{ backgroundColor: color.value }}
-                                        />
-                                        {color.label}
-                                      </div>
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="avatarShape"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Shape</FormLabel>
-                              <Select
-                                value={field.value}
-                                onValueChange={field.onChange}
-                              >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select a shape" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="circle">Circle</SelectItem>
-                                  <SelectItem value="square">Square</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="avatarIcon"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Icon</FormLabel>
-                              <Select
-                                value={field.value}
-                                onValueChange={field.onChange}
-                              >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select an icon" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="user">User</SelectItem>
-                                  <SelectItem value="circleUser">Circle User</SelectItem>
-                                  <SelectItem value="userCircle">User Circle</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormDescription>
-                                Used when no photo is set
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="avatarBackground"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Background Style</FormLabel>
-                              <Select
-                                value={field.value}
-                                onValueChange={field.onChange}
-                              >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select a style" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="solid">Solid</SelectItem>
-                                  <SelectItem value="gradient">Gradient</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </div>
-                  </form>
-                </Form>
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="details" className="mt-6">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Personal Information</h3>
-                  <Separator />
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="fullName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Full Name</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="Your full name" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email Address</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="your.email@example.com" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                onChange={handleFileChange}
+              />
+              
+              {selectedFile && (
+                <div className="flex flex-col items-center">
+                  <span className="text-sm text-muted-foreground mb-2">
+                    {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
+                  </span>
+                  <div className="flex space-x-2">
+                    <Button 
+                      onClick={uploadSelectedFile} 
+                      disabled={isUploading}
+                      size="sm"
+                    >
+                      {isUploading ? "Uploading..." : "Upload"}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        setSelectedFile(null);
+                        setImagePreview(null);
+                      }}
+                    >
+                      Cancel
+                    </Button>
                   </div>
                 </div>
-                
-                <DialogFooter>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={onClose}
-                    className="mr-2"
+              )}
+              
+              {!selectedFile && (
+                <div className="text-center">
+                  <Button
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
                   >
-                    Cancel
+                    Upload Photo
                   </Button>
-                  <Button 
-                    type="submit" 
+                  <p className="text-xs text-muted-foreground mt-2">
+                    JPEG, PNG, GIF or WebP. Max 5MB.
+                  </p>
+                </div>
+              )}
+            </div>
+            
+            <Form {...form}>
+              <form className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-sm font-medium">Avatar Customization</h3>
+                  
+                  <FormField
+                    control={form.control}
+                    name="avatarColor"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Color</FormLabel>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {colorOptions.map((color) => (
+                            <div
+                              key={color.value}
+                              className={`w-8 h-8 rounded-full cursor-pointer transition-all ${
+                                field.value === color.value 
+                                  ? 'ring-2 ring-offset-2 ring-primary scale-110' 
+                                  : 'hover:scale-110'
+                              }`}
+                              style={{ backgroundColor: color.value }}
+                              onClick={() => field.onChange(color.value)}
+                              title={color.label}
+                            />
+                          ))}
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="avatarShape"
+                    render={({ field }) => (
+                      <FormItem className="space-y-1">
+                        <FormLabel>Shape</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            className="flex space-x-4"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="circle" id="shape-circle" />
+                              <Label htmlFor="shape-circle">Circle</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="square" id="shape-square" />
+                              <Label htmlFor="shape-square">Square</Label>
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="avatarIcon"
+                    render={({ field }) => (
+                      <FormItem className="space-y-1">
+                        <FormLabel>Icon Style</FormLabel>
+                        <div className="flex justify-between space-x-4 mt-1">
+                          {["user", "circleUser", "userCircle"].map((iconType) => (
+                            <div
+                              key={iconType}
+                              className={`flex flex-col items-center p-2 border rounded-md cursor-pointer ${
+                                field.value === iconType 
+                                  ? 'border-primary bg-primary/5' 
+                                  : 'border-border hover:border-primary'
+                              }`}
+                              onClick={() => field.onChange(iconType)}
+                            >
+                              {renderAvatarIcon(iconType)}
+                              <span className="text-xs mt-1">{
+                                iconType === "user" ? "Default" : 
+                                iconType === "circleUser" ? "Circle" : "Round"
+                              }</span>
+                            </div>
+                          ))}
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="avatarBackground"
+                    render={({ field }) => (
+                      <FormItem className="space-y-1">
+                        <FormLabel>Background Style</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            className="flex space-x-4"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="solid" id="bg-solid" />
+                              <Label htmlFor="bg-solid">Solid</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="gradient" id="bg-gradient" />
+                              <Label htmlFor="bg-gradient">Gradient</Label>
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <div className="flex justify-end">
+                  <Button
+                    type="button"
+                    onClick={form.handleSubmit(onSubmit)}
                     disabled={updateProfileMutation.isPending}
                   >
-                    {updateProfileMutation.isPending ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <Check className="h-4 w-4 mr-2" />
-                        Save Changes
-                      </>
-                    )}
+                    {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
                   </Button>
-                </DialogFooter>
+                </div>
+              </form>
+            </Form>
+          </TabsContent>
+          
+          {/* Info Tab */}
+          <TabsContent value="info" className="space-y-4 py-4">
+            <Form {...form}>
+              <form className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="fullName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your full name" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Your full name as it will appear in the application.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your email address" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Your email address for notifications and account recovery.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="flex justify-end">
+                  <Button
+                    type="button"
+                    onClick={form.handleSubmit(onSubmit)}
+                    disabled={updateProfileMutation.isPending}
+                  >
+                    {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
+                  </Button>
+                </div>
               </form>
             </Form>
           </TabsContent>

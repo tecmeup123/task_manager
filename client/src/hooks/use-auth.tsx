@@ -12,6 +12,11 @@ type User = {
   forcePasswordChange: boolean;
   passwordChangeRequired: boolean;
   createdAt: string;
+  avatarUrl?: string | null;
+  avatarColor?: string;
+  avatarShape?: string;
+  avatarIcon?: string;
+  avatarBackground?: string;
 };
 
 type LoginData = {

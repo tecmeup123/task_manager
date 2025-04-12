@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/hooks/use-auth";
+import { UserAvatar } from "@/components/user-avatar";
 import ChangePasswordForm from "@/components/change-password-form";
 import { 
   DropdownMenu,
@@ -159,29 +160,10 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <Bell className="h-5 w-5 text-neutral-500" />
           </Button>
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className="w-8 h-8 rounded-full bg-primary ml-2 flex items-center justify-center text-white text-sm cursor-pointer">
-                {user?.username?.substring(0, 2).toUpperCase() || "AM"}
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {user && (
-                <>
-                  <div className="px-2 py-1.5 text-xs text-muted-foreground">
-                    Signed in as <span className="font-semibold">{user.username}</span>
-                  </div>
-                  <DropdownMenuItem 
-                    className="cursor-pointer flex items-center text-red-600"
-                    onClick={() => logoutMutation.mutate()}
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* User Avatar - new component */}
+          <div className="ml-2">
+            <UserAvatar />
+          </div>
         </div>
       </header>
 
