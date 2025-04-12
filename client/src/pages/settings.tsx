@@ -1003,7 +1003,7 @@ export default function Settings() {
                 {t('settings.accountSettings')}
               </CardTitle>
               <CardDescription>
-                Manage your account details and preferences
+                {t('settings.accountDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -1136,7 +1136,7 @@ export default function Settings() {
                 {t('settings.notificationSettings')}
               </CardTitle>
               <CardDescription>
-                Configure how and when you receive notifications
+                {t('settings.notificationDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">

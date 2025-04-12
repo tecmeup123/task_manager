@@ -185,6 +185,9 @@ const zh = {
     'trainingType.slr': '自学路线',
     'trainingType.all': '所有类型',
     
+    // Authentication
+    'auth.changePassword': '更改密码',
+    
     // Roles
     'role.admin': '管理员',
     'role.editor': '编辑',
