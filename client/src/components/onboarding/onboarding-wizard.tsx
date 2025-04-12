@@ -65,7 +65,7 @@ export default function OnboardingWizard() {
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           transition={{ type: "spring", damping: 25 }}
-          className="relative w-[95%] sm:w-full max-w-3xl bg-white rounded-xl shadow-xl overflow-hidden"
+          className="relative w-[92%] sm:w-full max-w-3xl bg-white rounded-xl shadow-xl overflow-hidden"
         >
           {/* Close button */}
           <Button 
@@ -208,7 +208,7 @@ function DashboardStep() {
       
       <motion.div 
         variants={itemVariants}
-        className="bg-blue-50 border border-blue-200 text-blue-800 p-3 sm:p-4 rounded-lg text-sm sm:text-base"
+        className="bg-blue-50 border border-blue-200 text-blue-800 p-2 sm:p-4 rounded-lg text-xs sm:text-sm"
       >
         <p className="flex items-center">
           <span className="mr-2 flex-shrink-0">💡</span>
@@ -282,7 +282,7 @@ function TasksStep() {
       
       <motion.div 
         variants={itemVariants}
-        className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-3 sm:p-4 rounded-lg text-sm sm:text-base"
+        className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-2 sm:p-4 rounded-lg text-xs sm:text-sm"
       >
         <p className="flex items-center">
           <span className="mr-2 flex-shrink-0">⚡</span>
@@ -339,9 +339,9 @@ function EditionsStep() {
       </motion.div>
       
       <motion.div variants={itemVariants}>
-        <div className="bg-green-50 border border-green-200 text-green-800 p-3 sm:p-4 rounded-lg">
-          <h3 className="font-semibold text-sm sm:text-base mb-1 sm:mb-2">{t("edition_cloning")}</h3>
-          <p className="text-sm sm:text-base">{t("edition_cloning_description")}</p>
+        <div className="bg-green-50 border border-green-200 text-green-800 p-2 sm:p-4 rounded-lg">
+          <h3 className="font-semibold text-xs sm:text-sm mb-1 sm:mb-2">{t("edition_cloning")}</h3>
+          <p className="text-xs sm:text-sm">{t("edition_cloning_description")}</p>
         </div>
       </motion.div>
     </motion.div>
@@ -395,7 +395,7 @@ function SettingsStep() {
       
       <motion.div 
         variants={itemVariants}
-        className="bg-purple-50 border border-purple-200 text-purple-800 p-3 sm:p-4 rounded-lg text-sm sm:text-base"
+        className="bg-purple-50 border border-purple-200 text-purple-800 p-2 sm:p-4 rounded-lg text-xs sm:text-sm"
       >
         <p className="flex items-center">
           <span className="mr-2 flex-shrink-0">🔑</span>
@@ -478,9 +478,9 @@ function CompleteStep() {
         {t("onboarding_complete_description")}
       </motion.p>
       
-      <motion.div variants={itemVariants} className="bg-green-50 border border-green-200 text-green-800 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
-        <h3 className="font-semibold text-sm sm:text-base mb-1 sm:mb-2">{t("whats_next")}</h3>
-        <p className="text-sm sm:text-base">{t("onboarding_next_steps")}</p>
+      <motion.div variants={itemVariants} className="bg-green-50 border border-green-200 text-green-800 p-2 sm:p-4 rounded-lg mb-3 sm:mb-6">
+        <h3 className="font-semibold text-xs sm:text-sm mb-1 sm:mb-2">{t("whats_next")}</h3>
+        <p className="text-xs sm:text-sm">{t("onboarding_next_steps")}</p>
       </motion.div>
       
       <motion.p variants={itemVariants} className="text-sm text-gray-500 italic">
