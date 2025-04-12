@@ -769,7 +769,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // User management routes (admin only)
   // Get all users
-  app.get("/api/users", requireAdmin, async (req, res) => {
+  app.get("/api/users", async (req, res) => {
+    // Check if user is authenticated
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
     try {
       const users = await storage.getAllUsers();
       // Remove password field from response

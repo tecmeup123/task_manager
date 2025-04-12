@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
+import { User } from "@shared/schema";
 import {
   Dialog,
   DialogContent,
@@ -88,7 +89,7 @@ export default function TaskDetailModal({
   ]);
 
   // Fetch users for task assignment
-  const { data: users, isLoading: isLoadingUsers } = useQuery({
+  const { data: users = [], isLoading: isLoadingUsers } = useQuery<User[]>({
     queryKey: ['/api/users'],
     enabled: isOpen, // Only fetch when modal is open
   });
