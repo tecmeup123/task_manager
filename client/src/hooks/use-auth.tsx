@@ -9,6 +9,9 @@ type User = {
   fullName: string | null;
   email: string | null;
   role: string;
+  forcePasswordChange: boolean;
+  passwordChangeRequired: boolean;
+  createdAt: string;
 };
 
 type LoginData = {

@@ -34,6 +34,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const [location, navigate] = useLocation();
   const [currentEditionId, setCurrentEditionId] = useState<number | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const isMobile = useIsMobile();
   const { user, logoutMutation } = useAuth();
 
@@ -70,6 +71,15 @@ export default function MainLayout({ children }: MainLayoutProps) {
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location]);
+  
+  // Check if user needs to change password
+  useEffect(() => {
+    if (user && (user.forcePasswordChange || user.passwordChangeRequired)) {
+      setIsChangePasswordOpen(true);
+    } else {
+      setIsChangePasswordOpen(false);
+    }
+  }, [user]);
 
   return (
     <div className="font-sans bg-neutral-100 text-neutral-700 min-h-screen flex flex-col">
@@ -363,6 +373,12 @@ export default function MainLayout({ children }: MainLayoutProps) {
           </Link>
         </div>
       )}
+
+      {/* Change Password Modal */}
+      <ChangePasswordForm 
+        isOpen={isChangePasswordOpen}
+        onClose={() => setIsChangePasswordOpen(false)}
+      />
     </div>
   );
 }
