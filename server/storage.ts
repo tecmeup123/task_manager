@@ -406,11 +406,12 @@ export class MemStorage implements IStorage {
   async markAllNotificationsAsRead(userId: number): Promise<boolean> {
     let success = true;
     
-    for (const [id, notification] of this.notifications.entries()) {
+    // Use Array.from to avoid downlevelIteration issue
+    Array.from(this.notifications.entries()).forEach(([id, notification]) => {
       if (notification.userId === userId && !notification.isRead) {
         this.notifications.set(id, { ...notification, isRead: true });
       }
-    }
+    });
     
     return success;
   }
@@ -735,18 +736,25 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getAuditLogs(entityType?: string, entityId?: number): Promise<AuditLog[]> {
-    const { db } = await import("./db");
-    let query = db.select().from(auditLogs).orderBy(auditLogs.timestamp);
+    const { db, eq, and } = await import("./db");
     
+    let conditions = [];
     if (entityType) {
-      query = query.where(eq(auditLogs.entityType, entityType));
+      conditions.push(eq(auditLogs.entityType, entityType));
     }
     
     if (entityId) {
-      query = query.where(eq(auditLogs.entityId, entityId));
+      conditions.push(eq(auditLogs.entityId, entityId));
     }
     
-    return query;
+    if (conditions.length > 0) {
+      return db.select().from(auditLogs)
+        .where(and(...conditions))
+        .orderBy(auditLogs.timestamp);
+    } else {
+      return db.select().from(auditLogs)
+        .orderBy(auditLogs.timestamp);
+    }
   }
   
   // Trainer methods
@@ -1004,8 +1012,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserNotifications(userId: number, limit: number = 10, includeRead: boolean = false): Promise<Notification[]> {
-    const { db } = await import("./db");
-    const { and, eq, desc } = await import("drizzle-orm");
+    const { db, and, eq, desc } = await import("./db");
     
     if (includeRead) {
       // All notifications for the user
@@ -1026,8 +1033,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getNotification(id: number): Promise<Notification | undefined> {
-    const { db } = await import("./db");
-    const { eq } = await import("drizzle-orm");
+    const { db, eq } = await import("./db");
     
     const [notification] = await db.select().from(notifications)
       .where(eq(notifications.id, id));
@@ -1036,8 +1042,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async markNotificationAsRead(id: number): Promise<Notification> {
-    const { db } = await import("./db");
-    const { eq } = await import("drizzle-orm");
+    const { db, eq } = await import("./db");
     
     const [updatedNotification] = await db.update(notifications)
       .set({ isRead: true })
@@ -1052,8 +1057,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async markAllNotificationsAsRead(userId: number): Promise<boolean> {
-    const { db } = await import("./db");
-    const { eq } = await import("drizzle-orm");
+    const { db, eq } = await import("./db");
     
     const result = await db.update(notifications)
       .set({ isRead: true })
@@ -1064,8 +1068,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteNotification(id: number): Promise<boolean> {
-    const { db } = await import("./db");
-    const { eq } = await import("drizzle-orm");
+    const { db, eq } = await import("./db");
     
     const result = await db.delete(notifications)
       .where(eq(notifications.id, id))
@@ -1075,8 +1078,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUnreadNotificationCount(userId: number): Promise<number> {
-    const { db } = await import("./db");
-    const { eq, and, count } = await import("drizzle-orm");
+    const { db, eq, and, count } = await import("./db");
     
     const [result] = await db.select({ count: count() })
       .from(notifications)
