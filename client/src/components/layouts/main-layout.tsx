@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Search, Bell, ChevronDown, Menu, X, ArrowLeft, LogOut } from "lucide-react";
@@ -12,6 +12,7 @@ import {
   BookOpen,
   KeyRound
 } from "lucide-react";
+import { format, addDays, isAfter, isBefore, parseISO } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +32,16 @@ type MainLayoutProps = {
   children: React.ReactNode;
 };
 
+// Helper function to format dates
+const formatDate = (dateString: string, formatStr: string) => {
+  try {
+    if (!dateString) return '';
+    return format(parseISO(dateString), formatStr);
+  } catch (error) {
+    return 'Invalid date';
+  }
+};
+
 export default function MainLayout({ children }: MainLayoutProps) {
   const [location, navigate] = useLocation();
   const [currentEditionId, setCurrentEditionId] = useState<number | null>(null);
@@ -38,6 +49,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const isMobile = useIsMobile();
   const { user, logoutMutation } = useAuth();
+
+  // Fetch all tasks for all editions to get upcoming tasks
+  const { data: allTasks = [], isLoading: isTasksLoading } = useQuery<any[]>({
+    queryKey: ["/api/tasks"],
+    enabled: !!user,
+    staleTime: 60000,
+    refetchOnWindowFocus: false,
+  });
 
   // Determine if we need to show a back button
   const showBackButton = location !== "/" && !mobileMenuOpen;
@@ -171,33 +190,34 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 <Button variant="ghost" size="sm" className="text-xs h-7">Mark all as read</Button>
               </div>
               <div className="max-h-[400px] overflow-y-auto py-2">
-                <DropdownMenuItem className="p-3 focus:bg-neutral-100 cursor-default">
-                  <div className="flex flex-col space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-sm">Task Update</span>
-                      <span className="text-xs text-neutral-500">2h ago</span>
-                    </div>
-                    <p className="text-sm">Task "Verify mailing list" was marked as complete</p>
+                {isLoading || !editions ? (
+                  <div className="p-4 text-center text-sm text-neutral-500">
+                    Loading notifications...
                   </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="p-3 focus:bg-neutral-100 cursor-default">
-                  <div className="flex flex-col space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-sm">Due Date Reminder</span>
-                      <span className="text-xs text-neutral-500">1d ago</span>
-                    </div>
-                    <p className="text-sm">Task "Send invites" is due tomorrow</p>
+                ) : upcomingTasks && upcomingTasks.length > 0 ? (
+                  upcomingTasks.slice(0, 3).map((task: any) => (
+                    <DropdownMenuItem key={task.id} className="p-3 focus:bg-neutral-100 cursor-default">
+                      <div className="flex flex-col space-y-1 w-full">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-sm">Due Soon</span>
+                          <span className="text-xs text-neutral-500">{formatDate(task.dueDate, "MMM d")}</span>
+                        </div>
+                        <p className="text-sm mb-1">{task.name}</p>
+                        <div className="flex justify-end">
+                          <Link to={`/tasks/${task.editionId}?taskId=${task.id}`}>
+                            <Button size="sm" variant="outline" className="h-7 text-xs">
+                              Go to task
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                  ))
+                ) : (
+                  <div className="p-4 text-center text-sm text-neutral-500">
+                    No upcoming tasks due soon.
                   </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="p-3 focus:bg-neutral-100 cursor-default">
-                  <div className="flex flex-col space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-sm">New Assignment</span>
-                      <span className="text-xs text-neutral-500">2d ago</span>
-                    </div>
-                    <p className="text-sm">You were assigned a new task "Update edition status"</p>
-                  </div>
-                </DropdownMenuItem>
+                )}
               </div>
               <div className="p-2 border-t text-center">
                 <Button variant="ghost" size="sm" className="w-full text-xs">View all notifications</Button>

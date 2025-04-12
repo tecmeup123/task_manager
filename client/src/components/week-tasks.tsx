@@ -53,7 +53,7 @@ export default function WeekTasks({
             <span 
               className="font-medium whitespace-nowrap"
             >
-              Week {week === "undefined" ? "Unknown" : week}{weekStatus === 'CURRENT WEEK' ? " (Current)" : ""}
+              {week === "undefined" ? "Week Unknown" : `Week ${week}`}{weekStatus === 'CURRENT WEEK' ? " (Current)" : ""}
             </span>
           </div>
           
@@ -68,13 +68,9 @@ export default function WeekTasks({
               variant={
                 completionStatus === 'Complete' ? 'success' : 
                 completionStatus === 'In Progress' ? 'default' : 
-                'outline'
+                'secondary'
               }
-              className={`mr-2 my-1 text-white ${
-                weekStatus === 'CURRENT WEEK' && completionStatus === 'In Progress' ? 'bg-green-500 hover:bg-green-600' : 
-                weekStatus === 'CURRENT WEEK' && completionStatus === 'Not Started' ? 'bg-yellow-500 hover:bg-yellow-600' : 
-                completionStatus === 'In Progress' ? 'bg-yellow-500 hover:bg-yellow-600' : ''
-              }`}
+              className="mr-2 my-1"
             >
               {weekStatus === 'CURRENT WEEK' ? 'Current' : completionStatus}
             </Badge>
