@@ -29,6 +29,7 @@ const de = {
     'dashboard.welcome': 'Willkommen, {{name}}',
     'dashboard.overdueTasks': 'Überfällige Aufgaben',
     'dashboard.upcomingTasks': 'Anstehende Aufgaben',
+    'dashboard.ongoingTrainingSessions': 'Laufende Schulungssitzungen',
     
     // Settings
     'settings.title': 'Einstellungen',

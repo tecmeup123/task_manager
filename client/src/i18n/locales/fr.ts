@@ -25,6 +25,7 @@ const fr = {
     'dashboard.welcome': 'Bienvenue, {{name}}',
     'dashboard.overdueTasks': 'Tâches en Retard',
     'dashboard.upcomingTasks': 'Tâches à Venir',
+    'dashboard.ongoingTrainingSessions': 'Sessions de Formation en Cours',
     
     // Settings
     'settings.title': 'Paramètres',

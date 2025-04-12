@@ -63,6 +63,7 @@ const en = {
     'dashboard.recentEditions': 'Recent Editions',
     'dashboard.quickActions': 'Quick Actions',
     'dashboard.noOverdueTasks': 'No overdue tasks',
+    'dashboard.ongoingTrainingSessions': 'Ongoing Training Sessions',
     'dashboard.noUpcomingTasks': 'No upcoming tasks',
     'dashboard.viewAll': 'View All',
     

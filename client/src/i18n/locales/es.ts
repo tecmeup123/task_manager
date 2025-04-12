@@ -59,6 +59,7 @@ const es = {
     'dashboard.recentEditions': 'Ediciones Recientes',
     'dashboard.quickActions': 'Acciones Rápidas',
     'dashboard.noOverdueTasks': 'No hay tareas vencidas',
+    'dashboard.ongoingTrainingSessions': 'Sesiones de Formación en Curso',
     'dashboard.noUpcomingTasks': 'No hay próximas tareas',
     'dashboard.viewAll': 'Ver Todo',
     
