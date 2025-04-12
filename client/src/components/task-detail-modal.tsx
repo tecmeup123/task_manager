@@ -545,6 +545,16 @@ export default function TaskDetailModal({
                 ))}
               </div>
             </div>
+            
+            {/* Emoji Reactions Section */}
+            <div>
+              <h3 className="text-sm font-medium mb-2">Reactions</h3>
+              <div className="p-3 bg-neutral-50 rounded-lg border border-neutral-200">
+                {task?.id && (
+                  <EmojiReactions entityType="task" entityId={task.id} />
+                )}
+              </div>
+            </div>
 
             <DialogFooter className="flex justify-between sm:justify-end space-x-2">
               <Button 
