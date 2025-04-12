@@ -50,6 +50,13 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const isMobile = useIsMobile();
   const { user, logoutMutation } = useAuth();
+  const { 
+    notifications, 
+    unreadCount, 
+    isLoading: isNotificationsLoading, 
+    markAsRead, 
+    markAllAsRead 
+  } = useNotifications();
 
   // Fetch all tasks for all editions to get upcoming tasks
   const { data: allTasks = [], isLoading: isTasksLoading } = useQuery<any[]>({
@@ -217,9 +224,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full relative">
                 <Bell className="h-5 w-5 text-neutral-500" />
-                {upcomingTasks && upcomingTasks.length > 0 && (
+                {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 flex items-center justify-center text-[10px] font-bold text-white">
-                    {upcomingTasks.length > 9 ? '9+' : upcomingTasks.length}
+                    {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
               </Button>
@@ -227,44 +234,78 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <DropdownMenuContent align="end" className="w-80">
               <div className="flex items-center justify-between px-4 py-2 border-b">
                 <h4 className="font-medium">Notifications</h4>
-                <Button variant="ghost" size="sm" className="text-xs h-7">Mark all as read</Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-xs h-7"
+                  onClick={() => markAllAsRead()}
+                  disabled={isMarkingAllAsRead || notifications.length === 0 || !notifications.some(n => !n.isRead)}
+                >
+                  Mark all as read
+                </Button>
               </div>
               <div className="max-h-[400px] overflow-y-auto py-2">
-                {isLoading || !editions ? (
+                {isNotificationsLoading ? (
                   <div className="p-4 text-center text-sm text-neutral-500">
                     Loading notifications...
                   </div>
-                ) : upcomingTasks && upcomingTasks.length > 0 ? (
-                  upcomingTasks.slice(0, 5).map((task: any) => (
-                    <DropdownMenuItem key={task.id} className="p-3 focus:bg-neutral-100 cursor-default">
+                ) : notifications && notifications.length > 0 ? (
+                  notifications.map((notification) => (
+                    <DropdownMenuItem 
+                      key={notification.id} 
+                      className={`p-3 focus:bg-neutral-100 cursor-default ${!notification.isRead ? 'bg-primary-50' : ''}`}
+                    >
                       <div className="flex flex-col space-y-1 w-full">
                         <div className="flex items-center justify-between">
-                          {task.assignedUserId === user?.id ? (
-                            <span className="font-medium text-sm flex items-center">
+                          <span className="font-medium text-sm flex items-center">
+                            {notification.type === 'task_assigned' && (
                               <Badge variant="success" className="mr-1 py-0 px-1 text-[10px]">Assigned to you</Badge>
-                              {task.dueDate && <span className="text-neutral-500 ml-1">Due Soon</span>}
-                            </span>
-                          ) : (
-                            <span className="font-medium text-sm">Due Soon</span>
-                          )}
-                          {task.dueDate && (
-                            <span className="text-xs text-neutral-500">{formatDate(task.dueDate, "MMM d")}</span>
-                          )}
+                            )}
+                            {notification.type === 'task_updated' && (
+                              <Badge variant="outline" className="mr-1 py-0 px-1 text-[10px]">Updated</Badge>
+                            )}
+                            {notification.type === 'due_date' && (
+                              <Badge variant="destructive" className="mr-1 py-0 px-1 text-[10px]">Due Soon</Badge>
+                            )}
+                            <span className="text-neutral-600">{notification.title}</span>
+                          </span>
+                          <span className="text-xs text-neutral-500">
+                            {formatDate(notification.createdAt, "MMM d")}
+                          </span>
                         </div>
-                        <p className="text-sm mb-1">{task.name}</p>
-                        <div className="flex justify-end">
-                          <Link to={`/tasks/${task.editionId}?taskId=${task.id}`}>
-                            <Button size="sm" variant="outline" className="h-7 text-xs">
-                              Go to task
+                        <p className="text-sm mb-1">{notification.message}</p>
+                        <div className="flex justify-between">
+                          {!notification.isRead && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-7 text-xs"
+                              onClick={() => markAsRead(notification.id)}
+                            >
+                              Mark as read
                             </Button>
-                          </Link>
+                          )}
+                          {notification.entityType === 'task' && notification.entityId && (
+                            <Link to={`/tasks/${notification.entityId}`}>
+                              <Button size="sm" variant="outline" className="h-7 text-xs">
+                                Go to task
+                              </Button>
+                            </Link>
+                          )}
+                          {notification.entityType === 'edition' && notification.entityId && (
+                            <Link to={`/editions?id=${notification.entityId}`}>
+                              <Button size="sm" variant="outline" className="h-7 text-xs">
+                                View edition
+                              </Button>
+                            </Link>
+                          )}
                         </div>
                       </div>
                     </DropdownMenuItem>
                   ))
                 ) : (
                   <div className="p-4 text-center text-sm text-neutral-500">
-                    No upcoming tasks due soon.
+                    No notifications.
                   </div>
                 )}
               </div>
