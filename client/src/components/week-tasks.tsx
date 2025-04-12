@@ -32,13 +32,13 @@ export default function WeekTasks({
 
   return (
     <div 
-      className={`border-b border-neutral-200 ${weekStatus === 'CURRENT WEEK' ? 'bg-primary bg-opacity-5' : ''}`}
+      className={`border-b border-neutral-200 ${weekStatus === 'CURRENT WEEK' ? 'bg-neutral-50' : ''}`}
     >
       {/* Week Header */}
       <div 
         className={`p-3 cursor-pointer ${
           weekStatus === 'CURRENT WEEK' 
-            ? 'bg-primary bg-opacity-10 hover:bg-primary hover:bg-opacity-15' 
+            ? 'bg-primary bg-opacity-5 hover:bg-primary hover:bg-opacity-10' 
             : 'bg-neutral-50 hover:bg-neutral-100'
         }`}
         onClick={onToggleExpand}
