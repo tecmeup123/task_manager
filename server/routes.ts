@@ -574,7 +574,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.createUser({
         ...req.body,
         password: hashedPassword,
-        forcePasswordChange: true // Force password change on first login
+        forcePasswordChange: true, // Force password change on first login
+        passwordChangeRequired: true // Mark that password change is required
       });
       
       // Create audit log
