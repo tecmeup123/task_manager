@@ -11,10 +11,6 @@ type User = {
   role: string;
   forcePasswordChange: boolean;
   passwordChangeRequired: boolean;
-  avatarColor: string | null;
-  avatarShape: string | null;
-  avatarIcon: string | null;
-  avatarBackground: string | null;
   createdAt: string;
 };
 
