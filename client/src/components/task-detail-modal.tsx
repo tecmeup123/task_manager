@@ -135,7 +135,13 @@ export default function TaskDetailModal({
   }, [task, form]);
 
   const onSubmit = (values: FormValues) => {
-    onSave(values);
+    // Process the assignedUserId field (convert "none" to null)
+    const formData = { ...values };
+    if (typeof formData.assignedUserId === 'string' && formData.assignedUserId === "none") {
+      formData.assignedUserId = null;
+    }
+    
+    onSave(formData);
   };
 
   return (

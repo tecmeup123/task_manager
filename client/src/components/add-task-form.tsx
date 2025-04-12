@@ -116,11 +116,12 @@ export default function AddTaskForm({
   // Handle form submission
   const onSubmit = (values: FormValues) => {
     // Process the assignedUserId field (convert "none" to null)
-    if (values.assignedUserId === "none") {
-      values.assignedUserId = null;
+    const formData = { ...values };
+    if (typeof formData.assignedUserId === 'string' && formData.assignedUserId === "none") {
+      formData.assignedUserId = null;
     }
     
-    onSave(values);
+    onSave(formData);
     form.reset();
   };
 
