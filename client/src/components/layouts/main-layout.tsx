@@ -83,23 +83,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
   }, [user]);
 
   return (
-    <div className="font-sans bg-[#f8f9fa] text-[#333333] min-h-screen flex flex-col">
-      {/* Top Header Banner */}
-      <div className="cmf-header">
-        <div className="cmf-container flex justify-between items-center">
-          <div className="text-sm">Training Management System</div>
-          <div className="text-sm">
-            {new Date().toLocaleDateString('en-US', {
-              year: 'numeric', 
-              month: 'short', 
-              day: 'numeric'
-            })}
-          </div>
-        </div>
-      </div>
-      
-      {/* Main Navigation Header */}
-      <header className="cmf-navbar px-4 md:px-6 py-3 flex justify-between items-center fixed top-[28px] w-full z-20">
+    <div className="font-sans bg-neutral-100 text-neutral-700 min-h-screen flex flex-col">
+      {/* Header */}
+      <header className="bg-white border-b border-neutral-200 px-4 md:px-6 py-3 flex justify-between items-center fixed top-0 w-full shadow-sm z-20">
         <div className="flex items-center">
           {isMobile && showBackButton ? (
             <Button 
@@ -121,7 +107,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             </Button>
           ) : null}
           
-          <h1 className="text-lg md:text-xl font-semibold text-[#0056b3] mr-6 truncate">
+          <h1 className="text-lg md:text-xl font-semibold text-primary mr-6 truncate">
             {isMobile && location.startsWith('/tasks/') 
               ? 'Task Details' 
               : isMobile && location === '/tasks'
@@ -135,7 +121,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <Link to="/">
               <Button
                 variant={location === "/" ? "default" : "ghost"}
-                className={location === "/" ? "bg-[#0056b3] text-white hover:bg-[#004494]" : "hover:bg-[#e9ecef] text-[#0056b3]"}
+                className={location === "/" ? "bg-primary text-white" : "hover:bg-neutral-100"}
                 size="sm"
               >
                 Dashboard
@@ -144,7 +130,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <Link to="/tasks">
               <Button
                 variant={location.startsWith("/tasks") ? "default" : "ghost"}
-                className={location.startsWith("/tasks") ? "bg-[#0056b3] text-white hover:bg-[#004494]" : "hover:bg-[#e9ecef] text-[#0056b3]"}
+                className={location.startsWith("/tasks") ? "bg-primary text-white" : "hover:bg-neutral-100"}
                 size="sm"
               >
                 Tasks
@@ -153,7 +139,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <Link to="/editions">
               <Button
                 variant={location === "/editions" ? "default" : "ghost"}
-                className={location === "/editions" ? "bg-[#0056b3] text-white hover:bg-[#004494]" : "hover:bg-[#e9ecef] text-[#0056b3]"}
+                className={location === "/editions" ? "bg-primary text-white" : "hover:bg-neutral-100"}
                 size="sm"
               >
                 Editions
@@ -166,12 +152,12 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <Input 
               type="text" 
               placeholder="Search..." 
-              className="w-40 h-9 pl-8 border-[#dee2e6] focus:border-[#0056b3] focus:ring-[#0056b3] focus:ring-opacity-25"
+              className="w-40 h-9 pl-8"
             />
-            <Search className="absolute left-2 top-2.5 w-4 h-4 text-[#6c757d]" />
+            <Search className="absolute left-2 top-2.5 w-4 h-4 text-neutral-500" />
           </div>
-          <Button variant="ghost" size="icon" className="rounded-full text-[#6c757d] hover:text-[#0056b3] hover:bg-[#e9ecef]">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="rounded-full">
+            <Bell className="h-5 w-5 text-neutral-500" />
           </Button>
           
           {/* User Avatar - new component */}
@@ -183,48 +169,48 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
       {/* Mobile Menu */}
       {isMobile && mobileMenuOpen && (
-        <div className="fixed inset-0 bg-white z-10 pt-20 pb-4 px-4 overflow-y-auto">
+        <div className="fixed inset-0 bg-white z-10 pt-16 pb-4 px-4 overflow-y-auto">
           <nav className="mt-4">
             <div className="flex flex-col space-y-2">
               <Link to="/">
-                <div className={`flex items-center px-4 py-3 text-base ${location === "/" ? "cmf-sidebar-nav-item-active" : "cmf-sidebar-nav-item"}`}>
+                <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <LayoutDashboard className="w-5 h-5 mr-3" />
                   <span>Dashboard</span>
                 </div>
               </Link>
               <Link to="/tasks">
-                <div className={`flex items-center px-4 py-3 text-base ${location.startsWith("/tasks") ? "cmf-sidebar-nav-item-active" : "cmf-sidebar-nav-item"}`}>
+                <div className={`flex items-center px-4 py-3 text-base rounded-md ${location.startsWith("/tasks") ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <ListTodo className="w-5 h-5 mr-3" />
                   <span>Tasks</span>
                 </div>
               </Link>
               <Link to="/editions">
-                <div className={`flex items-center px-4 py-3 text-base ${location === "/editions" ? "cmf-sidebar-nav-item-active" : "cmf-sidebar-nav-item"}`}>
+                <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/editions" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <GraduationCap className="w-5 h-5 mr-3" />
                   <span>Editions</span>
                 </div>
               </Link>
               <Link to="/trainers">
-                <div className={`flex items-center px-4 py-3 text-base ${location === "/trainers" ? "cmf-sidebar-nav-item-active" : "cmf-sidebar-nav-item"}`}>
+                <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/trainers" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <Users className="w-5 h-5 mr-3" />
                   <span>Trainers</span>
                 </div>
               </Link>
               <Link to="/reports">
-                <div className={`flex items-center px-4 py-3 text-base ${location === "/reports" ? "cmf-sidebar-nav-item-active" : "cmf-sidebar-nav-item"}`}>
+                <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/reports" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <BarChart className="w-5 h-5 mr-3" />
                   <span>Reports</span>
                 </div>
               </Link>
               <Link to="/settings">
-                <div className={`flex items-center px-4 py-3 text-base ${location === "/settings" ? "cmf-sidebar-nav-item-active" : "cmf-sidebar-nav-item"}`}>
+                <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/settings" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <Settings className="w-5 h-5 mr-3" />
                   <span>Settings</span>
                 </div>
               </Link>
               {user && user.role === "admin" && (
                 <Link to="/users">
-                  <div className={`flex items-center px-4 py-3 text-base ${location === "/users" ? "cmf-sidebar-nav-item-active" : "cmf-sidebar-nav-item"}`}>
+                  <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/users" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                     <Users className="w-5 h-5 mr-3" />
                     <span>Users</span>
                   </div>
@@ -234,7 +220,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
           </nav>
           
           <div className="mt-8">
-            <h3 className="px-4 text-base font-medium text-[#6c757d]">Current Editions</h3>
+            <h3 className="px-4 text-base font-medium text-neutral-500">Current Editions</h3>
             <div className="mt-2 space-y-1">
               {isLoading ? (
                 <>
@@ -244,28 +230,28 @@ export default function MainLayout({ children }: MainLayoutProps) {
               ) : editions && editions.length > 0 ? (
                 editions.map((edition: any) => (
                   <Link key={edition.id} to={`/tasks/${edition.id}`}>
-                    <div className={`flex items-center px-4 py-3 text-base ${edition.id === currentEditionId ? 'cmf-sidebar-nav-item-active' : 'cmf-sidebar-nav-item'}`}>
+                    <div className={`flex items-center px-4 py-3 text-base rounded-md ${edition.id === currentEditionId ? 'bg-primary-light bg-opacity-10 text-primary' : 'text-neutral-600 hover:bg-neutral-100'}`}>
                       <BookOpen className="w-5 h-5 mr-3" />
                       {edition.code}
                     </div>
                   </Link>
                 ))
               ) : (
-                <div className="px-4 py-3 text-[#6c757d]">No editions available</div>
+                <div className="px-4 py-3 text-neutral-500">No editions available</div>
               )}
             </div>
           </div>
         </div>
       )}
 
-      <div className="flex flex-1 pt-16 mt-[28px]">
+      <div className="flex flex-1 pt-16">
         {/* Desktop Sidebar */}
-        <aside className="w-48 hidden md:block cmf-sidebar fixed h-full pt-4">
-          <div className="px-4 py-2 text-sm font-medium text-[#6c757d] uppercase">Navigation</div>
+        <aside className="w-48 hidden md:block bg-white border-r border-neutral-200 fixed h-full pt-4">
+          <div className="px-4 py-2 text-sm font-medium text-neutral-500 uppercase">Navigation</div>
           <nav>
             <div>
               <Link to="/">
-                <div className={`flex items-center text-sm ${location === "/" ? "cmf-sidebar-nav-item-active" : "cmf-sidebar-nav-item"}`}>
+                <div className={`flex items-center px-4 py-2 text-sm ${location === "/" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <LayoutDashboard className="w-5 h-5 mr-2" />
                   <span>Dashboard</span>
                 </div>
@@ -273,7 +259,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             </div>
             <div>
               <Link to="/tasks">
-                <div className={`flex items-center text-sm ${location.startsWith("/tasks") ? "cmf-sidebar-nav-item-active" : "cmf-sidebar-nav-item"}`}>
+                <div className={`flex items-center px-4 py-2 text-sm ${location.startsWith("/tasks") ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <ListTodo className="w-5 h-5 mr-2" />
                   <span>Tasks</span>
                 </div>
@@ -281,33 +267,34 @@ export default function MainLayout({ children }: MainLayoutProps) {
             </div>
             <div>
               <Link to="/editions">
-                <div className={`flex items-center text-sm ${location === "/editions" ? "cmf-sidebar-nav-item-active" : "cmf-sidebar-nav-item"}`}>
+                <div className={`flex items-center px-4 py-2 text-sm ${location === "/editions" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <GraduationCap className="w-5 h-5 mr-2" />
                   <span>Editions</span>
                 </div>
               </Link>
             </div>
             <Link to="/trainers">
-              <div className={`flex items-center text-sm ${location === "/trainers" ? "cmf-sidebar-nav-item-active" : "cmf-sidebar-nav-item"}`}>
+              <div className={`flex items-center px-4 py-2 text-sm ${location === "/trainers" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                 <Users className="w-5 h-5 mr-2" />
                 <span>Trainers</span>
               </div>
             </Link>
             <Link to="/reports">
-              <div className={`flex items-center text-sm ${location === "/reports" ? "cmf-sidebar-nav-item-active" : "cmf-sidebar-nav-item"}`}>
+              <div className={`flex items-center px-4 py-2 text-sm ${location === "/reports" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                 <BarChart className="w-5 h-5 mr-2" />
                 <span>Reports</span>
               </div>
             </Link>
             <Link to="/settings">
-              <div className={`flex items-center text-sm ${location === "/settings" ? "cmf-sidebar-nav-item-active" : "cmf-sidebar-nav-item"}`}>
+              <div className={`flex items-center px-4 py-2 text-sm ${location === "/settings" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                 <Settings className="w-5 h-5 mr-2" />
                 <span>Settings</span>
               </div>
             </Link>
+            {/* Debug information removed */}
             {user && user.role === "admin" && (
               <Link to="/users">
-                <div className={`flex items-center text-sm ${location === "/users" ? "cmf-sidebar-nav-item-active" : "cmf-sidebar-nav-item"}`}>
+                <div className={`flex items-center px-4 py-2 text-sm ${location === "/users" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <Users className="w-5 h-5 mr-2" />
                   <span>Users</span>
                 </div>
@@ -315,7 +302,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             )}
           </nav>
           
-          <div className="px-4 py-2 mt-6 text-sm font-medium text-[#6c757d] uppercase">Current Editions</div>
+          <div className="px-4 py-2 mt-6 text-sm font-medium text-neutral-500 uppercase">Current Editions</div>
           <div className="px-4 py-2">
             {isLoading ? (
               <>
@@ -327,7 +314,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
               editions.map((edition: any) => (
                 <div key={edition.id}>
                   <Link to={`/tasks/${edition.id}`}>
-                    <div className={`text-sm mb-2 px-2 py-1 flex items-center ${edition.id === currentEditionId ? 'text-[#0056b3] font-medium' : 'text-[#495057] hover:text-[#0056b3]'}`}>
+                    <div className={`text-sm mb-2 px-2 py-1 rounded flex items-center ${edition.id === currentEditionId ? 'bg-primary-light bg-opacity-10 text-primary' : 'hover:bg-neutral-100 text-neutral-600'}`}>
                       <BookOpen className="w-4 h-4 mr-1" />
                       {edition.code}
                     </div>
@@ -335,7 +322,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 </div>
               ))
             ) : (
-              <div className="text-sm text-[#6c757d]">No editions available</div>
+              <div className="text-sm text-neutral-500">No editions available</div>
             )}
           </div>
         </aside>
@@ -348,20 +335,20 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
       {/* Mobile Bottom Navigation Bar */}
       {isMobile && !mobileMenuOpen && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#dee2e6] flex justify-around items-center py-2 px-4 z-10">
-          <Link to="/" className={`flex flex-col items-center ${location === '/' ? 'text-[#0056b3]' : 'text-[#6c757d]'}`}>
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 flex justify-around items-center py-2 px-4 z-10">
+          <Link to="/" className={`flex flex-col items-center ${location === '/' ? 'text-primary' : 'text-neutral-500'}`}>
             <LayoutDashboard className="h-6 w-6" />
             <span className="text-xs mt-1">Home</span>
           </Link>
-          <Link to="/tasks" className={`flex flex-col items-center ${location.startsWith('/tasks') ? 'text-[#0056b3]' : 'text-[#6c757d]'}`}>
+          <Link to="/tasks" className={`flex flex-col items-center ${location.startsWith('/tasks') ? 'text-primary' : 'text-neutral-500'}`}>
             <ListTodo className="h-6 w-6" />
             <span className="text-xs mt-1">Tasks</span>
           </Link>
-          <Link to="/editions" className={`flex flex-col items-center ${location === '/editions' ? 'text-[#0056b3]' : 'text-[#6c757d]'}`}>
+          <Link to="/editions" className={`flex flex-col items-center ${location === '/editions' ? 'text-primary' : 'text-neutral-500'}`}>
             <GraduationCap className="h-6 w-6" />
             <span className="text-xs mt-1">Editions</span>
           </Link>
-          <Link to="/settings" className={`flex flex-col items-center ${location === '/settings' ? 'text-[#0056b3]' : 'text-[#6c757d]'}`}>
+          <Link to="/settings" className={`flex flex-col items-center ${location === '/settings' ? 'text-primary' : 'text-neutral-500'}`}>
             <Settings className="h-6 w-6" />
             <span className="text-xs mt-1">Settings</span>
           </Link>
