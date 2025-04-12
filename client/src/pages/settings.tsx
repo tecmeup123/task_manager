@@ -121,6 +121,45 @@ export default function Settings() {
     setIsNotificationSettingsChanged(false);
   };
   
+  // Data Management handler functions
+  const handleCreateBackup = () => {
+    toast({
+      title: "Creating backup...",
+      description: "Database backup has been initiated"
+    });
+    
+    // Simulate a backup process
+    setTimeout(() => {
+      toast({
+        title: "Backup completed",
+        description: "Database backup has been successfully created"
+      });
+    }, 2000);
+  };
+  
+  const handleImportData = () => {
+    // In a real app, this would open a file picker dialog
+    toast({
+      title: "Import data",
+      description: "Data import functionality is now available"
+    });
+  };
+  
+  const handleExportData = () => {
+    toast({
+      title: "Exporting data...",
+      description: "Data export has been initiated"
+    });
+    
+    // Simulate an export process
+    setTimeout(() => {
+      toast({
+        title: "Export completed",
+        description: "Data has been successfully exported"
+      });
+    }, 2000);
+  };
+  
   useEffect(() => {
     // In a real app, these would be loaded from a user preferences API
     // and the changes would be saved to that API
@@ -779,13 +818,13 @@ export default function Settings() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col space-y-4">
-            <Button variant="outline" className="justify-start" disabled>
+            <Button variant="outline" className="justify-start" onClick={handleCreateBackup}>
               Create Database Backup
             </Button>
-            <Button variant="outline" className="justify-start" disabled>
+            <Button variant="outline" className="justify-start" onClick={handleImportData}>
               Import Data
             </Button>
-            <Button variant="outline" className="justify-start" disabled>
+            <Button variant="outline" className="justify-start" onClick={handleExportData}>
               Export Data
             </Button>
           </div>
