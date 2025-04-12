@@ -25,8 +25,8 @@ export default function TaskRow({ task, onClick, isCurrentWeek = false }: TaskRo
     <div 
       className={`task-row p-3 border-t border-neutral-200 text-sm cursor-pointer ${
         isCurrentWeek 
-          ? 'hover:bg-primary hover:bg-opacity-5' 
-          : 'hover:bg-neutral-50'
+          ? 'bg-neutral-100 hover:bg-neutral-200' 
+          : 'bg-neutral-50 hover:bg-neutral-100'
       }`}
       onClick={onClick}
     >
