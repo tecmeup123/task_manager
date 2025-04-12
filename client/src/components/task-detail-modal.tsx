@@ -5,6 +5,7 @@ import { z } from "zod";
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "wouter";
 import { User } from "@shared/schema";
 import {
   Dialog,
@@ -72,6 +73,7 @@ export default function TaskDetailModal({
   onSave,
 }: TaskDetailModalProps) {
   const { t } = useTranslation();
+  const [, setLocation] = useLocation();
   const [activityHistory, setActivityHistory] = useState<any[]>([
     {
       action: `Status changed to ${task.status}`,
@@ -160,7 +162,10 @@ export default function TaskDetailModal({
       <DialogContent className="sm:max-w-md md:max-w-2xl">
         <DialogHeader className="flex flex-row items-center justify-start">
           <button 
-            onClick={() => onClose()} 
+            onClick={() => {
+              onClose();
+              setLocation('/');
+            }} 
             className="mr-3 hover:bg-neutral-100 p-1 rounded-full transition-colors"
             aria-label="Back to dashboard"
           >
@@ -564,7 +569,10 @@ export default function TaskDetailModal({
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => onClose()}
+                onClick={() => {
+                  onClose();
+                  setLocation('/');
+                }}
                 className="flex items-center"
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
