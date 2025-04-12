@@ -98,12 +98,18 @@ export default function Editions() {
 
   // Helper functions to determine edition status
   const isEditionUpcoming = (edition: any) => {
+    // Archived editions are never upcoming
+    if (edition.archived) return false;
+    
     const startDate = new Date(edition.startDate);
     const now = new Date();
     return startDate > now;
   };
 
   const isEditionActive = (edition: any) => {
+    // Archived editions are never active
+    if (edition.archived) return false;
+    
     const startDate = new Date(edition.startDate);
     const now = new Date();
     // An edition is active if it has started but hasn't reached week 8 yet
@@ -113,6 +119,9 @@ export default function Editions() {
   };
   
   const isEditionFinished = (edition: any) => {
+    // Archived editions are always considered finished
+    if (edition.archived) return true;
+    
     const startDate = new Date(edition.startDate);
     const now = new Date();
     const endDate = addWeeks(startDate, 8);
