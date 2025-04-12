@@ -1,5 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, getQueryFn } from "@/lib/queryClient";
+import { useAuth } from "./use-auth";
 
 export interface Notification {
   id: number;
@@ -11,29 +12,29 @@ export interface Notification {
   entityId: number | null;
   isRead: boolean;
   createdAt: string;
+  actionUrl?: string;
+  metadata?: any;
 }
 
-export function useNotifications(limit: number = 5, includeRead: boolean = false) {
+export function useNotifications(limit: number = 10, includeRead: boolean = false) {
+  const { user } = useAuth();
+  
+  // Only fetch notifications if user is logged in
   const { data: notifications = [], isLoading, error, refetch } = useQuery<Notification[]>({
     queryKey: ["/api/notifications", { limit, includeRead }],
-    queryFn: async () => {
-      const res = await fetch(`/api/notifications?limit=${limit}&includeRead=${includeRead}`);
-      if (!res.ok) {
-        throw new Error("Failed to fetch notifications");
-      }
-      return res.json();
-    }
+    queryFn: getQueryFn({ on401: "returnNull" }),
+    enabled: !!user, // Only run the query if the user is logged in
+    refetchOnWindowFocus: false,
+    retry: 1
   });
 
-  const { data: unreadCount = 0 } = useQuery<{ count: number }>({
+  // Only fetch unread count if user is logged in
+  const { data: unreadCount = { count: 0 } } = useQuery<{ count: number }>({
     queryKey: ["/api/notifications/count"],
-    queryFn: async () => {
-      const res = await fetch("/api/notifications/count");
-      if (!res.ok) {
-        throw new Error("Failed to fetch unread count");
-      }
-      return res.json();
-    }
+    queryFn: getQueryFn({ on401: "returnNull" }),
+    enabled: !!user, // Only run the query if the user is logged in
+    refetchOnWindowFocus: false,
+    retry: 1
   });
 
   const markAsReadMutation = useMutation({
@@ -56,6 +57,17 @@ export function useNotifications(limit: number = 5, includeRead: boolean = false
     }
   });
 
+  const createTestNotificationMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/notifications/test");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/notifications/count"] });
+    }
+  });
+
   return {
     notifications,
     unreadCount: unreadCount && typeof unreadCount === 'object' ? unreadCount.count : 0,
@@ -64,7 +76,9 @@ export function useNotifications(limit: number = 5, includeRead: boolean = false
     refetch,
     markAsRead: (id: number) => markAsReadMutation.mutate(id),
     markAllAsRead: () => markAllAsReadMutation.mutate(),
+    createTestNotification: () => createTestNotificationMutation.mutate(),
     isMarkingAsRead: markAsReadMutation.isPending,
-    isMarkingAllAsRead: markAllAsReadMutation.isPending
+    isMarkingAllAsRead: markAllAsReadMutation.isPending,
+    isCreatingTest: createTestNotificationMutation.isPending
   };
 }

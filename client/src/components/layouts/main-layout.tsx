@@ -309,8 +309,18 @@ export default function MainLayout({ children }: MainLayoutProps) {
                     </DropdownMenuItem>
                   ))
                 ) : (
-                  <div className="p-4 text-center text-sm text-neutral-500">
-                    No notifications.
+                  <div className="p-4 text-center space-y-2">
+                    <p className="text-sm text-neutral-500">No notifications.</p>
+                    {user?.role === 'admin' && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="text-xs"
+                        onClick={() => refetch()}
+                      >
+                        Create Test Notification
+                      </Button>
+                    )}
                   </div>
                 )}
               </div>
