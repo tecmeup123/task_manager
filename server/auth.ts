@@ -148,6 +148,35 @@ export function setupAuth(app: Express) {
       passwordChangeRequired
     });
   });
+  
+  // Update user avatar settings
+  app.post("/api/user/avatar", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) return res.sendStatus(401);
+      
+      const { avatarColor, avatarShape, avatarIcon, avatarBackground } = req.body;
+      
+      if (!avatarColor || !avatarShape || !avatarIcon || !avatarBackground) {
+        return res.status(400).json({ message: "Missing avatar properties" });
+      }
+      
+      // Update user avatar settings
+      const updatedUser = await storage.updateUser(req.user.id, {
+        avatarColor,
+        avatarShape,
+        avatarIcon, 
+        avatarBackground
+      });
+      
+      // Remove sensitive info
+      const safeUser = { ...updatedUser };
+      delete safeUser.password;
+      
+      res.json(safeUser);
+    } catch (error) {
+      next(error);
+    }
+  });
 
   app.get("/api/users", async (req, res, next) => {
     try {

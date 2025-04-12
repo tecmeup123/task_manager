@@ -4,11 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings as SettingsIcon, User, Bell, Lock, Database, Calendar, Clock, Eye, Columns, EyeOff } from "lucide-react";
+import { Settings as SettingsIcon, User, Bell, Lock, Database, Calendar, Clock, Eye, Columns, EyeOff, Smile } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/use-auth";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import AvatarCustomizer from "@/components/avatar-customizer";
+import { UserAvatar } from "@/components/user-avatar";
+import { AvatarShape, AvatarBackground } from "@/components/user-avatar";
 
 export default function Settings() {
   const { toast } = useToast();
