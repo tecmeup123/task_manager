@@ -145,10 +145,16 @@ export default function TaskDetailModal({
   };
 
   // Using a more direct approach for closing the modal
+  const handleClose = () => {
+    console.log("Modal close function called");
+    onClose();
+  };
+  
   return (
     <Dialog 
       open={isOpen} 
       onOpenChange={(open) => {
+        console.log("Dialog onOpenChange called", {open});
         if (!open) onClose();
       }}
     >
@@ -159,7 +165,7 @@ export default function TaskDetailModal({
               type="button" 
               variant="ghost" 
               size="icon"
-              onClick={onClose}
+              onClick={handleClose}
               className="mr-2 h-8 w-8 p-0"
               aria-label="Back to task list"
             >
@@ -555,7 +561,7 @@ export default function TaskDetailModal({
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={onClose}
+                onClick={handleClose}
                 className="flex items-center"
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
