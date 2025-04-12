@@ -159,6 +159,13 @@ export default function TaskDetailModal({
     >
       <DialogContent className="sm:max-w-md md:max-w-2xl">
         <DialogHeader className="flex flex-row items-center justify-start">
+          <button 
+            onClick={() => onClose()} 
+            className="mr-3 hover:bg-neutral-100 p-1 rounded-full transition-colors"
+            aria-label="Back to dashboard"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </button>
           <div className="flex items-center">
             <DialogTitle>{t('tasks.details')}: {task?.taskCode || ""}</DialogTitle>
           </div>
