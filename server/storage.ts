@@ -58,6 +58,15 @@ export interface IStorage {
   updateTask(id: number, task: Partial<Task>): Promise<Task>;
   deleteTask(id: number): Promise<boolean>;
   
+  // Notification methods
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  getUserNotifications(userId: number, limit?: number, includeRead?: boolean): Promise<Notification[]>;
+  getNotification(id: number): Promise<Notification | undefined>;
+  markNotificationAsRead(id: number): Promise<Notification>;
+  markAllNotificationsAsRead(userId: number): Promise<boolean>;
+  deleteNotification(id: number): Promise<boolean>;
+  getUnreadNotificationCount(userId: number): Promise<number>;
+  
   // Helper method to duplicate edition with tasks
   duplicateEdition(editionId: number, newEditionData: InsertEdition): Promise<Edition>;
 }
@@ -73,11 +82,13 @@ export class MemStorage implements IStorage {
   private editions: Map<number, Edition>;
   private tasks: Map<number, Task>;
   private auditLogs: Map<number, AuditLog>;
+  private notifications: Map<number, Notification>;
   private currentUserId: number;
   private currentTrainerId: number;
   private currentEditionId: number;
   private currentTaskId: number;
   private currentAuditLogId: number;
+  private currentNotificationId: number;
   sessionStore: session.Store;
 
   constructor() {
@@ -86,11 +97,13 @@ export class MemStorage implements IStorage {
     this.editions = new Map();
     this.tasks = new Map();
     this.auditLogs = new Map();
+    this.notifications = new Map();
     this.currentUserId = 1;
     this.currentTrainerId = 1;
     this.currentEditionId = 1;
     this.currentTaskId = 1;
     this.currentAuditLogId = 1;
+    this.currentNotificationId = 1;
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000 // 24 hours
     });
@@ -316,6 +329,69 @@ export class MemStorage implements IStorage {
     }
     
     return newEdition;
+  }
+
+  // Notification methods
+  async createNotification(notification: InsertNotification): Promise<Notification> {
+    const id = this.currentNotificationId++;
+    const notificationRecord: Notification = {
+      ...notification,
+      id,
+      isRead: false,
+      createdAt: new Date()
+    };
+    this.notifications.set(id, notificationRecord);
+    return notificationRecord;
+  }
+
+  async getUserNotifications(userId: number, limit: number = 10, includeRead: boolean = false): Promise<Notification[]> {
+    let userNotifications = Array.from(this.notifications.values())
+      .filter(notification => notification.userId === userId);
+    
+    if (!includeRead) {
+      userNotifications = userNotifications.filter(notification => !notification.isRead);
+    }
+    
+    return userNotifications
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limit);
+  }
+
+  async getNotification(id: number): Promise<Notification | undefined> {
+    return this.notifications.get(id);
+  }
+
+  async markNotificationAsRead(id: number): Promise<Notification> {
+    const notification = this.notifications.get(id);
+    if (!notification) {
+      throw new Error(`Notification with id ${id} not found`);
+    }
+    
+    const updatedNotification = { ...notification, isRead: true };
+    this.notifications.set(id, updatedNotification);
+    return updatedNotification;
+  }
+
+  async markAllNotificationsAsRead(userId: number): Promise<boolean> {
+    let success = true;
+    
+    for (const [id, notification] of this.notifications.entries()) {
+      if (notification.userId === userId && !notification.isRead) {
+        this.notifications.set(id, { ...notification, isRead: true });
+      }
+    }
+    
+    return success;
+  }
+
+  async deleteNotification(id: number): Promise<boolean> {
+    return this.notifications.delete(id);
+  }
+
+  async getUnreadNotificationCount(userId: number): Promise<number> {
+    return Array.from(this.notifications.values())
+      .filter(notification => notification.userId === userId && !notification.isRead)
+      .length;
   }
 
   // Seed some initial data
