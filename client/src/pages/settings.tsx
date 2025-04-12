@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings as SettingsIcon, User, Bell, Lock, Database, Calendar, Clock, Eye, Columns, EyeOff } from "lucide-react";
+import { Settings as SettingsIcon, User, Bell, Lock, Database, Calendar, Clock, Eye, Columns, EyeOff, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/use-auth";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function Settings() {
   const { toast } = useToast();
@@ -262,6 +263,55 @@ export default function Settings() {
         description: `${templateData.length} tasks template has been successfully downloaded`
       });
     }, 500);
+  };
+  
+  // Template upload handler
+  const handleUploadTemplate = () => {
+    if (!templateFile) {
+      toast({
+        title: "No file selected",
+        description: "Please select a template file to upload",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    toast({
+      title: "Uploading template...",
+      description: "Processing template data"
+    });
+    
+    // Read the file
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const templateData = JSON.parse(content);
+        
+        if (!Array.isArray(templateData)) {
+          throw new Error("Invalid template format. Expected an array of tasks.");
+        }
+        
+        // In a real implementation, would send this to the server
+        // In this prototype, just show success
+        
+        setTimeout(() => {
+          toast({
+            title: "Template uploaded",
+            description: `Successfully imported ${templateData.length} tasks from template`
+          });
+          setTemplateFile(null);
+        }, 1000);
+      } catch (error) {
+        toast({
+          title: "Error parsing template",
+          description: error instanceof Error ? error.message : "Invalid template format",
+          variant: "destructive"
+        });
+      }
+    };
+    
+    reader.readAsText(templateFile);
   };
   
   // Helper function to generate comprehensive template data for all weeks
@@ -684,75 +734,7 @@ export default function Settings() {
     return templateSpecificTasks[templateType as keyof typeof templateSpecificTasks] || templateSpecificTasks.default;
   };
   
-  const handleUploadTemplate = () => {
-    if (!templateFile) {
-      toast({
-        title: "Error",
-        description: "Please select a file to upload",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    toast({
-      title: "Uploading template...",
-      description: `Processing ${templateFile.name}`
-    });
-    
-    // Read and parse the file
-    const reader = new FileReader();
-    
-    reader.onload = (event) => {
-      try {
-        // Attempt to parse as JSON
-        const fileContent = event.target?.result as string;
-        const jsonData = JSON.parse(fileContent);
-        
-        // Validate the structure
-        if (!Array.isArray(jsonData)) {
-          throw new Error("Template must be an array of tasks");
-        }
-        
-        // Check if tasks have required fields
-        const hasRequiredFields = jsonData.every((task: any) => 
-          task.taskCode && task.week && task.name && task.trainingType
-        );
-        
-        if (!hasRequiredFields) {
-          throw new Error("Some tasks are missing required fields");
-        }
-        
-        // In a real app, would send this data to the backend to update templates
-        console.log("Template data validated:", jsonData);
-        
-        toast({
-          title: "Template uploaded",
-          description: `${jsonData.length} template tasks have been successfully processed`
-        });
-        
-        // Clear the file input
-        setTemplateFile(null);
-      } catch (error) {
-        console.error("Template parsing error:", error);
-        
-        toast({
-          title: "Upload error",
-          description: `Could not process template file: ${error instanceof Error ? error.message : "Invalid format"}`,
-          variant: "destructive"
-        });
-      }
-    };
-    
-    reader.onerror = () => {
-      toast({
-        title: "Upload error",
-        description: "Failed to read the file",
-        variant: "destructive"
-      });
-    };
-    
-    reader.readAsText(templateFile);
-  };
+  // The handleUploadTemplate function has been moved to a single instance above to avoid duplication
   
   useEffect(() => {
     // In a real app, these would be loaded from a user preferences API
@@ -1414,110 +1396,130 @@ export default function Settings() {
           <div className="flex flex-col space-y-6">
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Database Operations</h3>
-              <div className="flex flex-col space-y-2">
-                <Button 
-                  variant="outline" 
-                  className="justify-start flex items-center" 
-                  onClick={handleSystemBackup}
-                >
-                  <Database className="h-4 w-4 mr-2" />
-                  Create System Backup
-                </Button>
-                
-                <div className="flex flex-col">
-                  <input
-                    type="file"
-                    id="file-import"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                    accept=".json"
-                  />
+              
+              {user?.role === 'admin' ? (
+                <div className="flex flex-col space-y-2">
+                  <Button 
+                    variant="outline" 
+                    className="justify-start flex items-center" 
+                    onClick={handleSystemBackup}
+                  >
+                    <Database className="h-4 w-4 mr-2" />
+                    Create System Backup
+                  </Button>
                   
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Button 
-                      variant="outline" 
-                      className="justify-start flex-1 flex items-center" 
-                      onClick={handleImportClick}
-                    >
-                      <Eye className="h-4 w-4 mr-2" />
-                      Select Backup File
-                    </Button>
+                  <div className="flex flex-col">
+                    <input
+                      type="file"
+                      id="file-import"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      className="hidden"
+                      accept=".json"
+                    />
                     
-                    <Button 
-                      variant="outline" 
-                      className="flex items-center" 
-                      onClick={handleImportData}
-                      disabled={!importFile}
-                    >
-                      Import
-                    </Button>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Button 
+                        variant="outline" 
+                        className="justify-start flex-1 flex items-center" 
+                        onClick={handleImportClick}
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        Select Backup File
+                      </Button>
+                      
+                      <Button 
+                        variant="outline" 
+                        className="flex items-center" 
+                        onClick={handleImportData}
+                        disabled={!importFile}
+                      >
+                        Import
+                      </Button>
+                    </div>
+                    
+                    {importFile && (
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Selected: {importFile.name}
+                      </div>
+                    )}
                   </div>
                   
-                  {importFile && (
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Selected: {importFile.name}
-                    </div>
-                  )}
+                  <Button 
+                    variant="outline" 
+                    className="justify-start flex items-center" 
+                    onClick={handleExportData}
+                  >
+                    <EyeOff className="h-4 w-4 mr-2" />
+                    Export All System Data
+                  </Button>
                 </div>
-                
-                <Button 
-                  variant="outline" 
-                  className="justify-start flex items-center" 
-                  onClick={handleExportData}
-                >
-                  <EyeOff className="h-4 w-4 mr-2" />
-                  Export All System Data
-                </Button>
-              </div>
+              ) : (
+                <Alert className="my-2">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    Administrator privileges are required to access system data management features.
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
             
             <div className="space-y-4 pt-4 border-t">
               <h3 className="text-lg font-medium">Template Management</h3>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="templateSelect">Select Template to Download</Label>
-                  <div className="flex items-center space-x-2 mt-2">
-                    <Button 
-                      onClick={handleDownloadTemplate}
-                      className="w-full"
-                    >
-                      Download Default Template ({generateTemplateData('default').length} tasks)
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Templates include tasks for all weeks from Week -5 to Week 8.
-                  </p>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="templateFile">Upload Template</Label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                    <div className="md:col-span-2">
-                      <Input 
-                        id="templateFile" 
-                        type="file" 
-                        accept=".json,.csv"
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                          const files = e.target.files;
-                          if (files && files.length > 0) {
-                            setTemplateFile(files[0]);
-                          }
-                        }}
-                      />
+              
+              {user?.role === 'admin' || user?.role === 'editor' ? (
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="templateSelect">Select Template to Download</Label>
+                    <div className="flex items-center space-x-2 mt-2">
+                      <Button 
+                        onClick={handleDownloadTemplate}
+                        className="w-full"
+                      >
+                        Download Default Template ({generateTemplateData('default').length} tasks)
+                      </Button>
                     </div>
-                    <Button 
-                      onClick={handleUploadTemplate}
-                      disabled={!templateFile}
-                    >
-                      Upload
-                    </Button>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Templates include tasks for all weeks from Week -5 to Week 8.
+                    </p>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Upload a JSON or CSV file with task templates. This will update your template tasks.
-                  </p>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="templateFile">Upload Template</Label>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      <div className="md:col-span-2">
+                        <Input 
+                          id="templateFile" 
+                          type="file" 
+                          accept=".json,.csv"
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            const files = e.target.files;
+                            if (files && files.length > 0) {
+                              setTemplateFile(files[0]);
+                            }
+                          }}
+                        />
+                      </div>
+                      <Button 
+                        onClick={handleUploadTemplate}
+                        disabled={!templateFile}
+                      >
+                        Upload
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Upload a JSON or CSV file with task templates. This will update your template tasks.
+                    </p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <Alert className="my-2">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    Admin or editor privileges are required to access template management features.
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
           </div>
         </CardContent>
