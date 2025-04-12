@@ -65,10 +65,18 @@ export default function WeekTasks({
               {taskCount} {taskCount === 1 ? 'task' : 'tasks'}
             </Badge>
             <Badge 
-              variant={completionStatus === 'Complete' ? 'success' : 'secondary'} 
-              className={`mr-2 my-1 ${completionStatus === 'In Progress' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : ''}`}
+              variant={
+                completionStatus === 'Complete' ? 'success' : 
+                completionStatus === 'In Progress' ? 'default' : 
+                'outline'
+              }
+              className={`mr-2 my-1 text-white ${
+                weekStatus === 'CURRENT WEEK' && completionStatus === 'In Progress' ? 'bg-green-500 hover:bg-green-600' : 
+                weekStatus === 'CURRENT WEEK' && completionStatus === 'Not Started' ? 'bg-yellow-500 hover:bg-yellow-600' : 
+                completionStatus === 'In Progress' ? 'bg-yellow-500 hover:bg-yellow-600' : ''
+              }`}
             >
-              {completionStatus}
+              {weekStatus === 'CURRENT WEEK' ? 'Current' : completionStatus}
             </Badge>
             <MoreVertical className="h-4 w-4 text-neutral-500" />
           </div>
