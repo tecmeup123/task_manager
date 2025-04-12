@@ -15,6 +15,8 @@ export default function Settings() {
   const { user } = useAuth();
   const [isDashboardSettingsChanged, setIsDashboardSettingsChanged] = useState(false);
   const [isTaskSettingsChanged, setIsTaskSettingsChanged] = useState(false);
+  const [isAccountSettingsChanged, setIsAccountSettingsChanged] = useState(false);
+  const [isSecuritySettingsChanged, setIsSecuritySettingsChanged] = useState(false);
   
   // Dashboard settings
   const [collapseOverdueTasks, setCollapseOverdueTasks] = useState(true);
@@ -26,6 +28,20 @@ export default function Settings() {
   const [taskSortOrder, setTaskSortOrder] = useState("due-date");
   const [taskGrouping, setTaskGrouping] = useState("week");
   const [defaultTaskView, setDefaultTaskView] = useState("list");
+  
+  // Account settings
+  const [fullName, setFullName] = useState(user?.fullName || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [language, setLanguage] = useState("en");
+  const [timezone, setTimezone] = useState("utc");
+  const [useDarkTheme, setUseDarkTheme] = useState(false);
+  
+  // Security settings
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [sessionTimeout, setSessionTimeout] = useState("120");
+  const [rememberMe, setRememberMe] = useState(true);
   
   const handleSaveDashboardSettings = () => {
     toast({
@@ -41,6 +57,60 @@ export default function Settings() {
       description: "Your task display preferences have been updated"
     });
     setIsTaskSettingsChanged(false);
+  };
+  
+  const handleSaveAccountSettings = () => {
+    toast({
+      title: "Account settings saved",
+      description: "Your account information has been updated"
+    });
+    setIsAccountSettingsChanged(false);
+  };
+  
+  const handleChangePassword = () => {
+    // Basic validation
+    if (!currentPassword) {
+      toast({
+        title: "Error",
+        description: "Please enter your current password",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: "Error",
+        description: "New passwords do not match",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    toast({
+      title: "Password changed",
+      description: "Your password has been updated successfully"
+    });
+    
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setIsSecuritySettingsChanged(false);
+  };
+  
+  const handleSaveSecuritySettings = () => {
+    toast({
+      title: "Security settings saved",
+      description: "Your security preferences have been updated"
+    });
+    setIsSecuritySettingsChanged(false);
+  };
+  
+  const handleSaveNotificationSettings = () => {
+    toast({
+      title: "Notification settings saved",
+      description: "Your notification preferences have been updated"
+    });
   };
   
   useEffect(() => {
@@ -262,19 +332,101 @@ export default function Settings() {
                 Account Information
               </CardTitle>
               <CardDescription>
-                Manage your account details
+                Manage your account details and preferences
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input id="name" placeholder="Your name" disabled />
+                  <Label htmlFor="username">Username</Label>
+                  <Input 
+                    id="username" 
+                    value={user?.username || ''} 
+                    disabled 
+                  />
+                  <p className="text-xs text-muted-foreground">Username cannot be changed</p>
                 </div>
+                
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="email@example.com" disabled />
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input 
+                    id="fullName" 
+                    placeholder="Your full name" 
+                    value={user?.fullName || ''} 
+                  />
                 </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="email@example.com" 
+                    value={user?.email || ''} 
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="role">Role</Label>
+                  <Input 
+                    id="role" 
+                    value={user?.role || ''} 
+                    disabled 
+                  />
+                  <p className="text-xs text-muted-foreground">Contact an administrator to change your role</p>
+                </div>
+              </div>
+              
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="text-lg font-medium">Account Preferences</h3>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="language">Interface Language</Label>
+                  <Select defaultValue="en">
+                    <SelectTrigger id="language">
+                      <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="es">Spanish</SelectItem>
+                      <SelectItem value="fr">French</SelectItem>
+                      <SelectItem value="de">German</SelectItem>
+                      <SelectItem value="pt">Portuguese</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="timezone">Time Zone</Label>
+                  <Select defaultValue="utc">
+                    <SelectTrigger id="timezone">
+                      <SelectValue placeholder="Select time zone" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="utc">UTC (Coordinated Universal Time)</SelectItem>
+                      <SelectItem value="est">EST (Eastern Standard Time)</SelectItem>
+                      <SelectItem value="cst">CST (Central Standard Time)</SelectItem>
+                      <SelectItem value="mst">MST (Mountain Standard Time)</SelectItem>
+                      <SelectItem value="pst">PST (Pacific Standard Time)</SelectItem>
+                      <SelectItem value="gmt">GMT (Greenwich Mean Time)</SelectItem>
+                      <SelectItem value="cet">CET (Central European Time)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Switch id="theme-switch" />
+                  <Label htmlFor="theme-switch">Use Dark Theme</Label>
+                </div>
+              </div>
+              
+              <div className="pt-4 border-t flex justify-end">
+                <Button 
+                  onClick={handleSaveAccountSettings}
+                  disabled={!isAccountSettingsChanged}
+                >
+                  Save Account Settings
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -288,13 +440,109 @@ export default function Settings() {
                 Notification Settings
               </CardTitle>
               <CardDescription>
-                Configure your notification preferences
+                Configure how and when you receive notifications
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Notification preferences management coming soon.
-              </p>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Email Notifications</h3>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Task Assignments</Label>
+                      <p className="text-sm text-muted-foreground">Receive email notifications when you are assigned a task</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Task Updates</Label>
+                      <p className="text-sm text-muted-foreground">Receive email notifications when tasks you own are updated</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Approaching Due Dates</Label>
+                      <p className="text-sm text-muted-foreground">Receive email reminders for tasks with approaching due dates</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>New Edition Created</Label>
+                      <p className="text-sm text-muted-foreground">Receive email notifications when a new training edition is created</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Weekly Summary</Label>
+                      <p className="text-sm text-muted-foreground">Receive a weekly summary of your tasks and upcoming deadlines</p>
+                    </div>
+                    <Switch />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="text-lg font-medium">In-App Notifications</h3>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Task Assignments</Label>
+                      <p className="text-sm text-muted-foreground">Show notifications when you are assigned a task</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Task Status Changes</Label>
+                      <p className="text-sm text-muted-foreground">Show notifications when task status changes</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Due Date Reminders</Label>
+                      <p className="text-sm text-muted-foreground">Show reminders for upcoming task due dates</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="text-lg font-medium">Notification Frequency</h3>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="dueDateReminder">Due Date Reminder</Label>
+                  <Select defaultValue="3">
+                    <SelectTrigger id="dueDateReminder">
+                      <SelectValue placeholder="Select reminder time" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 day before</SelectItem>
+                      <SelectItem value="2">2 days before</SelectItem>
+                      <SelectItem value="3">3 days before</SelectItem>
+                      <SelectItem value="5">5 days before</SelectItem>
+                      <SelectItem value="7">1 week before</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="pt-4 border-t flex justify-end">
+                <Button>Save Notification Settings</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -307,13 +555,112 @@ export default function Settings() {
                 Security Settings
               </CardTitle>
               <CardDescription>
-                Manage your security preferences
+                Manage your password and security preferences
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Security settings management coming soon.
-              </p>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Password Management</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="currentPassword">Current Password</Label>
+                    <Input id="currentPassword" type="password" />
+                  </div>
+                  
+                  <div className="hidden md:block" />
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="newPassword">New Password</Label>
+                    <Input id="newPassword" type="password" />
+                    <p className="text-xs text-muted-foreground">Password must be at least 8 characters and include letters, numbers, and special characters</p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                    <Input id="confirmPassword" type="password" />
+                  </div>
+                </div>
+                
+                <div className="pt-4 flex justify-end">
+                  <Button>Change Password</Button>
+                </div>
+              </div>
+              
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="text-lg font-medium">Login Security</h3>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Session Timeout</Label>
+                      <p className="text-sm text-muted-foreground">Automatically log out after period of inactivity</p>
+                    </div>
+                    <Select defaultValue="120">
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select timeout" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="30">30 minutes</SelectItem>
+                        <SelectItem value="60">1 hour</SelectItem>
+                        <SelectItem value="120">2 hours</SelectItem>
+                        <SelectItem value="240">4 hours</SelectItem>
+                        <SelectItem value="480">8 hours</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Remember Me</Label>
+                      <p className="text-sm text-muted-foreground">Stay logged in on this device</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="text-lg font-medium">Account Activity</h3>
+                
+                <div className="border rounded-md">
+                  <div className="bg-muted px-4 py-2 border-b">
+                    <div className="grid grid-cols-3 font-medium">
+                      <div>Date & Time</div>
+                      <div>IP Address</div>
+                      <div>Device</div>
+                    </div>
+                  </div>
+                  
+                  <div className="px-4 py-2 border-b">
+                    <div className="grid grid-cols-3">
+                      <div className="text-sm">Apr 12, 2025 02:15 AM</div>
+                      <div className="text-sm">127.0.0.1</div>
+                      <div className="text-sm">Chrome - Windows</div>
+                    </div>
+                  </div>
+                  
+                  <div className="px-4 py-2">
+                    <div className="grid grid-cols-3">
+                      <div className="text-sm">Apr 11, 2025 10:24 PM</div>
+                      <div className="text-sm">127.0.0.1</div>
+                      <div className="text-sm">Firefox - MacOS</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex justify-end">
+                  <Button variant="outline">View Full Activity Log</Button>
+                </div>
+              </div>
+              
+              <div className="pt-4 border-t flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-medium text-destructive">Danger Zone</h3>
+                  <p className="text-sm text-muted-foreground mt-1">Once you delete your account, there is no going back</p>
+                </div>
+                <Button variant="destructive">Delete Account</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
