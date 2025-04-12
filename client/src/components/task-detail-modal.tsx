@@ -35,7 +35,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, Loader2 } from "lucide-react";
+import { CalendarIcon, ChevronLeft, Loader2 } from "lucide-react";
 import { WEEK_OPTIONS, TASK_STATUS_OPTIONS, OWNER_OPTIONS, ASSIGNED_TO_OPTIONS } from "@/lib/constants";
 import { formatDate, getInitials, getStatusColor } from "@/lib/utils";
 
@@ -147,7 +147,17 @@ export default function TaskDetailModal({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md md:max-w-2xl">
-        <DialogHeader>
+        <DialogHeader className="flex flex-row items-center">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="mr-2 h-8 w-8 rounded-full p-0"
+          >
+            <span className="sr-only">Back</span>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
           <DialogTitle>Task Detail: {task?.taskCode || ""}</DialogTitle>
         </DialogHeader>
 
