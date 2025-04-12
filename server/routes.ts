@@ -943,6 +943,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if the user already reacted with this emoji
+      if (!req.user) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
       const existingReaction = await storage.getUserTaskReaction(taskId, req.user.id, emoji);
       
       if (existingReaction) {
@@ -1013,6 +1017,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if the user already reacted with this emoji
+      if (!req.user) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
       const existingReaction = await storage.getUserCommentReaction(commentId, req.user.id, emoji);
       
       if (existingReaction) {
