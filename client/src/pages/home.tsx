@@ -37,7 +37,9 @@ export default function Home() {
   });
 
   // Filter out archived editions for the dashboard
-  const editions = allEditions ? allEditions.filter((edition: any) => !edition.archived) : [];
+  const editions = allEditions && Array.isArray(allEditions) 
+    ? allEditions.filter((edition: any) => !edition.archived) 
+    : [];
   
   const currentEdition = editions?.[0];
   
@@ -57,7 +59,7 @@ export default function Home() {
       }
       
       // Create an array of promises, one for each edition's tasks
-      const fetchPromises = editionIds.map(id => 
+      const fetchPromises = editionIds.map((id: number) => 
         fetch(`/api/editions/${id}/tasks`).then(res => res.json())
       );
       
@@ -157,9 +159,27 @@ export default function Home() {
   const [ownerFilter, setOwnerFilter] = useState("all");
   
   // Get unique task weeks, statuses, and owners for filter dropdowns
-  const uniqueWeeks = tasks ? [...new Set(tasks.map((task: any) => task.week))].sort() : [];
-  const uniqueStatuses = tasks ? [...new Set(tasks.map((task: any) => task.status))].sort() : [];
-  const uniqueOwners = tasks ? [...new Set(tasks.map((task: any) => task.owner).filter(Boolean))].sort() : [];
+  const getUniqueValues = (tasks: any[], field: string): string[] => {
+    if (!tasks || !Array.isArray(tasks)) return [];
+    
+    // Use a regular array and object to track unique values instead of Set
+    const unique: {[key: string]: boolean} = {};
+    const result: string[] = [];
+    
+    tasks.forEach(task => {
+      const value = task[field];
+      if (value && !unique[value]) {
+        unique[value] = true;
+        result.push(value);
+      }
+    });
+    
+    return result.sort();
+  };
+  
+  const uniqueWeeks = getUniqueValues(tasks, 'week');
+  const uniqueStatuses = getUniqueValues(tasks, 'status');
+  const uniqueOwners = getUniqueValues(tasks, 'owner');
   
   // Apply filters to tasks
   const filterTasks = (taskList: any[]) => {
