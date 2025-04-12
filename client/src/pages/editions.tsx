@@ -43,6 +43,8 @@ import {
 import { Plus, MoreVertical, Copy, Trash2, Edit, CalendarDays, Layers, ArrowRight, Archive, ArchiveRestore } from "lucide-react";
 import WeekProgressIndicator from "@/components/week-progress-indicator";
 import CreateEditionForm from "@/components/create-edition-form";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { formatDate } from "@/lib/utils";
 
 export default function Editions() {
@@ -151,11 +153,33 @@ export default function Editions() {
     <div className="pb-20 md:pb-0">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 md:mb-6">
         <h2 className="text-2xl font-semibold mb-2 md:mb-0">Training Editions</h2>
-        <Button onClick={() => setIsCreateEditionOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          <span className="hidden sm:inline">Create New Edition</span>
-          <span className="sm:hidden">New</span>
-        </Button>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="archive-toggle"
+              checked={showArchived}
+              onCheckedChange={setShowArchived}
+            />
+            <Label htmlFor="archive-toggle" className="text-sm cursor-pointer">
+              {showArchived ? (
+                <span className="flex items-center">
+                  <Archive className="h-4 w-4 mr-1" />
+                  Archived
+                </span>
+              ) : (
+                <span className="flex items-center">
+                  <ArchiveRestore className="h-4 w-4 mr-1" />
+                  Active
+                </span>
+              )}
+            </Label>
+          </div>
+          <Button onClick={() => setIsCreateEditionOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            <span className="hidden sm:inline">Create New Edition</span>
+            <span className="sm:hidden">New</span>
+          </Button>
+        </div>
       </div>
 
       {/* Editions Table (Desktop) */}
@@ -196,20 +220,27 @@ export default function Editions() {
                     </TableCell>
                     <TableCell>{formatDate(edition.startDate)}</TableCell>
                     <TableCell>
-                      <Badge 
-                        variant={
-                          isEditionUpcoming(edition) ? "outline" : 
-                          isEditionActive(edition) ? "success" : 
-                          "destructive"
-                        }
-                        className={
-                          isEditionUpcoming(edition) ? "bg-yellow-100 hover:bg-yellow-200 text-yellow-800 border-yellow-200" : ""
-                        }
-                      >
-                        {isEditionUpcoming(edition) ? "Upcoming" : 
-                         isEditionActive(edition) ? "Active" : 
-                         "Finished"}
-                      </Badge>
+                      <div className="flex gap-2">
+                        <Badge 
+                          variant={
+                            isEditionUpcoming(edition) ? "outline" : 
+                            isEditionActive(edition) ? "success" : 
+                            "destructive"
+                          }
+                          className={
+                            isEditionUpcoming(edition) ? "bg-yellow-100 hover:bg-yellow-200 text-yellow-800 border-yellow-200" : ""
+                          }
+                        >
+                          {isEditionUpcoming(edition) ? "Upcoming" : 
+                           isEditionActive(edition) ? "Active" : 
+                           "Finished"}
+                        </Badge>
+                        {edition.archived && (
+                          <Badge variant="outline" className="bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-200">
+                            <Archive className="h-3 w-3 mr-1" /> Archived
+                          </Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="w-[250px]">
                     <WeekProgressIndicator currentWeek={edition.currentWeek || 1} />
@@ -254,12 +285,18 @@ export default function Editions() {
               </div>
               <h3 className="text-lg font-medium mb-2">No Editions Found</h3>
               <p className="text-muted-foreground mb-4">
-                Start by creating your first training edition.
+                {showArchived ? (
+                  "No archived editions found. Editions will appear here after they are archived."
+                ) : (
+                  "Start by creating your first training edition."
+                )}
               </p>
-              <Button onClick={() => setIsCreateEditionOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Create New Edition
-              </Button>
+              {!showArchived && (
+                <Button onClick={() => setIsCreateEditionOpen(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create New Edition
+                </Button>
+              )}
             </div>
           )}
         </CardContent>
@@ -290,7 +327,7 @@ export default function Editions() {
                   >
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <p className="font-medium">{edition.code}</p>
                           <Badge variant={edition.trainingType === "GLR" ? "default" : "secondary"}>
                             {edition.trainingType}
@@ -309,6 +346,11 @@ export default function Editions() {
                              isEditionActive(edition) ? "Active" : 
                              "Finished"}
                           </Badge>
+                          {edition.archived && (
+                            <Badge variant="outline" className="bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-200">
+                              <Archive className="h-3 w-3 mr-1" /> Archived
+                            </Badge>
+                          )}
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
                           Starts {formatDate(edition.startDate)}
@@ -368,12 +410,18 @@ export default function Editions() {
                 </div>
                 <h3 className="text-lg font-medium mb-2">No Editions Found</h3>
                 <p className="text-muted-foreground mb-4">
-                  Start by creating your first training edition.
+                  {showArchived ? (
+                    "No archived editions found. Editions will appear here after they are archived."
+                  ) : (
+                    "Start by creating your first training edition."
+                  )}
                 </p>
-                <Button onClick={() => setIsCreateEditionOpen(true)}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create New Edition
-                </Button>
+                {!showArchived && (
+                  <Button onClick={() => setIsCreateEditionOpen(true)}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create New Edition
+                  </Button>
+                )}
               </div>
             )}
           </CardContent>
@@ -399,10 +447,11 @@ export default function Editions() {
                 const currentDate = new Date();
                 
                 // Filter and sort editions that haven't started yet
-                const upcomingEditions = [...editions]
+                const upcomingEditions = [...allEditions || []]
                   .filter((edition: any) => {
                     const startDate = new Date(edition.startDate);
-                    return startDate > currentDate;
+                    // Only show non-archived editions in the upcoming section
+                    return startDate > currentDate && !edition.archived;
                   })
                   .sort((a: any, b: any) => {
                     const dateA = new Date(a.startDate);
