@@ -18,6 +18,12 @@ export const users = pgTable("users", {
   passwordChangeRequired: boolean("password_change_required").default(false).notNull(),
   approved: boolean("approved").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  // Avatar settings
+  avatarUrl: text("avatar_url"), // URL to the uploaded photo
+  avatarColor: text("avatar_color").default("#6366F1"), // Fallback color for avatar
+  avatarShape: text("avatar_shape").default("circle"), // circle or square
+  avatarIcon: text("avatar_icon").default("user"), // Default icon if no photo
+  avatarBackground: text("avatar_background").default("gradient"), // solid or gradient
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({
