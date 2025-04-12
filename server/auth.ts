@@ -30,7 +30,7 @@ export async function comparePasswords(supplied: string, stored: string) {
 
 export function setupAuth(app: Express) {
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET || 'training-app-session-secret',
+    secret: process.env.SESSION_SECRET || '6374b9d714b8b3ed22582cdc8e431c80c630c913b3bc1804e510fdbcf0386978',
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
@@ -112,7 +112,7 @@ export function setupAuth(app: Express) {
       
       req.login(user, (err) => {
         if (err) return next(err);
-        const safeUser = { ...user };
+        const safeUser = { ...user } as Record<string, any>;
         delete safeUser.password;
         
         // Check if this user needs to change their password
@@ -136,7 +136,7 @@ export function setupAuth(app: Express) {
 
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send();
-    const safeUser = { ...req.user };
+    const safeUser = { ...req.user } as Record<string, any>;
     delete safeUser.password;
     
     // Check if this user needs to change their password
@@ -156,7 +156,7 @@ export function setupAuth(app: Express) {
       
       const users = await storage.getAllUsers();
       const safeUsers = users.map(user => {
-        const safeUser = { ...user };
+        const safeUser = { ...user } as Record<string, any>;
         delete safeUser.password;
         return safeUser;
       });
@@ -206,7 +206,7 @@ export function setupAuth(app: Express) {
       });
       
       // Return updated user
-      const safeUser = { ...updatedUser };
+      const safeUser = { ...updatedUser } as Record<string, any>;
       delete safeUser.password;
       
       res.json({
