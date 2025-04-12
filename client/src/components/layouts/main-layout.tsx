@@ -100,6 +100,25 @@ export default function MainLayout({ children }: MainLayoutProps) {
       setIsChangePasswordOpen(false);
     }
   }, [user]);
+  
+  // Calculate upcoming tasks for notifications
+  const upcomingTasks = useMemo(() => {
+    if (!allTasks || !Array.isArray(allTasks)) return [];
+    
+    const today = new Date();
+    const nextWeek = addDays(today, 7);
+    
+    return allTasks
+      .filter(task => {
+        if (!task.dueDate) return false;
+        
+        const dueDate = parseISO(task.dueDate);
+        return isAfter(dueDate, today) && isBefore(dueDate, nextWeek) && task.status !== 'completed';
+      })
+      .sort((a, b) => {
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      });
+  }, [allTasks]);
 
   return (
     <div className="font-sans bg-neutral-100 text-neutral-700 min-h-screen flex flex-col">
@@ -179,9 +198,11 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full relative">
                 <Bell className="h-5 w-5 text-neutral-500" />
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 flex items-center justify-center text-[10px] font-bold text-white">
-                  3
-                </span>
+                {upcomingTasks && upcomingTasks.length > 0 && (
+                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 flex items-center justify-center text-[10px] font-bold text-white">
+                    {upcomingTasks.length > 9 ? '9+' : upcomingTasks.length}
+                  </span>
+                )}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80">

@@ -594,6 +594,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all tasks (for notifications and global search)
+  app.get("/api/tasks", async (req, res) => {
+    try {
+      const tasks = await storage.getAllTasks();
+      res.json(tasks);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch tasks" });
+    }
+  });
+
   // Get a specific task
   app.get("/api/tasks/:id", async (req, res) => {
     try {
