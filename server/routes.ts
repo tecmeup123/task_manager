@@ -1186,6 +1186,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to mark all notifications as read" });
     }
   });
+  
+  // System backup and restore endpoints
+  app.get("/api/system/backup", requireAdmin, async (req, res) => {
+    try {
+      // Collect all system data
+      const users = await storage.getAllUsers();
+      const trainers = await storage.getAllTrainers();
+      const editions = await storage.getAllEditions();
+      const tasks = await storage.getAllTasks();
+      const auditLogs = await storage.getAuditLogs();
+      
+      // Create a backup object with metadata
+      const backup = {
+        metadata: {
+          version: "1.0",
+          timestamp: new Date().toISOString(),
+          exportedBy: req.user!.id,
+        },
+        data: {
+          users: users.map(user => ({
+            ...user,
+            // Don't include password hashes in export for security
+            password: "[REDACTED]"
+          })),
+          trainers,
+          editions,
+          tasks,
+          auditLogs
+        }
+      };
+      
+      // Send as a download with a timestamp filename
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      res.setHeader('Content-Disposition', `attachment; filename="training-system-backup-${timestamp}.json"`);
+      res.setHeader('Content-Type', 'application/json');
+      res.json(backup);
+      
+      // Log the export
+      await storage.createAuditLog({
+        action: "export",
+        entityType: "system",
+        entityId: 0,
+        userId: req.user!.id,
+        timestamp: new Date(),
+        notes: "Full system backup exported",
+        previousState: null,
+        newState: null
+      });
+      
+    } catch (error) {
+      console.error("Export error:", error);
+      res.status(500).json({ error: "Failed to export system data" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

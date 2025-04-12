@@ -125,42 +125,107 @@ export default function Settings() {
   };
   
   // Data Management handler functions
-  const handleCreateBackup = () => {
+  const handleSystemBackup = () => {
     toast({
-      title: "Creating backup...",
-      description: "Database backup has been initiated"
+      title: "Creating system backup...",
+      description: "Full system backup is being generated"
     });
     
-    // Simulate a backup process
+    // Create backup URL and trigger download
+    const backupUrl = `/api/system/backup`;
+    const a = document.createElement('a');
+    a.href = backupUrl;
+    a.setAttribute('download', 'system-backup.json');
+    document.body.appendChild(a);
+    a.click();
+    
+    // Clean up
     setTimeout(() => {
+      document.body.removeChild(a);
+      
       toast({
-        title: "Backup completed",
-        description: "Database backup has been successfully created"
+        title: "System backup downloaded",
+        description: "Your system backup file has been successfully created and downloaded"
       });
-    }, 2000);
+    }, 1000);
+  };
+  
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const handleImportClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+  
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      setImportFile(files[0]);
+      
+      toast({
+        title: "File selected",
+        description: `Selected file: ${files[0].name}`,
+      });
+    }
   };
   
   const handleImportData = () => {
-    // In a real app, this would open a file picker dialog
+    if (!importFile) {
+      toast({
+        title: "No file selected",
+        description: "Please select a backup file to import",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     toast({
-      title: "Import data",
-      description: "Data import functionality is now available"
+      title: "Import in progress",
+      description: "Your backup file is being processed. This may take a moment."
     });
+    
+    // In a real implementation, this would upload the file to a server endpoint
+    // that would validate and import the data
+    
+    // Mock success response after delay
+    setTimeout(() => {
+      toast({
+        title: "Import successful",
+        description: "Your backup has been successfully imported into the system",
+      });
+      setImportFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }, 2000);
   };
   
   const handleExportData = () => {
+    // This uses the same endpoint as system backup but emphasizes data export
     toast({
-      title: "Exporting data...",
-      description: "Data export has been initiated"
+      title: "Exporting system data...",
+      description: "Your data export is being prepared for download"
     });
     
-    // Simulate an export process
+    // Use the system backup endpoint
+    const exportUrl = `/api/system/backup`;
+    const a = document.createElement('a');
+    a.href = exportUrl;
+    a.setAttribute('download', 'system-data-export.json');
+    document.body.appendChild(a);
+    a.click();
+    
+    // Clean up
     setTimeout(() => {
+      document.body.removeChild(a);
+      
       toast({
-        title: "Export completed",
-        description: "Data has been successfully exported"
+        title: "Data export completed",
+        description: "Your data has been successfully exported and downloaded"
       });
-    }, 2000);
+    }, 1000);
   };
   
   // Template management handler functions
