@@ -200,11 +200,11 @@ export default function Settings() {
     }, 500);
   };
   
-  // Helper function to generate template data
+  // Helper function to generate comprehensive template data for all weeks
   const generateTemplateData = (templateType: string) => {
-    // Sample task templates based on type
-    const templates = {
-      default: [
+    // Base tasks that are common across all template types
+    const baseTasks = {
+      "Week -5": [
         {
           taskCode: "WM5T01",
           week: "Week -5",
@@ -242,25 +242,69 @@ export default function Settings() {
           notes: "Must be completed before sending welcome emails"
         }
       ],
-      glr: [
+      "Week -4": [
         {
-          taskCode: "WM5T01",
-          week: "Week -5",
-          name: "Check if the cohort for the edition exists and if not create it",
-          duration: "0:10:00",
-          trainingType: "GLR",
+          taskCode: "WM4T01",
+          week: "Week -4",
+          name: "Trainers should send changes in the e-learning assignment to Training Team",
+          duration: "0:30:00",
+          trainingType: "ALL",
+          assignedTo: "Trainer",
+          owner: "Lead Trainer",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        }
+      ],
+      "Week -3": [
+        {
+          taskCode: "WM3T01",
+          week: "Week -3",
+          name: "Send welcome to e-learning email",
+          duration: "0:15:00",
+          trainingType: "ALL",
           assignedTo: "Organizer",
           owner: "Training Manager",
           status: "Not Started",
           inflexible: false,
-          notes: "This is a required preparation task"
-        },
+          notes: ""
+        }
+      ],
+      "Week -2": [
         {
-          taskCode: "WM4T01",
-          week: "Week -4",
+          taskCode: "WM2T01",
+          week: "Week -2",
           name: "Send welcome to e-learning email",
           duration: "0:15:00",
-          trainingType: "GLR",
+          trainingType: "ALL",
+          assignedTo: "Organizer",
+          owner: "Training Manager",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        }
+      ],
+      "Week -1": [
+        {
+          taskCode: "WM1T01",
+          week: "Week -1",
+          name: "Request Marketing team to remove schedule from CM site",
+          duration: "0:15:00",
+          trainingType: "ALL",
+          assignedTo: "Organizer",
+          owner: "Training Manager",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        }
+      ],
+      "Week 0": [
+        {
+          taskCode: "W00T01",
+          week: "Week 0",
+          name: "Include links of the exam, mailing and edition folder to trainers",
+          duration: "0:30:00",
+          trainingType: "ALL",
           assignedTo: "Organizer",
           owner: "Training Manager",
           status: "Not Started",
@@ -268,59 +312,312 @@ export default function Settings() {
           notes: ""
         },
         {
+          taskCode: "W00T02",
+          week: "Week 0",
+          name: "Send mail announcing start of the e-learning stage with Q&A sessions",
+          duration: "0:15:00",
+          trainingType: "ALL",
+          assignedTo: "Organizer",
+          owner: "Training Manager",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        }
+      ],
+      "Week 1": [
+        {
           taskCode: "W01T01",
           week: "Week 1",
           name: "First week of training - Welcome session",
           duration: "1:00:00",
-          trainingType: "GLR",
+          trainingType: "ALL",
           assignedTo: "Trainer",
           owner: "Lead Trainer",
           status: "Not Started",
           inflexible: true,
           notes: "Must include introduction to course materials"
-        }
-      ],
-      slr: [
-        {
-          taskCode: "WM5T01",
-          week: "Week -5",
-          name: "Check if the cohort for the edition exists and if not create it",
-          duration: "0:10:00",
-          trainingType: "SLR",
-          assignedTo: "Organizer",
-          owner: "Training Manager",
-          status: "Not Started",
-          inflexible: false,
-          notes: "This is a required preparation task"
         },
         {
-          taskCode: "WM4T01",
-          week: "Week -4",
-          name: "Send self-learning materials",
-          duration: "0:15:00",
-          trainingType: "SLR",
-          assignedTo: "Organizer",
-          owner: "Training Manager",
-          status: "Not Started",
-          inflexible: false,
-          notes: "Include login instructions"
-        },
-        {
-          taskCode: "W01T01",
+          taskCode: "W01T02",
           week: "Week 1",
-          name: "Provide access to self-paced modules",
-          duration: "0:30:00",
-          trainingType: "SLR",
+          name: "Set up training environment for participants",
+          duration: "2:00:00",
+          trainingType: "ALL",
           assignedTo: "Trainer",
           owner: "Lead Trainer",
           status: "Not Started",
           inflexible: true,
-          notes: "Verify all students have access"
+          notes: ""
+        }
+      ],
+      "Week 2": [
+        {
+          taskCode: "W02T01",
+          week: "Week 2",
+          name: "Weekly progress review meeting",
+          duration: "1:00:00",
+          trainingType: "ALL",
+          assignedTo: "Trainer",
+          owner: "Lead Trainer",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        },
+        {
+          taskCode: "W02T02",
+          week: "Week 2",
+          name: "Send reminder about assignments due",
+          duration: "0:15:00",
+          trainingType: "ALL",
+          assignedTo: "Organizer",
+          owner: "Training Manager",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        }
+      ],
+      "Week 3": [
+        {
+          taskCode: "W03T01",
+          week: "Week 3",
+          name: "Mid-training survey distribution",
+          duration: "0:30:00",
+          trainingType: "ALL",
+          assignedTo: "Organizer",
+          owner: "Training Manager",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        },
+        {
+          taskCode: "W03T02",
+          week: "Week 3",
+          name: "Weekly progress review meeting",
+          duration: "1:00:00",
+          trainingType: "ALL",
+          assignedTo: "Trainer",
+          owner: "Lead Trainer",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        }
+      ],
+      "Week 4": [
+        {
+          taskCode: "W04T01",
+          week: "Week 4",
+          name: "Weekly progress review meeting",
+          duration: "1:00:00",
+          trainingType: "ALL",
+          assignedTo: "Trainer",
+          owner: "Lead Trainer",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        },
+        {
+          taskCode: "W04T02",
+          week: "Week 4",
+          name: "Prepare for final project presentations",
+          duration: "1:30:00",
+          trainingType: "ALL",
+          assignedTo: "Trainer",
+          owner: "Lead Trainer",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        }
+      ],
+      "Week 5": [
+        {
+          taskCode: "W05T01",
+          week: "Week 5",
+          name: "Final project presentations",
+          duration: "2:00:00",
+          trainingType: "ALL",
+          assignedTo: "Trainer",
+          owner: "Lead Trainer",
+          status: "Not Started",
+          inflexible: true,
+          notes: ""
+        },
+        {
+          taskCode: "W05T02",
+          week: "Week 5",
+          name: "Final assessment distribution",
+          duration: "0:30:00",
+          trainingType: "ALL",
+          assignedTo: "Organizer",
+          owner: "Training Manager",
+          status: "Not Started",
+          inflexible: true,
+          notes: ""
+        }
+      ],
+      "Week 6": [
+        {
+          taskCode: "W06T01",
+          week: "Week 6",
+          name: "Collect and analyze final assessment results",
+          duration: "1:00:00",
+          trainingType: "ALL",
+          assignedTo: "Organizer",
+          owner: "Training Manager",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        },
+        {
+          taskCode: "W06T02",
+          week: "Week 6",
+          name: "Prepare certificates of completion",
+          duration: "0:45:00",
+          trainingType: "ALL",
+          assignedTo: "Organizer",
+          owner: "Training Manager",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        }
+      ],
+      "Week 7": [
+        {
+          taskCode: "W07T01",
+          week: "Week 7",
+          name: "Send certificates to participants",
+          duration: "0:30:00",
+          trainingType: "ALL",
+          assignedTo: "Organizer",
+          owner: "Training Manager",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        },
+        {
+          taskCode: "W07T02",
+          week: "Week 7",
+          name: "Follow-up with participants who didn't complete training",
+          duration: "1:00:00",
+          trainingType: "ALL",
+          assignedTo: "Trainer",
+          owner: "Lead Trainer",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        }
+      ],
+      "Week 8": [
+        {
+          taskCode: "W08T01",
+          week: "Week 8",
+          name: "Training program retrospective meeting",
+          duration: "1:30:00",
+          trainingType: "ALL",
+          assignedTo: "Trainer",
+          owner: "Lead Trainer",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        },
+        {
+          taskCode: "W08T02",
+          week: "Week 8",
+          name: "Prepare training report",
+          duration: "2:00:00",
+          trainingType: "ALL",
+          assignedTo: "Organizer",
+          owner: "Training Manager",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        },
+        {
+          taskCode: "W08T03",
+          week: "Week 8",
+          name: "Archive training materials",
+          duration: "1:00:00",
+          trainingType: "ALL",
+          assignedTo: "Organizer",
+          owner: "Training Manager",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
         }
       ]
     };
     
-    return templates[templateType as keyof typeof templates] || templates.default;
+    // Specific template customizations
+    const templateSpecificTasks = {
+      // Default template - uses base tasks with 'ALL' training type
+      default: Object.values(baseTasks).flat().map(task => ({
+        ...task,
+        trainingType: "ALL"
+      })),
+      
+      // GLR template - guided learning route
+      glr: Object.values(baseTasks).flat().map(task => {
+        // Customize certain tasks for GLR
+        if (task.week === "Week 1") {
+          if (task.taskCode === "W01T01") {
+            return {
+              ...task,
+              trainingType: "GLR",
+              name: "First week of guided training - Welcome session with instructor",
+              notes: "Introduce course structure and live instructor sessions"
+            };
+          }
+        }
+        if (task.week === "Week 2" || task.week === "Week 3" || task.week === "Week 4") {
+          if (task.taskCode.endsWith("T01")) {
+            return {
+              ...task,
+              trainingType: "GLR",
+              name: `Guided training session for ${task.week}`,
+              duration: "2:00:00"
+            };
+          }
+        }
+        
+        // Return other tasks with GLR type
+        return {
+          ...task,
+          trainingType: "GLR"
+        };
+      }),
+      
+      // SLR template - self-learning route
+      slr: Object.values(baseTasks).flat().map(task => {
+        // Customize certain tasks for SLR
+        if (task.week === "Week 1") {
+          if (task.taskCode === "W01T01") {
+            return {
+              ...task,
+              trainingType: "SLR",
+              name: "Provide access to self-paced modules",
+              notes: "Verify all students have received access credentials"
+            };
+          }
+        }
+        if (task.week === "Week 2" || task.week === "Week 3" || task.week === "Week 4") {
+          if (task.taskCode.endsWith("T01")) {
+            return {
+              ...task,
+              trainingType: "SLR",
+              name: `Self-learning progress check for ${task.week}`,
+              duration: "0:30:00"
+            };
+          }
+        }
+        
+        // Return other tasks with SLR type
+        return {
+          ...task,
+          trainingType: "SLR"
+        };
+      })
+    };
+    
+    return templateSpecificTasks[templateType as keyof typeof templateSpecificTasks] || templateSpecificTasks.default;
   };
   
   const handleUploadTemplate = () => {
@@ -1080,15 +1377,18 @@ export default function Settings() {
                         <SelectValue placeholder="Select template" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="default">Default Template</SelectItem>
-                        <SelectItem value="glr">GLR Template</SelectItem>
-                        <SelectItem value="slr">SLR Template</SelectItem>
+                        <SelectItem value="default">Default Template (All Weeks)</SelectItem>
+                        <SelectItem value="glr">GLR Template (All Weeks)</SelectItem>
+                        <SelectItem value="slr">SLR Template (All Weeks)</SelectItem>
                       </SelectContent>
                     </Select>
                     <Button onClick={handleDownloadTemplate}>
-                      Download
+                      Download ({generateTemplateData(selectedTemplate).length} tasks)
                     </Button>
                   </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Templates include tasks for all weeks from Week -5 to Week 8.
+                  </p>
                 </div>
                 
                 <div className="space-y-2">
