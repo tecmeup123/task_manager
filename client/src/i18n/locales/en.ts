@@ -66,6 +66,12 @@ const en = {
     'dashboard.ongoingTrainingSessions': 'Ongoing Training Sessions',
     'dashboard.noUpcomingTasks': 'No upcoming tasks',
     'dashboard.viewAll': 'View All',
+    'dashboard.tasksThisWeek': 'Tasks This Week',
+    'dashboard.completedThisWeek': 'Completed This Week',
+    'dashboard.currentWeeks': 'Current Weeks',
+    'dashboard.activeEditions': 'Active Editions',
+    'dashboard.currentlyRunningEditions': 'Currently running training editions',
+    'dashboard.taskManagement': 'Task Management',
     
     // Editions
     'editions.title': 'Editions',

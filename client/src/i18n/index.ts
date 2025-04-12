@@ -10,11 +10,10 @@ import de from './locales/de';
 import pt from './locales/pt';
 
 // Get saved language or default to English
-const savedLanguage = localStorage.getItem('i18nextLng');
+const savedLanguage = localStorage.getItem('i18nextLng') || 'en';
 const supportedLanguages = ['en', 'es', 'fr', 'de', 'pt'];
-const initialLanguage = savedLanguage && supportedLanguages.includes(savedLanguage.split('-')[0]) 
-  ? savedLanguage.split('-')[0] 
-  : 'en';
+const simpleLang = savedLanguage.split('-')[0];
+const initialLanguage = supportedLanguages.includes(simpleLang) ? simpleLang : 'en';
 
 // Initialize i18next
 i18n
@@ -42,13 +41,19 @@ i18n
       order: ['localStorage', 'navigator'],
       lookupLocalStorage: 'i18nextLng',
       caches: ['localStorage']
+    },
+    react: {
+      useSuspense: false // Disable suspense for better compatibility
     }
   });
 
 // Force the language to be set
-if (initialLanguage) {
-  console.log(`Setting initial language to: ${initialLanguage}`);
-  i18n.changeLanguage(initialLanguage);
+console.log(`Setting initial language to: ${initialLanguage}`);
+i18n.changeLanguage(initialLanguage);
+
+// Update localStorage to ensure consistency
+if (initialLanguage !== savedLanguage) {
+  localStorage.setItem('i18nextLng', initialLanguage);
 }
 
 export default i18n;

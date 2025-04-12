@@ -1,15 +1,21 @@
 import { useTranslation } from 'react-i18next';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export function LanguageSwitcher() {
   const { i18n, t } = useTranslation();
+  const [currentLang, setCurrentLang] = useState(i18n.language?.split('-')[0] || 'en');
   
   const changeLanguage = (value: string) => {
+    // Update state
+    setCurrentLang(value);
+    
     // Update i18n instance language
     i18n.changeLanguage(value);
-    // Save the language preference to localStorage
+    
+    // Save the language preference to localStorage with the exact code
     localStorage.setItem('i18nextLng', value);
+    
     // Force a reload to ensure all components update with the new language
     // This is more reliable than trying to update every component manually
     window.location.reload();
@@ -17,11 +23,16 @@ export function LanguageSwitcher() {
   
   useEffect(() => {
     // Get the language from localStorage or use default
-    const savedLanguage = localStorage.getItem('i18nextLng')?.split('-')[0] || 'en';
+    const savedLanguage = localStorage.getItem('i18nextLng') || 'en';
     
     // Make sure we're using a supported language code
     const supportedLanguages = ['en', 'es', 'fr', 'de', 'pt'];
-    const language = supportedLanguages.includes(savedLanguage) ? savedLanguage : 'en';
+    const language = supportedLanguages.includes(savedLanguage.split('-')[0]) 
+      ? savedLanguage.split('-')[0] 
+      : 'en';
+    
+    // Update the current language state
+    setCurrentLang(language);
     
     // Only change if different - this prevents infinite loops
     if (i18n.language !== language) {
@@ -32,7 +43,7 @@ export function LanguageSwitcher() {
   
   return (
     <Select
-      value={i18n.language?.split('-')[0] || 'en'}
+      value={currentLang}
       onValueChange={changeLanguage}
     >
       <SelectTrigger id="language-select" className="w-[180px]">

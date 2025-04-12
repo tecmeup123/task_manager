@@ -62,6 +62,12 @@ const es = {
     'dashboard.ongoingTrainingSessions': 'Sesiones de Formación en Curso',
     'dashboard.noUpcomingTasks': 'No hay próximas tareas',
     'dashboard.viewAll': 'Ver Todo',
+    'dashboard.tasksThisWeek': 'Tareas de Esta Semana',
+    'dashboard.completedThisWeek': 'Completadas Esta Semana',
+    'dashboard.currentWeeks': 'Semanas Actuales',
+    'dashboard.activeEditions': 'Ediciones Activas',
+    'dashboard.currentlyRunningEditions': 'Ediciones de formación en ejecución',
+    'dashboard.taskManagement': 'Gestión de Tareas',
     
     // Editions
     'editions.title': 'Ediciones',
