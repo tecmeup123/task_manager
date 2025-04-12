@@ -160,7 +160,7 @@ export default function TaskDetailModal({
       <DialogContent className="sm:max-w-md md:max-w-2xl">
         <DialogHeader className="flex flex-row items-center justify-start">
           <div className="flex items-center">
-            <DialogTitle>Task Detail: {task?.taskCode || ""}</DialogTitle>
+            <DialogTitle>{t('tasks.details')}: {task?.taskCode || ""}</DialogTitle>
           </div>
         </DialogHeader>
 
@@ -168,7 +168,7 @@ export default function TaskDetailModal({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Task Status Progress Bar */}
             <div className="mb-4">
-              <h3 className="text-sm font-semibold mb-2">Status</h3>
+              <h3 className="text-sm font-semibold mb-2">{t('tasks.status')}</h3>
               <div className="p-4 bg-neutral-50 rounded-lg border border-neutral-200">
                 <div className="flex items-center justify-between mb-2">
                   <Badge 
@@ -225,7 +225,7 @@ export default function TaskDetailModal({
                 name="taskCode"
                 render={({ field }) => (
                   <FormItem className="md:col-span-1">
-                    <FormLabel>Task Code</FormLabel>
+                    <FormLabel>{t('tasks.code')}</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -239,7 +239,7 @@ export default function TaskDetailModal({
                 name="week"
                 render={({ field }) => (
                   <FormItem className="md:col-span-1">
-                    <FormLabel>Week</FormLabel>
+                    <FormLabel>{t('tasks.week')}</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
@@ -267,7 +267,7 @@ export default function TaskDetailModal({
                 name="name"
                 render={({ field }) => (
                   <FormItem className="md:col-span-2">
-                    <FormLabel>Task Description</FormLabel>
+                    <FormLabel>{t('tasks.description')}</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -281,7 +281,7 @@ export default function TaskDetailModal({
                 name="duration"
                 render={({ field }) => (
                   <FormItem className="md:col-span-1">
-                    <FormLabel>Duration</FormLabel>
+                    <FormLabel>{t('tasks.duration')}</FormLabel>
                     <FormControl>
                       <Input {...field} value={field.value || ''} placeholder="e.g. 0:15:00" />
                     </FormControl>
@@ -295,7 +295,7 @@ export default function TaskDetailModal({
                 name="dueDate"
                 render={({ field }) => (
                   <FormItem className="md:col-span-1">
-                    <FormLabel>Due Date</FormLabel>
+                    <FormLabel>{t('tasks.dueDate')}</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -528,7 +528,7 @@ export default function TaskDetailModal({
             />
 
             <div>
-              <h3 className="text-sm font-medium mb-2">Activity History</h3>
+              <h3 className="text-sm font-medium mb-2">{t('tasks.activityHistory')}</h3>
               <div className="border border-neutral-200 rounded-lg overflow-hidden">
                 {activityHistory.map((activity, index) => (
                   <div
@@ -561,9 +561,9 @@ export default function TaskDetailModal({
                 className="flex items-center"
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
-                Back to Task List
+                {t('tasks.backToList')}
               </Button>
-              <Button type="submit">Update Task</Button>
+              <Button type="submit">{t('tasks.update')}</Button>
             </DialogFooter>
           </form>
         </Form>
