@@ -64,6 +64,7 @@ interface TaskDetailModalProps {
   task: any;
   onClose: () => void;
   onSave: (task: any) => void;
+  redirectPath?: string;
 }
 
 export default function TaskDetailModal({
@@ -71,6 +72,7 @@ export default function TaskDetailModal({
   task,
   onClose,
   onSave,
+  redirectPath = '/',
 }: TaskDetailModalProps) {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
@@ -164,7 +166,7 @@ export default function TaskDetailModal({
           <button 
             onClick={() => {
               onClose();
-              setLocation('/');
+              setLocation(redirectPath);
             }} 
             className="mr-3 hover:bg-neutral-100 p-1 rounded-full transition-colors"
             aria-label="Back to dashboard"
@@ -571,7 +573,7 @@ export default function TaskDetailModal({
                 variant="outline" 
                 onClick={() => {
                   onClose();
-                  setLocation('/');
+                  setLocation(redirectPath);
                 }}
                 className="flex items-center"
               >
