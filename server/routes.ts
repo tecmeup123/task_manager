@@ -481,6 +481,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User management routes (admin only)
+  // Get all users
+  app.get("/api/users", requireAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      // Remove password field from response
+      const safeUsers = users.map(user => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      res.json(safeUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+  
+  // Update a user (used for changing role)
+  app.patch("/api/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      
+      // Don't allow changing user's own role (to prevent removing all admins)
+      if (id === req.user?.id && req.body.role && req.body.role !== req.user.role) {
+        return res.status(400).json({ message: "You cannot change your own role" });
+      }
+      
+      const user = await storage.getUser(id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Create audit log before updating
+      if (req.user) {
+        await storage.createAuditLog({
+          userId: req.user.id,
+          entityType: "user",
+          entityId: id,
+          action: "update",
+          previousState: { ...user, password: "[REDACTED]" },
+          newState: { ...user, ...req.body, password: "[REDACTED]" },
+          notes: `User ${user.username} updated by ${req.user.username}`
+        });
+      }
+      
+      const updatedUser = await storage.updateUser(id, req.body);
+      
+      // Remove password from response
+      const { password, ...safeUser } = updatedUser;
+      
+      res.json(safeUser);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ message: "Failed to update user" });
+    }
+  });
+  
   // Audit logs routes
   // Get all audit logs
   app.get("/api/audit-logs", requireAdmin, async (req, res) => {

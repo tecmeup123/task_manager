@@ -858,6 +858,43 @@ export class DatabaseStorage implements IStorage {
   // Method to seed initial data for the database
   async seedInitialData(): Promise<void> {
     const { db } = await import("./db");
+    const { scrypt, randomBytes } = await import("crypto");
+    const { promisify } = await import("util");
+    
+    const scryptAsync = promisify(scrypt);
+    
+    // Helper function to hash passwords
+    async function hashPassword(password: string) {
+      const salt = randomBytes(16).toString("hex");
+      const buf = (await scryptAsync(password, salt, 64)) as Buffer;
+      return `${buf.toString("hex")}.${salt}`;
+    }
+    
+    // Check if any users exist
+    const existingUsers = await db.select({ count: count() }).from(users);
+    
+    // Create default users if none exist
+    if (existingUsers[0].count === 0) {
+      // Create admin users
+      await db.insert(users).values([
+        {
+          username: "admin",
+          password: await hashPassword("admin123"),
+          fullName: "Administrator",
+          email: "admin@example.com",
+          role: "admin"
+        },
+        {
+          username: "Telmo",
+          password: await hashPassword("telmo123"),
+          fullName: "Telmo Silva",
+          email: "telmosilva@criticalmanufacturing.com",
+          role: "admin" // Set Telmo as admin by default
+        }
+      ]);
+      
+      console.log("Default users created.");
+    }
     
     // Check if any editions exist
     const existingEditions = await db.select({ count: count() }).from(editions);
