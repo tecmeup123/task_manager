@@ -144,27 +144,15 @@ export default function TaskDetailModal({
     onSave(formData);
   };
 
-  // Using a more direct approach for closing the modal
-  const handleClose = () => {
-    console.log("Modal close function called");
-    // Try to force dialog close first
-    try {
-      document.querySelector('[data-radix-dialog-close]')?.dispatchEvent(
-        new MouseEvent('click', { bubbles: true })
-      );
-    } catch (e) {
-      console.error("Error forcing dialog close:", e);
-    }
-    // Then call the parent onClose callback
-    onClose();
-  };
-  
+  // Simplified closing approach
   return (
     <Dialog 
       open={isOpen} 
       onOpenChange={(open) => {
-        console.log("Dialog onOpenChange called", {open});
-        if (!open) onClose();
+        if (!open) {
+          console.log("Dialog close triggered");
+          onClose();
+        }
       }}
     >
       <DialogContent className="sm:max-w-md md:max-w-2xl">
@@ -174,7 +162,7 @@ export default function TaskDetailModal({
               type="button" 
               variant="ghost" 
               size="icon"
-              onClick={handleClose}
+              onClick={() => onClose()}
               className="mr-2 h-8 w-8 p-0"
               aria-label="Back to task list"
             >
@@ -570,7 +558,7 @@ export default function TaskDetailModal({
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={handleClose}
+                onClick={() => onClose()}
                 className="flex items-center"
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
