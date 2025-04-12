@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +18,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -32,7 +34,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
 import { WEEK_OPTIONS, TASK_STATUS_OPTIONS, OWNER_OPTIONS, ASSIGNED_TO_OPTIONS } from "@/lib/constants";
 import { formatDate, getInitials, getStatusColor } from "@/lib/utils";
 
@@ -47,6 +49,7 @@ const formSchema = z.object({
   inflexible: z.boolean().default(false),
   owner: z.string().optional().nullable(),
   assignedTo: z.string().optional().nullable(),
+  assignedUserId: z.number().optional().nullable(),
   status: z.string(),
   notes: z.string().optional().nullable(),
 });
@@ -84,6 +87,12 @@ export default function TaskDetailModal({
     },
   ]);
 
+  // Fetch users for task assignment
+  const { data: users, isLoading: isLoadingUsers } = useQuery({
+    queryKey: ['/api/users'],
+    enabled: isOpen, // Only fetch when modal is open
+  });
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -97,6 +106,7 @@ export default function TaskDetailModal({
       inflexible: task?.inflexible || false,
       owner: task?.owner || "",
       assignedTo: task?.assignedTo || "",
+      assignedUserId: task?.assignedUserId || null,
       status: task?.status || "Not Started",
       notes: task?.notes || "",
     },
@@ -116,6 +126,7 @@ export default function TaskDetailModal({
         inflexible: task.inflexible,
         owner: task.owner,
         assignedTo: task.assignedTo,
+        assignedUserId: task.assignedUserId || null,
         status: task.status,
         notes: task.notes,
       });
@@ -369,7 +380,7 @@ export default function TaskDetailModal({
                 name="assignedTo"
                 render={({ field }) => (
                   <FormItem className="md:col-span-1">
-                    <FormLabel>Assigned To</FormLabel>
+                    <FormLabel>Assigned To (Role/Group)</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value || ""}
@@ -387,6 +398,47 @@ export default function TaskDetailModal({
                         ))}
                       </SelectContent>
                     </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="assignedUserId"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-1">
+                    <FormLabel>Assign to User</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
+                      value={field.value?.toString() || ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Assign to specific user" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="">None</SelectItem>
+                        {isLoadingUsers ? (
+                          <div className="flex items-center justify-center p-2">
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            <span>Loading users...</span>
+                          </div>
+                        ) : users && users.length > 0 ? (
+                          users.map(user => (
+                            <SelectItem key={user.id} value={user.id.toString()}>
+                              {user.fullName || user.username}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="" disabled>No users available</SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      User assignment will send a notification
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

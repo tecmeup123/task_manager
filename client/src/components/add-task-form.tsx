@@ -346,7 +346,7 @@ export default function AddTaskForm({
                 name="assignedTo"
                 render={({ field }) => (
                   <FormItem className="md:col-span-1">
-                    <FormLabel>Assigned To</FormLabel>
+                    <FormLabel>Assigned To (Role/Group)</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value || ""}
@@ -364,6 +364,47 @@ export default function AddTaskForm({
                         ))}
                       </SelectContent>
                     </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="assignedUserId"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-1">
+                    <FormLabel>Assign to User</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
+                      value={field.value?.toString() || ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Assign to specific user" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="">None</SelectItem>
+                        {isLoadingUsers ? (
+                          <div className="flex items-center justify-center p-2">
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            <span>Loading users...</span>
+                          </div>
+                        ) : users && users.length > 0 ? (
+                          users.map(user => (
+                            <SelectItem key={user.id} value={user.id.toString()}>
+                              {user.fullName || user.username}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="" disabled>No users available</SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      User assignment will send a notification
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
