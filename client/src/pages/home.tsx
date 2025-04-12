@@ -277,7 +277,10 @@ export default function Home() {
                     <div>
                       <p className="font-medium">{edition.code}</p>
                       <p className="text-sm text-muted-foreground">
-                        {edition.trainingType} · Started: {formatDate(edition.startDate)}
+                        {edition.trainingType} · Started: {formatDate(edition.startDate, 'MMM d, yyyy')}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {getRelativeDateDescription(edition.startDate)}
                       </p>
                     </div>
                     <Link to={`/tasks/${edition.id}`}>
@@ -403,7 +406,7 @@ export default function Home() {
                           <Badge variant="outline">{task.week}</Badge>
                           <Badge variant={getStatusColor(task.status).bg}>{task.status}</Badge>
                           <span className="text-xs text-amber-600">
-                            Due: {formatDate(task.dueDate)}
+                            Due: {formatDate(task.dueDate)} ({getRelativeDateDescription(task.dueDate)})
                           </span>
                         </div>
                       </div>
