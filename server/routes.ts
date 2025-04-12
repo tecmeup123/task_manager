@@ -705,8 +705,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Special route to update email/mailing terminology in task names
   app.post("/api/tasks/update-terminology", requireAuth, requireAdmin, async (req, res) => {
     try {
-      // Define replacement pairs
-      const replacementPairs = [
+      // Define word/phrase replacements for flexibility
+      const wordReplacements = [
+        { search: /\be-learning\b/gi, replace: "self-learning" },
+        { search: /\belearning\b/gi, replace: "self-learning" },
+        { search: /\bE-Learning\b/g, replace: "Self-Learning" },
+        { search: /\bElearning\b/g, replace: "Self-Learning" },
+        { search: /\bemail\b/gi, replace: "resources" },
+        { search: /\bmailing list\b/gi, replace: "participant list" },
+        { search: /\bmailing\b/gi, replace: "participant resources" },
+        { search: /\bsend mail\b/gi, replace: "announce" },
+        { search: /\bsend reminder\b/gi, replace: "post reminder" }
+      ];
+
+      // Define exact replacements for entire task names
+      const exactReplacements = [
         {
           search: "Send mail announcing start of the e-learning stage with Q&A sessions",
           replace: "Announce start of the self-learning stage with Q&A sessions"
@@ -749,13 +762,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tasks = await storage.getAllTasks();
       let updatedCount = 0;
 
-      // Update each task if it contains one of the search terms
+      // Update each task with the appropriate replacements
       for (const task of tasks) {
-        for (const pair of replacementPairs) {
-          if (task.name === pair.search) {
-            await storage.updateTask(task.id, { name: pair.replace });
-            updatedCount++;
-            break; // Move to next task after finding a match
+        if (!task.name) continue;
+
+        let newName = task.name;
+        let wasUpdated = false;
+        
+        // Check for exact matches first
+        const exactMatch = exactReplacements.find(pair => 
+          pair.search.toLowerCase() === task.name.toLowerCase()
+        );
+        
+        // Log for debugging
+        console.log(`Cleaning task data for update: ${task.id}`, {
+          before: { name: task.name },
+          after: { name: exactMatch ? exactMatch.replace : task.name }
+        });
+
+        if (exactMatch) {
+          newName = exactMatch.replace;
+          wasUpdated = true;
+        } else {
+          // Apply word replacements if no exact match
+          for (const replacement of wordReplacements) {
+            if (replacement.search.test(newName)) {
+              newName = newName.replace(replacement.search, replacement.replace);
+              wasUpdated = true;
+            }
           }
         }
       }

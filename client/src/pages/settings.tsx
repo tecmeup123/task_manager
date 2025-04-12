@@ -788,7 +788,7 @@ export default function Settings() {
       </div>
 
       <Tabs defaultValue="dashboard" className="mb-6">
-        <TabsList className="mb-4 flex flex-wrap">
+        <TabsList className="mb-4 flex flex-wrap gap-2 justify-start">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="tasks">Tasks</TabsTrigger>
           <TabsTrigger value="account">Account</TabsTrigger>
@@ -1521,8 +1521,8 @@ export default function Settings() {
                   
                   <div className="space-y-2">
                     <Label htmlFor="templateFile">Upload Template</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                      <div className="col-span-1 md:col-span-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <div className="flex-grow">
                         <Input 
                           id="templateFile" 
                           type="file" 
@@ -1539,6 +1539,7 @@ export default function Settings() {
                       <Button 
                         onClick={handleUploadTemplate}
                         disabled={!templateFile}
+                        className="w-full sm:w-auto"
                       >
                         Upload
                       </Button>
@@ -1552,11 +1553,11 @@ export default function Settings() {
                   {user?.role === 'admin' && (
                     <div className="space-y-2">
                       <Label>Update Terminology in Existing Tasks</Label>
-                      <div className="grid grid-cols-1 gap-2">
+                      <div className="flex">
                         <Button 
                           onClick={handleUpdateTerminology}
                           disabled={isUpdatingTerminology}
-                          className="w-full"
+                          className="w-full text-wrap"
                           variant="outline"
                         >
                           {isUpdatingTerminology ? 'Updating...' : 'Replace Email/Mailing References in Tasks'}
