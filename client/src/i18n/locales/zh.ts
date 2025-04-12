@@ -193,9 +193,24 @@ const zh = {
     
     // Menu Items
     'menu_dashboard': '仪表板',
+    'menu_home': '首页',
     'menu_tasks': '任务',
     'menu_editions': '版本',
     'menu_settings': '设置',
+    'menu_users': '用户',
+    'menu_navigation': '导航',
+    'menu_current_editions': '当前版本',
+    'app.footer': '培训团队任务管理器 ♥️ 制作',
+    
+    // Notifications
+    'notifications.title': '通知',
+    'notifications.markAllAsRead': '标记所有为已读',
+    'notifications.createTest': '创建测试通知',
+    'notifications.viewAll': '查看所有通知',
+    'notifications.empty': '没有新通知',
+    'notifications.new': '新通知',
+    'notifications.earlier': '早期通知',
+    'editions.none_found': '未找到版本',
     
     // Onboarding
     'welcome_to_training_app': '欢迎使用培训任务管理器！',

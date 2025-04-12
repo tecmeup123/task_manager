@@ -166,6 +166,14 @@ const en = {
     'settings.taskSettings': 'Task Settings',
     'settings.accountSettings': 'Account Settings',
     'settings.notificationSettings': 'Notification Settings',
+    'notifications.title': 'Notifications',
+    'notifications.markAllAsRead': 'Mark all as read',
+    'notifications.createTest': 'Create Test Notification',
+    'notifications.viewAll': 'View all notifications',
+    'notifications.empty': 'No new notifications',
+    'notifications.new': 'New',
+    'notifications.earlier': 'Earlier',
+    'editions.none_found': 'No editions found',
     'settings.securitySettings': 'Security Settings',
     'settings.darkTheme': 'Dark Theme',
     'settings.language': 'Language',
@@ -227,9 +235,14 @@ const en = {
     
     // Menu Items
     'menu_dashboard': 'Dashboard',
+    'menu_home': 'Home',
     'menu_tasks': 'Tasks',
     'menu_editions': 'Editions',
     'menu_settings': 'Settings',
+    'menu_users': 'Users',
+    'menu_navigation': 'Navigation',
+    'menu_current_editions': 'Current Editions',
+    'app.footer': 'Training Team Task Tracker made with ♥️',
     
     // Onboarding
     'welcome_to_training_app': 'Welcome to Training Task Manager!',

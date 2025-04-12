@@ -405,7 +405,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
           
           {/* Footer with heart symbol for mobile menu */}
           <div className="mt-auto pt-8 pb-4 text-xs text-center text-neutral-500">
-            Training Team Task Tracker made with ♥️
+            {t('app.footer')}
           </div>
           
           {/* Language selection removed from mobile menu as requested */}
@@ -415,7 +415,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
       <div className="flex flex-1 pt-16">
         {/* Desktop Sidebar */}
         <aside className="w-48 hidden md:block bg-white border-r border-neutral-200 fixed h-full pt-4">
-          <div className="px-4 py-2 text-sm font-medium text-neutral-500 uppercase">Navigation</div>
+          <div className="px-4 py-2 text-sm font-medium text-neutral-500 uppercase">{t('menu_navigation')}</div>
           <nav>
             <div>
               <Link to="/">
@@ -475,7 +475,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
           {/* Footer with heart symbol */}
           <div className="mt-auto px-4 py-3 text-xs text-center text-neutral-500 border-t">
-            Training Team Task Tracker made with ♥️
+            {t('app.footer')}
           </div>
 
           {/* Language switcher removed from sidebar as requested */}
