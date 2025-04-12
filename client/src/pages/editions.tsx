@@ -4,7 +4,7 @@ import { Link, useLocation } from "wouter";
 import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isAfter, isBefore, addWeeks } from "date-fns";
 import {
   Card,
   CardContent,
@@ -88,6 +88,22 @@ export default function Editions() {
     }
   };
 
+  // Helper functions to determine edition status
+  const isEditionUpcoming = (edition: any) => {
+    const startDate = new Date(edition.startDate);
+    const now = new Date();
+    return startDate > now;
+  };
+
+  const isEditionActive = (edition: any) => {
+    const startDate = new Date(edition.startDate);
+    const now = new Date();
+    // An edition is active if it has started but hasn't reached week 8 yet
+    // Assuming each week is 7 days
+    const endDate = addWeeks(startDate, 8);
+    return startDate <= now && now <= endDate;
+  };
+
   const handleDuplicateEdition = (edition: any) => {
     setSourceEditionId(edition.id);
     setIsDuplicateEditionOpen(true);
@@ -142,7 +158,20 @@ export default function Editions() {
                     </TableCell>
                     <TableCell>{formatDate(edition.startDate)}</TableCell>
                     <TableCell>
-                      <Badge variant="success">{edition.status}</Badge>
+                      <Badge 
+                        variant={
+                          isEditionUpcoming(edition) ? "outline" : 
+                          isEditionActive(edition) ? "success" : 
+                          "destructive"
+                        }
+                        className={
+                          isEditionUpcoming(edition) ? "bg-yellow-100 hover:bg-yellow-200 text-yellow-800 border-yellow-200" : ""
+                        }
+                      >
+                        {isEditionUpcoming(edition) ? "Upcoming" : 
+                         isEditionActive(edition) ? "Active" : 
+                         "Finished"}
+                      </Badge>
                     </TableCell>
                     <TableCell className="w-[250px]">
                     <WeekProgressIndicator currentWeek={edition.currentWeek || 1} />
@@ -222,7 +251,20 @@ export default function Editions() {
                           <Badge variant={edition.trainingType === "GLR" ? "default" : "secondary"}>
                             {edition.trainingType}
                           </Badge>
-                          <Badge variant="success">{edition.status}</Badge>
+                          <Badge 
+                            variant={
+                              isEditionUpcoming(edition) ? "outline" : 
+                              isEditionActive(edition) ? "success" : 
+                              "destructive"
+                            }
+                            className={
+                              isEditionUpcoming(edition) ? "bg-yellow-100 hover:bg-yellow-200 text-yellow-800 border-yellow-200" : ""
+                            }
+                          >
+                            {isEditionUpcoming(edition) ? "Upcoming" : 
+                             isEditionActive(edition) ? "Active" : 
+                             "Finished"}
+                          </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
                           Starts {formatDate(edition.startDate)}
