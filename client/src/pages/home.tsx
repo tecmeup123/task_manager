@@ -366,6 +366,149 @@ export default function Home() {
 
       </div>
 
+      {/* Task Filtering UI */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-lg font-medium">Task Management</h3>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setIsFiltersVisible(!isFiltersVisible)}
+            className="gap-2"
+          >
+            <Filter className="h-4 w-4" />
+            {isFiltersVisible ? "Hide Filters" : "Show Filters"}
+          </Button>
+        </div>
+        
+        {isFiltersVisible && (
+          <Card className="mb-4">
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div className="space-y-2">
+                  <Label htmlFor="search">Search Tasks</Label>
+                  <div className="relative">
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="search"
+                      placeholder="Search by name, owner, status..."
+                      className="pl-8"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    {searchQuery && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3"
+                        onClick={() => setSearchQuery("")}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="status-filter">Status</Label>
+                  <Select 
+                    value={statusFilter} 
+                    onValueChange={setStatusFilter}
+                  >
+                    <SelectTrigger id="status-filter">
+                      <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Statuses</SelectItem>
+                      {uniqueStatuses.map((status: string) => (
+                        <SelectItem key={status} value={status}>
+                          {status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="week-filter">Week</Label>
+                  <Select 
+                    value={weekFilter} 
+                    onValueChange={setWeekFilter}
+                  >
+                    <SelectTrigger id="week-filter">
+                      <SelectValue placeholder="Filter by week" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Weeks</SelectItem>
+                      {uniqueWeeks.map((week: string) => (
+                        <SelectItem key={week} value={week}>
+                          {week}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edition-filter">Edition</Label>
+                  <Select 
+                    value={editionFilter} 
+                    onValueChange={setEditionFilter}
+                  >
+                    <SelectTrigger id="edition-filter">
+                      <SelectValue placeholder="Filter by edition" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Editions</SelectItem>
+                      {editions && editions.map((edition: any) => (
+                        <SelectItem key={edition.id} value={edition.code}>
+                          {edition.code}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="owner-filter">Owner</Label>
+                  <Select 
+                    value={ownerFilter} 
+                    onValueChange={setOwnerFilter}
+                  >
+                    <SelectTrigger id="owner-filter">
+                      <SelectValue placeholder="Filter by owner" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Owners</SelectItem>
+                      {uniqueOwners.map((owner: string) => (
+                        <SelectItem key={owner} value={owner}>
+                          {owner}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="flex items-end">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setSearchQuery("");
+                      setStatusFilter("all");
+                      setWeekFilter("all");
+                      setEditionFilter("all");
+                      setOwnerFilter("all");
+                    }}
+                  >
+                    Reset Filters
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
       {/* Overdue and Upcoming Tasks */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
         {/* Overdue Tasks */}
@@ -378,7 +521,9 @@ export default function Home() {
               </CardTitle>
               <div className="flex items-center gap-2">
                 {!isLoading && overdueTasks.length > 0 && (
-                  <Badge variant="destructive">{overdueTasks.length}</Badge>
+                  <Badge variant="destructive">
+                    {isFiltersVisible ? filteredOverdueTasks.length : overdueTasks.length}
+                  </Badge>
                 )}
                 <Button 
                   variant="ghost" 
@@ -399,9 +544,9 @@ export default function Home() {
                 <Skeleton className="h-12 w-full mb-2" />
                 <Skeleton className="h-12 w-full" />
               </>
-            ) : overdueTasks.length > 0 ? (
+            ) : filteredOverdueTasks && filteredOverdueTasks.length > 0 ? (
               <div className="space-y-4 max-h-[calc(40vh-50px)] overflow-y-auto pr-2">
-                {overdueTasks.map((task: any) => (
+                {filteredOverdueTasks.map((task: any) => (
                   <div key={task.id} className="flex justify-between items-start border-b pb-3">
                     <div className="flex items-start gap-3">
                       <div className="bg-red-100 p-2 rounded-md mt-1">
@@ -426,11 +571,11 @@ export default function Home() {
                   </div>
                 ))}
 
-                {overdueTasks.length > 5 && (
+                {filteredOverdueTasks.length > 5 && (
                   <div className="text-center pt-2">
                     <Link to="/tasks">
                       <Button variant="link" size="sm">
-                        View all {overdueTasks.length} overdue tasks
+                        View all {filteredOverdueTasks.length} overdue tasks
                       </Button>
                     </Link>
                   </div>
@@ -454,7 +599,9 @@ export default function Home() {
               </CardTitle>
               <div className="flex items-center gap-2">
                 {!isLoading && upcomingTasks.length > 0 && (
-                  <Badge variant="secondary">{upcomingTasks.length}</Badge>
+                  <Badge variant="secondary">
+                    {isFiltersVisible ? filteredUpcomingTasks.length : upcomingTasks.length}
+                  </Badge>
                 )}
                 <Button 
                   variant="ghost" 
@@ -475,9 +622,9 @@ export default function Home() {
                 <Skeleton className="h-12 w-full mb-2" />
                 <Skeleton className="h-12 w-full" />
               </>
-            ) : upcomingTasks.length > 0 ? (
+            ) : filteredUpcomingTasks && filteredUpcomingTasks.length > 0 ? (
               <div className="space-y-4 max-h-[calc(40vh-50px)] overflow-y-auto pr-2">
-                {upcomingTasks.map((task: any) => (
+                {filteredUpcomingTasks.map((task: any) => (
                   <div key={task.id} className="flex justify-between items-start border-b pb-3">
                     <div className="flex items-start gap-3">
                       <div className="bg-amber-100 p-2 rounded-md mt-1">
@@ -502,11 +649,11 @@ export default function Home() {
                   </div>
                 ))}
 
-                {upcomingTasks.length > 5 && (
+                {filteredUpcomingTasks.length > 5 && (
                   <div className="text-center pt-2">
                     <Link to="/tasks">
                       <Button variant="link" size="sm">
-                        View all {upcomingTasks.length} upcoming tasks
+                        View all {filteredUpcomingTasks.length} upcoming tasks
                       </Button>
                     </Link>
                   </div>
