@@ -1275,11 +1275,11 @@ export default function Settings() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Password Management</h3>
+                <h3 className="text-lg font-medium">{t('settings.passwordManagement')}</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="currentPassword">Current Password</Label>
+                    <Label htmlFor="currentPassword">{t('settings.currentPassword')}</Label>
                     <Input 
                       id="currentPassword" 
                       type="password" 
@@ -1294,7 +1294,7 @@ export default function Settings() {
                   <div className="hidden md:block" />
                   
                   <div className="space-y-2">
-                    <Label htmlFor="newPassword">New Password</Label>
+                    <Label htmlFor="newPassword">{t('settings.newPassword')}</Label>
                     <Input 
                       id="newPassword" 
                       type="password" 
