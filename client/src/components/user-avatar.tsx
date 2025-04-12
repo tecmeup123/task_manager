@@ -27,8 +27,8 @@ export function UserAvatar() {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-            <Avatar className="h-10 w-10">
+          <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0">
+            <Avatar className="h-9 w-9">
               {user.avatarUrl ? (
                 <AvatarImage src={user.avatarUrl} alt={user.username} />
               ) : (

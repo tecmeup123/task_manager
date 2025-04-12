@@ -157,7 +157,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
     <div className="font-sans bg-neutral-100 text-neutral-700 min-h-screen flex flex-col">
       {/* Header */}
       <header className="bg-white border-b border-neutral-200 px-4 md:px-6 py-3 flex justify-between items-center fixed top-0 w-full shadow-sm z-20">
-        <div className="flex items-center">
+        <div className="flex items-center flex-shrink-0">
           {isMobile && showBackButton ? (
             <Button 
               variant="ghost" 
@@ -178,7 +178,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             </Button>
           ) : null}
           
-          <h1 className="text-lg md:text-xl font-semibold text-primary mr-6 truncate">
+          <h1 className="text-lg md:text-xl font-semibold text-primary mr-6 truncate max-w-[150px] md:max-w-none">
             {isMobile && location.startsWith('/tasks/') 
               ? t('tasks.details') 
               : isMobile && location === '/tasks'
@@ -218,7 +218,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             </Link>
           </div>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center flex-shrink-0">
           <div className="relative mr-2 hidden md:block">
             <Input 
               type="text" 
@@ -333,7 +333,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
           </DropdownMenu>
           
           {/* User Avatar - new component */}
-          <div className="ml-2">
+          <div className="ml-2 flex items-center">
             <UserAvatar />
           </div>
         </div>
