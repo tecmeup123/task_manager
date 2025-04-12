@@ -30,6 +30,15 @@ const de = {
     'dashboard.overdueTasks': 'Überfällige Aufgaben',
     'dashboard.upcomingTasks': 'Anstehende Aufgaben',
     'dashboard.ongoingTrainingSessions': 'Laufende Schulungssitzungen',
+    'dashboard.noOverdueTasks': 'Keine überfälligen Aufgaben',
+    'dashboard.noUpcomingTasks': 'Keine anstehenden Aufgaben',
+    'dashboard.viewAll': 'Alle anzeigen',
+    'dashboard.tasksThisWeek': 'Aufgaben diese Woche',
+    'dashboard.completedThisWeek': 'Diese Woche abgeschlossen',
+    'dashboard.currentWeeks': 'Aktuelle Wochen',
+    'dashboard.activeEditions': 'Aktive Ausgaben',
+    'dashboard.currentlyRunningEditions': 'Derzeit laufende Schulungsausgaben',
+    'dashboard.taskManagement': 'Aufgabenverwaltung',
     
     // Settings
     'settings.title': 'Einstellungen',
