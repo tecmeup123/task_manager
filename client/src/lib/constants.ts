@@ -153,5 +153,157 @@ export const TASK_TEMPLATE = {
       owner: "Miguel",
       trainingType: "GLR"
     }
+  ],
+  "Week 1": [
+    {
+      taskCode: "W1T01",
+      name: "First week of training - Welcome session",
+      duration: "1:00:00",
+      assignedTo: "Trainers",
+      owner: "Trainers",
+      trainingType: "GLR"
+    },
+    {
+      taskCode: "W1T02",
+      name: "Set up training environment for participants",
+      duration: "0:30:00",
+      assignedTo: "Organizer",
+      owner: "Platform Engineering",
+      trainingType: "GLR"
+    }
+  ],
+  "Week 2": [
+    {
+      taskCode: "W2T01",
+      name: "Weekly progress review meeting",
+      duration: "0:30:00",
+      assignedTo: "Trainers",
+      owner: "Trainers",
+      trainingType: "GLR"
+    },
+    {
+      taskCode: "W2T02",
+      name: "Send reminder about assignments due",
+      duration: "0:10:00",
+      assignedTo: "Organizer",
+      owner: "Miguel",
+      trainingType: "GLR"
+    }
+  ],
+  "Week 3": [
+    {
+      taskCode: "W3T01",
+      name: "Mid-training survey distribution",
+      duration: "0:15:00",
+      assignedTo: "Organizer",
+      owner: "Miguel",
+      trainingType: "GLR"
+    },
+    {
+      taskCode: "W3T02",
+      name: "Weekly progress review meeting",
+      duration: "0:30:00",
+      assignedTo: "Trainers", 
+      owner: "Trainers",
+      trainingType: "GLR"
+    }
+  ],
+  "Week 4": [
+    {
+      taskCode: "W4T01",
+      name: "Weekly progress review meeting",
+      duration: "0:30:00",
+      assignedTo: "Trainers",
+      owner: "Trainers",
+      trainingType: "GLR"
+    },
+    {
+      taskCode: "W4T02",
+      name: "Prepare for final project presentations",
+      duration: "1:00:00",
+      assignedTo: "Trainers",
+      owner: "Trainers",
+      trainingType: "GLR"
+    }
+  ],
+  "Week 5": [
+    {
+      taskCode: "W5T01",
+      name: "Final project presentations",
+      duration: "2:00:00",
+      assignedTo: "Trainers",
+      owner: "Trainers",
+      trainingType: "GLR"
+    },
+    {
+      taskCode: "W5T02",
+      name: "Final assessment distribution",
+      duration: "0:15:00",
+      assignedTo: "Organizer",
+      owner: "Miguel",
+      trainingType: "GLR"
+    }
+  ],
+  "Week 6": [
+    {
+      taskCode: "W6T01",
+      name: "Collect and analyze final assessment results",
+      duration: "1:00:00",
+      assignedTo: "Organizer",
+      owner: "Miguel",
+      trainingType: "GLR"
+    },
+    {
+      taskCode: "W6T02",
+      name: "Prepare certificates of completion",
+      duration: "0:30:00",
+      assignedTo: "Organizer",
+      owner: "Miguel",
+      trainingType: "GLR"
+    }
+  ],
+  "Week 7": [
+    {
+      taskCode: "W7T01",
+      name: "Send certificates to participants",
+      duration: "0:15:00",
+      assignedTo: "Organizer",
+      owner: "Miguel",
+      trainingType: "GLR"
+    },
+    {
+      taskCode: "W7T02",
+      name: "Follow-up with participants who didn't complete training",
+      duration: "0:30:00",
+      assignedTo: "Organizer",
+      owner: "Miguel",
+      trainingType: "GLR"
+    }
+  ],
+  "Week 8": [
+    {
+      taskCode: "W8T01",
+      name: "Training program retrospective meeting",
+      duration: "1:00:00",
+      assignedTo: "Organizer",
+      owner: "Miguel",
+      trainingType: "GLR"
+    },
+    {
+      taskCode: "W8T02",
+      name: "Prepare training report",
+      duration: "1:30:00",
+      assignedTo: "Organizer",
+      owner: "Miguel",
+      trainingType: "GLR"
+    },
+    {
+      taskCode: "W8T03",
+      name: "Archive training materials",
+      duration: "0:30:00",
+      assignedTo: "Organizer",
+      owner: "Miguel",
+      trainingType: "GLR"
+    }
   ]
 };
