@@ -790,6 +790,7 @@ export class DatabaseStorage implements IStorage {
 
   async duplicateEdition(editionId: number, newEditionData: InsertEdition): Promise<Edition> {
     const { db } = await import("./db");
+    const { calculateTaskDueDate } = await import("../client/src/lib/utils");
     
     // First, get the source edition
     const sourceEdition = await this.getEdition(editionId);
@@ -819,7 +820,6 @@ export class DatabaseStorage implements IStorage {
         .where(eq(tasks.editionId, editionId));
       
       // Create new tasks in the new edition
-      const originalStartDate = new Date(sourceEdition.startDate);
       const newStartDate = new Date(newEdition.startDate);
       
       // Prepare batch insert for all tasks
@@ -827,17 +827,15 @@ export class DatabaseStorage implements IStorage {
         const taskValues = sourceTasks.map(sourceTask => {
           const { id, editionId, completionDate, ...taskProps } = sourceTask;
           
-          // Adjust dates based on the new start date
-          let newDueDate = taskProps.dueDate ? adjustDate(new Date(taskProps.dueDate), originalStartDate, newStartDate) : null;
-          let newTaskStartDate = taskProps.startDate ? adjustDate(new Date(taskProps.startDate), originalStartDate, newStartDate) : null;
-          let newEndDate = taskProps.endDate ? adjustDate(new Date(taskProps.endDate), originalStartDate, newStartDate) : null;
+          // Calculate the due date based on the week number and new start date
+          // Extract just the number from the week string (e.g., "Week -5" -> "-5")
+          const weekNumber = taskProps.week.replace(/Week\s+/, "");
+          const dueDate = calculateTaskDueDate(weekNumber, newStartDate);
           
           return {
             ...taskProps,
             editionId: newEdition.id,
-            dueDate: newDueDate?.toISOString() || null,
-            startDate: newTaskStartDate?.toISOString() || null,
-            endDate: newEndDate?.toISOString() || null,
+            dueDate: dueDate,
             status: "Not Started",
             completionDate: null,
           };
