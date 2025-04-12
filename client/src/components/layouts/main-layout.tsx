@@ -103,22 +103,40 @@ export default function MainLayout({ children }: MainLayoutProps) {
   
   // Calculate upcoming tasks for notifications
   const upcomingTasks = useMemo(() => {
-    if (!allTasks || !Array.isArray(allTasks)) return [];
+    if (!allTasks || !Array.isArray(allTasks) || !user) return [];
     
     const today = new Date();
     const nextWeek = addDays(today, 7);
     
-    return allTasks
+    // Due date tasks (coming up in the next week)
+    const dueDateTasks = allTasks
       .filter(task => {
         if (!task.dueDate) return false;
         
         const dueDate = parseISO(task.dueDate);
         return isAfter(dueDate, today) && isBefore(dueDate, nextWeek) && task.status !== 'completed';
-      })
-      .sort((a, b) => {
-        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
       });
-  }, [allTasks]);
+      
+    // Tasks assigned to current user
+    const assignedTasks = allTasks
+      .filter(task => {
+        return task.assignedUserId === user.id && task.status !== 'completed';
+      });
+    
+    // Combine and sort tasks, removing duplicates
+    const combinedTasks = [...dueDateTasks];
+    
+    // Add assigned tasks that aren't already in the due date list
+    assignedTasks.forEach(task => {
+      if (!combinedTasks.some(t => t.id === task.id)) {
+        combinedTasks.push(task);
+      }
+    });
+    
+    return combinedTasks.sort((a, b) => {
+      return new Date(a.dueDate || '2099-01-01').getTime() - new Date(b.dueDate || '2099-01-01').getTime();
+    });
+  }, [allTasks, user]);
 
   return (
     <div className="font-sans bg-neutral-100 text-neutral-700 min-h-screen flex flex-col">
@@ -216,12 +234,21 @@ export default function MainLayout({ children }: MainLayoutProps) {
                     Loading notifications...
                   </div>
                 ) : upcomingTasks && upcomingTasks.length > 0 ? (
-                  upcomingTasks.slice(0, 3).map((task: any) => (
+                  upcomingTasks.slice(0, 5).map((task: any) => (
                     <DropdownMenuItem key={task.id} className="p-3 focus:bg-neutral-100 cursor-default">
                       <div className="flex flex-col space-y-1 w-full">
                         <div className="flex items-center justify-between">
-                          <span className="font-medium text-sm">Due Soon</span>
-                          <span className="text-xs text-neutral-500">{formatDate(task.dueDate, "MMM d")}</span>
+                          {task.assignedUserId === user?.id ? (
+                            <span className="font-medium text-sm flex items-center">
+                              <Badge variant="success" className="mr-1 py-0 px-1 text-[10px]">Assigned to you</Badge>
+                              {task.dueDate && <span className="text-neutral-500 ml-1">Due Soon</span>}
+                            </span>
+                          ) : (
+                            <span className="font-medium text-sm">Due Soon</span>
+                          )}
+                          {task.dueDate && (
+                            <span className="text-xs text-neutral-500">{formatDate(task.dueDate, "MMM d")}</span>
+                          )}
                         </div>
                         <p className="text-sm mb-1">{task.name}</p>
                         <div className="flex justify-end">
