@@ -335,33 +335,33 @@ export default function MainLayout({ children }: MainLayoutProps) {
               <Link to="/">
                 <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <LayoutDashboard className="w-5 h-5 mr-3" />
-                  <span>{t('navigation.dashboard')}</span>
+                  <span>Dashboard</span>
                 </div>
               </Link>
               <Link to="/tasks">
                 <div className={`flex items-center px-4 py-3 text-base rounded-md ${location.startsWith("/tasks") ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <ListTodo className="w-5 h-5 mr-3" />
-                  <span>{t('navigation.tasks')}</span>
+                  <span>Tasks</span>
                 </div>
               </Link>
               <Link to="/editions">
                 <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/editions" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <GraduationCap className="w-5 h-5 mr-3" />
-                  <span>{t('navigation.editions')}</span>
+                  <span>Editions</span>
                 </div>
               </Link>
               {/* Trainers and reports links removed to simplify navigation */}
               <Link to="/settings">
                 <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/settings" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <Settings className="w-5 h-5 mr-3" />
-                  <span>{t('navigation.settings')}</span>
+                  <span>Settings</span>
                 </div>
               </Link>
               {user && user.role === "admin" && (
                 <Link to="/users">
                   <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/users" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                     <Users className="w-5 h-5 mr-3" />
-                    <span>{t('navigation.users')}</span>
+                    <span>Users</span>
                   </div>
                 </Link>
               )}
