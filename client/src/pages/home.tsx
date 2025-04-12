@@ -335,7 +335,7 @@ export default function Home() {
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm text-muted-foreground">No active editions</p>
+                  <p className="text-sm text-muted-foreground">{t('dashboard.noActiveEditions')}</p>
                 )}
               </div>
             )}
@@ -379,9 +379,9 @@ export default function Home() {
               </div>
             ) : (
               <div className="text-center py-6 text-muted-foreground">
-                <p>No editions available</p>
+                <p>{t('dashboard.noEditionsAvailable')}</p>
                 <Link to="/editions">
-                  <Button variant="outline" className="mt-2">Create Edition</Button>
+                  <Button variant="outline" className="mt-2">{t('dashboard.createEdition')}</Button>
                 </Link>
               </div>
             )}
@@ -402,7 +402,7 @@ export default function Home() {
             className="gap-2"
           >
             <Filter className="h-4 w-4" />
-            {isFiltersVisible ? "Hide Filters" : "Show Filters"}
+            {isFiltersVisible ? t('dashboard.hideFilters') : t('dashboard.showFilters')}
           </Button>
         </div>
         
@@ -411,12 +411,12 @@ export default function Home() {
             <CardContent className="pt-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div className="space-y-2">
-                  <Label htmlFor="search">Search Tasks</Label>
+                  <Label htmlFor="search">{t('dashboard.searchTasks')}</Label>
                   <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="search"
-                      placeholder="Search by name, owner, status..."
+                      placeholder={t('dashboard.searchPlaceholder')}
                       className="pl-8"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}

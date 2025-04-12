@@ -8,10 +8,11 @@ import es from './locales/es';
 import fr from './locales/fr';
 import de from './locales/de';
 import pt from './locales/pt';
+import zh from './locales/zh';
 
 // Get saved language or default to English
 const savedLanguage = localStorage.getItem('i18nextLng') || 'en';
-const supportedLanguages = ['en', 'es', 'fr', 'de', 'pt'];
+const supportedLanguages = ['en', 'es', 'fr', 'de', 'pt', 'zh'];
 const simpleLang = savedLanguage.split('-')[0];
 const initialLanguage = supportedLanguages.includes(simpleLang) ? simpleLang : 'en';
 
@@ -35,6 +36,7 @@ i18n
       fr,
       de,
       pt,
+      zh,
     },
     // Set detection order to prioritize localStorage
     detection: {
