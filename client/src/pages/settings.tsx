@@ -167,17 +167,160 @@ export default function Settings() {
   // Template management handler functions
   const handleDownloadTemplate = () => {
     toast({
-      title: "Downloading template...",
-      description: `Downloading ${selectedTemplate} template`
+      title: "Preparing template...",
+      description: `Generating ${selectedTemplate} template`
     });
+
+    // Create sample template data based on selected template type
+    const templateData = generateTemplateData(selectedTemplate);
     
-    // Simulate a download process
+    // Convert template data to JSON string
+    const jsonString = JSON.stringify(templateData, null, 2);
+    
+    // Create a blob and download link
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create and trigger download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${selectedTemplate}-template-tasks.json`;
+    document.body.appendChild(a);
+    a.click();
+    
+    // Clean up
     setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
       toast({
         title: "Template downloaded",
         description: "Task template has been successfully downloaded"
       });
-    }, 1500);
+    }, 500);
+  };
+  
+  // Helper function to generate template data
+  const generateTemplateData = (templateType: string) => {
+    // Sample task templates based on type
+    const templates = {
+      default: [
+        {
+          taskCode: "WM5T01",
+          week: "Week -5",
+          name: "Check if the cohort for the edition exists and if not create it",
+          duration: "0:10:00",
+          trainingType: "ALL",
+          assignedTo: "Organizer",
+          owner: "Training Manager",
+          status: "Not Started",
+          inflexible: false,
+          notes: "This is a required preparation task"
+        },
+        {
+          taskCode: "WM5T02",
+          week: "Week -5",
+          name: "Create mailing list (names; groups information; schedule; edition)",
+          duration: "0:30:00",
+          trainingType: "ALL",
+          assignedTo: "Organizer",
+          owner: "Training Manager",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        },
+        {
+          taskCode: "WM5T03",
+          week: "Week -5",
+          name: "Copy course's path and update exam and assignments dates and configure cohorts",
+          duration: "1:00:00",
+          trainingType: "ALL",
+          assignedTo: "Trainer",
+          owner: "Lead Trainer",
+          status: "Not Started",
+          inflexible: true,
+          notes: "Must be completed before sending welcome emails"
+        }
+      ],
+      glr: [
+        {
+          taskCode: "WM5T01",
+          week: "Week -5",
+          name: "Check if the cohort for the edition exists and if not create it",
+          duration: "0:10:00",
+          trainingType: "GLR",
+          assignedTo: "Organizer",
+          owner: "Training Manager",
+          status: "Not Started",
+          inflexible: false,
+          notes: "This is a required preparation task"
+        },
+        {
+          taskCode: "WM4T01",
+          week: "Week -4",
+          name: "Send welcome to e-learning email",
+          duration: "0:15:00",
+          trainingType: "GLR",
+          assignedTo: "Organizer",
+          owner: "Training Manager",
+          status: "Not Started",
+          inflexible: false,
+          notes: ""
+        },
+        {
+          taskCode: "W01T01",
+          week: "Week 1",
+          name: "First week of training - Welcome session",
+          duration: "1:00:00",
+          trainingType: "GLR",
+          assignedTo: "Trainer",
+          owner: "Lead Trainer",
+          status: "Not Started",
+          inflexible: true,
+          notes: "Must include introduction to course materials"
+        }
+      ],
+      slr: [
+        {
+          taskCode: "WM5T01",
+          week: "Week -5",
+          name: "Check if the cohort for the edition exists and if not create it",
+          duration: "0:10:00",
+          trainingType: "SLR",
+          assignedTo: "Organizer",
+          owner: "Training Manager",
+          status: "Not Started",
+          inflexible: false,
+          notes: "This is a required preparation task"
+        },
+        {
+          taskCode: "WM4T01",
+          week: "Week -4",
+          name: "Send self-learning materials",
+          duration: "0:15:00",
+          trainingType: "SLR",
+          assignedTo: "Organizer",
+          owner: "Training Manager",
+          status: "Not Started",
+          inflexible: false,
+          notes: "Include login instructions"
+        },
+        {
+          taskCode: "W01T01",
+          week: "Week 1",
+          name: "Provide access to self-paced modules",
+          duration: "0:30:00",
+          trainingType: "SLR",
+          assignedTo: "Trainer",
+          owner: "Lead Trainer",
+          status: "Not Started",
+          inflexible: true,
+          notes: "Verify all students have access"
+        }
+      ]
+    };
+    
+    return templates[templateType as keyof typeof templates] || templates.default;
   };
   
   const handleUploadTemplate = () => {
@@ -192,17 +335,62 @@ export default function Settings() {
     
     toast({
       title: "Uploading template...",
-      description: `Uploading ${templateFile.name}`
+      description: `Processing ${templateFile.name}`
     });
     
-    // Simulate an upload process
-    setTimeout(() => {
+    // Read and parse the file
+    const reader = new FileReader();
+    
+    reader.onload = (event) => {
+      try {
+        // Attempt to parse as JSON
+        const fileContent = event.target?.result as string;
+        const jsonData = JSON.parse(fileContent);
+        
+        // Validate the structure
+        if (!Array.isArray(jsonData)) {
+          throw new Error("Template must be an array of tasks");
+        }
+        
+        // Check if tasks have required fields
+        const hasRequiredFields = jsonData.every((task: any) => 
+          task.taskCode && task.week && task.name && task.trainingType
+        );
+        
+        if (!hasRequiredFields) {
+          throw new Error("Some tasks are missing required fields");
+        }
+        
+        // In a real app, would send this data to the backend to update templates
+        console.log("Template data validated:", jsonData);
+        
+        toast({
+          title: "Template uploaded",
+          description: `${jsonData.length} template tasks have been successfully processed`
+        });
+        
+        // Clear the file input
+        setTemplateFile(null);
+      } catch (error) {
+        console.error("Template parsing error:", error);
+        
+        toast({
+          title: "Upload error",
+          description: `Could not process template file: ${error instanceof Error ? error.message : "Invalid format"}`,
+          variant: "destructive"
+        });
+      }
+    };
+    
+    reader.onerror = () => {
       toast({
-        title: "Template uploaded",
-        description: "Task template has been successfully uploaded and applied"
+        title: "Upload error",
+        description: "Failed to read the file",
+        variant: "destructive"
       });
-      setTemplateFile(null);
-    }, 2000);
+    };
+    
+    reader.readAsText(templateFile);
   };
   
   useEffect(() => {
