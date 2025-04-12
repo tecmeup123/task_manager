@@ -360,62 +360,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Change password endpoint
-  app.post("/api/change-password", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "Authentication required" });
-    }
-    
-    const { currentPassword, newPassword } = req.body;
-    
-    if (!currentPassword || !newPassword) {
-      return res.status(400).json({ message: "Current password and new password are required" });
-    }
-    
-    try {
-      // Get the user from storage
-      const user = await storage.getUser(req.user.id);
-      
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      // Verify current password
-      const isPasswordValid = await comparePasswords(currentPassword, user.password);
-      
-      if (!isPasswordValid) {
-        return res.status(400).json({ message: "Current password is incorrect" });
-      }
-      
-      // Hash the new password
-      const hashedPassword = await hashPassword(newPassword);
-      
-      // Update user with new password and reset both password change flags
-      const updatedUser = await storage.updateUser(user.id, {
-        password: hashedPassword,
-        forcePasswordChange: false,
-        passwordChangeRequired: false, // Always set passwordChangeRequired to false
-      });
-      
-      // Create audit log for password change
-      await storage.createAuditLog({
-        action: "update",
-        entityType: "user",
-        entityId: user.id,
-        userId: user.id,
-        previousState: { passwordChanged: false },
-        newState: { passwordChanged: true },
-        notes: "User changed password",
-      });
-      
-      // Return the updated user without the password
-      const { password, ...userWithoutPassword } = updatedUser;
-      res.status(200).json(userWithoutPassword);
-    } catch (error) {
-      console.error("Error changing password:", error);
-      res.status(500).json({ message: "Failed to change password" });
-    }
-  });
+  // Change password endpoint has been moved to auth.ts to avoid duplicates
 
   // Audit Logs
   app.get("/api/audit-logs", requireAdmin, async (req, res) => {
