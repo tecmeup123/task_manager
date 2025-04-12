@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -31,7 +32,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
 import { WEEK_OPTIONS, TASK_STATUS_OPTIONS, OWNER_OPTIONS, ASSIGNED_TO_OPTIONS, TASK_TEMPLATE } from "@/lib/constants";
 
 // Schema for the form
@@ -45,6 +46,7 @@ const formSchema = z.object({
   inflexible: z.boolean().default(false),
   owner: z.string().optional().nullable(),
   assignedTo: z.string().optional().nullable(),
+  assignedUserId: z.number().optional().nullable(),
   status: z.string(),
 });
 
@@ -63,6 +65,12 @@ export default function AddTaskForm({
   onSave,
   edition,
 }: AddTaskFormProps) {
+  // Fetch users for task assignment
+  const { data: users, isLoading: isLoadingUsers } = useQuery({
+    queryKey: ['/api/users'],
+    enabled: isOpen, // Only fetch when modal is open
+  });
+  
   // Track selected week for task code generation
   const [selectedWeek, setSelectedWeek] = useState<string>("Week 1");
   
@@ -93,6 +101,7 @@ export default function AddTaskForm({
       inflexible: false,
       owner: "",
       assignedTo: "",
+      assignedUserId: null,
       status: "Not Started",
     },
   });

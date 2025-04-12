@@ -85,6 +85,7 @@ export const tasks = pgTable("tasks", {
   trainingType: varchar("training_type", { length: 10 }).notNull(),
   links: text("links"),
   assignedTo: varchar("assigned_to", { length: 100 }),
+  assignedUserId: integer("assigned_user_id").references(() => users.id),
   owner: varchar("owner", { length: 100 }),
   status: varchar("status", { length: 20 }).default("Not Started"),
   inflexible: boolean("inflexible").default(false),
