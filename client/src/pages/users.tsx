@@ -91,6 +91,28 @@ export default function UsersPage() {
       });
     },
   });
+  
+  // Approve user mutation
+  const approveUserMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await apiRequest("POST", `/api/users/${id}/approve`);
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "User approved",
+        description: `${data.username} has been approved and can now access the application`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to approve user",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   // Only admin users can access this page
   if (!user || user.role !== "admin") {
@@ -107,6 +129,10 @@ export default function UsersPage() {
     if (selectedUser && newRole) {
       updateUserMutation.mutate({ id: selectedUser.id, role: newRole });
     }
+  };
+  
+  const handleApproveUser = (userId: number) => {
+    approveUserMutation.mutate(userId);
   };
 
   // Display a loading state
@@ -167,13 +193,14 @@ export default function UsersPage() {
                   <TableHead>Full Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Role</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {users && users.length > 0 ? (
                   users.map((user) => (
-                    <TableRow key={user.id}>
+                    <TableRow key={user.id} className={!user.approved ? "bg-muted/30" : ""}>
                       <TableCell className="font-medium">{user.username}</TableCell>
                       <TableCell>{user.fullName || "-"}</TableCell>
                       <TableCell>{user.email || "-"}</TableCell>
@@ -190,21 +217,46 @@ export default function UsersPage() {
                           {user.role}
                         </Badge>
                       </TableCell>
+                      <TableCell>
+                        {user.approved ? (
+                          <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+                            <CheckCircle className="mr-1 h-3 w-3" /> Approved
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300">
+                            <XCircle className="mr-1 h-3 w-3" /> Pending Approval
+                          </Badge>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditClick(user)}
-                          disabled={user.id === (window as any)?.currentUser?.id}
-                        >
-                          <Pencil className="h-4 w-4 mr-1" /> Edit Role
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                          {!user.approved && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleApproveUser(user.id)}
+                              disabled={approveUserMutation.isPending}
+                              className="bg-green-100 text-green-800 border-green-300 hover:bg-green-200"
+                            >
+                              {approveUserMutation.isPending && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}
+                              <CheckCircle className="h-4 w-4 mr-1" /> Approve
+                            </Button>
+                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditClick(user)}
+                            disabled={user.id === (window as any)?.currentUser?.id}
+                          >
+                            <Pencil className="h-4 w-4 mr-1" /> Edit Role
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8">
+                    <TableCell colSpan={6} className="text-center py-8">
                       No users found
                     </TableCell>
                   </TableRow>
