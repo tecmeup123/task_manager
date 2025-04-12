@@ -684,6 +684,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Edition not found" });
       }
       
+      // Verify assignedUserId is valid if provided and not null
+      if (taskData.assignedUserId !== null && taskData.assignedUserId !== undefined) {
+        const assignedUser = await storage.getUser(taskData.assignedUserId);
+        if (!assignedUser) {
+          return res.status(400).json({ 
+            message: "Invalid user assignment. User does not exist.", 
+            field: "assignedUserId" 
+          });
+        }
+      }
+      
       // Create audit log if user is authenticated
       if (req.isAuthenticated()) {
         await storage.createAuditLog({
