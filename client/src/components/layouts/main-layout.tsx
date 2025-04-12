@@ -180,12 +180,12 @@ export default function MainLayout({ children }: MainLayoutProps) {
           
           <h1 className="text-lg md:text-xl font-semibold text-primary mr-6 truncate">
             {isMobile && location.startsWith('/tasks/') 
-              ? 'Task Details' 
+              ? t('tasks.details') 
               : isMobile && location === '/tasks'
-                ? 'Tasks'
+                ? t('tasks.title')
                 : isMobile && location === '/editions'
-                  ? 'Editions'
-                  : 'Training Management System'}
+                  ? t('editions.title')
+                  : t('app.title')}
           </h1>
           
           <div className="hidden md:flex space-x-1">
@@ -195,7 +195,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 className={location === "/" ? "bg-primary text-white" : "hover:bg-neutral-100"}
                 size="sm"
               >
-                Dashboard
+                {t('menu_dashboard')}
               </Button>
             </Link>
             <Link to="/tasks">
@@ -204,7 +204,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 className={location.startsWith("/tasks") ? "bg-primary text-white" : "hover:bg-neutral-100"}
                 size="sm"
               >
-                Tasks
+                {t('menu_tasks')}
               </Button>
             </Link>
             <Link to="/editions">
@@ -213,7 +213,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 className={location === "/editions" ? "bg-primary text-white" : "hover:bg-neutral-100"}
                 size="sm"
               >
-                Editions
+                {t('menu_editions')}
               </Button>
             </Link>
           </div>
