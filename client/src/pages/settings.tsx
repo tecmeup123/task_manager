@@ -36,6 +36,13 @@ export default function Settings() {
   const [timezone, setTimezone] = useState("utc");
   const [useDarkTheme, setUseDarkTheme] = useState(false);
   
+  // Notification settings
+  const [playSound, setPlaySound] = useState(true);
+  const [showPopup, setShowPopup] = useState(true);
+  const [showBadge, setShowBadge] = useState(true);
+  const [reminderTime, setReminderTime] = useState("3");
+  const [isNotificationSettingsChanged, setIsNotificationSettingsChanged] = useState(false);
+  
   // Security settings
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -111,6 +118,7 @@ export default function Settings() {
       title: "Notification settings saved",
       description: "Your notification preferences have been updated"
     });
+    setIsNotificationSettingsChanged(false);
   };
   
   useEffect(() => {
@@ -472,53 +480,8 @@ export default function Settings() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Email Notifications</h3>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Task Assignments</Label>
-                      <p className="text-sm text-muted-foreground">Receive email notifications when you are assigned a task</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Task Updates</Label>
-                      <p className="text-sm text-muted-foreground">Receive email notifications when tasks you own are updated</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Approaching Due Dates</Label>
-                      <p className="text-sm text-muted-foreground">Receive email reminders for tasks with approaching due dates</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>New Edition Created</Label>
-                      <p className="text-sm text-muted-foreground">Receive email notifications when a new training edition is created</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Weekly Summary</Label>
-                      <p className="text-sm text-muted-foreground">Receive a weekly summary of your tasks and upcoming deadlines</p>
-                    </div>
-                    <Switch />
-                  </div>
-                </div>
-              </div>
-              
-              <div className="space-y-4 pt-4 border-t">
-                <h3 className="text-lg font-medium">In-App Notifications</h3>
+                <h3 className="text-lg font-medium">Bell Icon Notifications</h3>
+                <p className="text-sm text-muted-foreground mb-4">All notifications will appear in the bell icon at the top right of the application</p>
                 
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -531,19 +494,75 @@ export default function Settings() {
                   
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                      <Label>Task Status Changes</Label>
-                      <p className="text-sm text-muted-foreground">Show notifications when task status changes</p>
+                      <Label>Task Updates</Label>
+                      <p className="text-sm text-muted-foreground">Show notifications when tasks you own are updated</p>
                     </div>
                     <Switch defaultChecked />
                   </div>
                   
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                      <Label>Due Date Reminders</Label>
-                      <p className="text-sm text-muted-foreground">Show reminders for upcoming task due dates</p>
+                      <Label>Approaching Due Dates</Label>
+                      <p className="text-sm text-muted-foreground">Show reminders for tasks with approaching due dates</p>
                     </div>
                     <Switch defaultChecked />
                   </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>New Edition Created</Label>
+                      <p className="text-sm text-muted-foreground">Show notifications when a new training edition is created</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Weekly Summary</Label>
+                      <p className="text-sm text-muted-foreground">Show a weekly summary of your tasks and upcoming deadlines</p>
+                    </div>
+                    <Switch />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="text-lg font-medium">Notification Appearance</h3>
+                
+                <div className="flex items-center space-x-2">
+                  <Switch 
+                    id="sound-switch" 
+                    checked={playSound}
+                    onCheckedChange={(value) => {
+                      setPlaySound(value);
+                      setIsNotificationSettingsChanged(true);
+                    }} 
+                  />
+                  <Label htmlFor="sound-switch">Play sound when new notifications arrive</Label>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Switch 
+                    id="popup-switch" 
+                    checked={showPopup}
+                    onCheckedChange={(value) => {
+                      setShowPopup(value);
+                      setIsNotificationSettingsChanged(true);
+                    }}
+                  />
+                  <Label htmlFor="popup-switch">Show popup notifications</Label>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Switch 
+                    id="badge-switch" 
+                    checked={showBadge}
+                    onCheckedChange={(value) => {
+                      setShowBadge(value);
+                      setIsNotificationSettingsChanged(true);
+                    }}
+                  />
+                  <Label htmlFor="badge-switch">Show notification count badge on bell icon</Label>
                 </div>
               </div>
               
@@ -552,7 +571,13 @@ export default function Settings() {
                 
                 <div className="space-y-2">
                   <Label htmlFor="dueDateReminder">Due Date Reminder</Label>
-                  <Select defaultValue="3">
+                  <Select 
+                    value={reminderTime}
+                    onValueChange={(value) => {
+                      setReminderTime(value);
+                      setIsNotificationSettingsChanged(true);
+                    }}
+                  >
                     <SelectTrigger id="dueDateReminder">
                       <SelectValue placeholder="Select reminder time" />
                     </SelectTrigger>
