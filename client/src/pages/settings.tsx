@@ -789,12 +789,12 @@ export default function Settings() {
 
       <Tabs defaultValue="dashboard" className="mb-6">
         <div className="mb-4 overflow-x-auto pb-1">
-          <TabsList className="flex w-fit flex-wrap gap-1">
-            <TabsTrigger value="dashboard" className="px-2 md:px-3">Dashboard</TabsTrigger>
-            <TabsTrigger value="tasks" className="px-2 md:px-3">Tasks</TabsTrigger>
-            <TabsTrigger value="account" className="px-2 md:px-3">Account</TabsTrigger>
-            <TabsTrigger value="notifications" className="px-2 md:px-3">Notifications</TabsTrigger>
-            <TabsTrigger value="security" className="px-2 md:px-3">Security</TabsTrigger>
+          <TabsList className="grid grid-cols-3 sm:flex sm:w-fit gap-1">
+            <TabsTrigger value="dashboard" className="text-xs px-1 py-1 md:text-sm md:px-3">Dashboard</TabsTrigger>
+            <TabsTrigger value="tasks" className="text-xs px-1 py-1 md:text-sm md:px-3">Tasks</TabsTrigger>
+            <TabsTrigger value="account" className="text-xs px-1 py-1 md:text-sm md:px-3">Account</TabsTrigger>
+            <TabsTrigger value="notifications" className="text-xs px-1 py-1 md:text-sm md:px-3">Notif.</TabsTrigger>
+            <TabsTrigger value="security" className="text-xs px-1 py-1 md:text-sm md:px-3">Security</TabsTrigger>
           </TabsList>
         </div>
         
