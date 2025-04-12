@@ -795,12 +795,12 @@ export default function Settings() {
       <Tabs defaultValue="dashboard" className="mb-6">
         <div className="mb-4 overflow-x-auto pb-1">
           <TabsList className="grid grid-cols-3 sm:flex sm:w-fit gap-1">
-            <TabsTrigger value="dashboard" className="text-xs px-1 py-1 md:text-sm md:px-3">Dashboard</TabsTrigger>
-            <TabsTrigger value="tasks" className="text-xs px-1 py-1 md:text-sm md:px-3">Tasks</TabsTrigger>
-            <TabsTrigger value="account" className="text-xs px-1 py-1 md:text-sm md:px-3">Account</TabsTrigger>
-            <TabsTrigger value="notifications" className="text-xs px-1 py-1 md:text-sm md:px-3">Notif.</TabsTrigger>
-            <TabsTrigger value="security" className="text-xs px-1 py-1 md:text-sm md:px-3">Security</TabsTrigger>
-            <TabsTrigger value="data" className="text-xs px-1 py-1 md:text-sm md:px-3">Data</TabsTrigger>
+            <TabsTrigger value="dashboard" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.dashboard')}</TabsTrigger>
+            <TabsTrigger value="tasks" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.tasks')}</TabsTrigger>
+            <TabsTrigger value="account" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.account')}</TabsTrigger>
+            <TabsTrigger value="notifications" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.notifications')}</TabsTrigger>
+            <TabsTrigger value="security" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.security')}</TabsTrigger>
+            <TabsTrigger value="data" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.data')}</TabsTrigger>
           </TabsList>
         </div>
         
@@ -809,7 +809,7 @@ export default function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Columns className="h-5 w-5 mr-2" />
-                Dashboard Settings
+                {t('settings.dashboardSettings')}
               </CardTitle>
               <CardDescription>
                 Customize how information is displayed on your dashboard
@@ -909,7 +909,7 @@ export default function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Calendar className="h-5 w-5 mr-2" />
-                Task Display Settings
+                {t('settings.taskSettings')}
               </CardTitle>
               <CardDescription>
                 Customize how tasks are displayed and organized
@@ -1000,7 +1000,7 @@ export default function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <User className="h-5 w-5 mr-2" />
-                Account Information
+                {t('settings.accountSettings')}
               </CardTitle>
               <CardDescription>
                 Manage your account details and preferences
@@ -1132,7 +1132,7 @@ export default function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Bell className="h-5 w-5 mr-2" />
-                Notification Settings
+                {t('settings.notificationSettings')}
               </CardTitle>
               <CardDescription>
                 Configure how and when you receive notifications
@@ -1266,7 +1266,7 @@ export default function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Lock className="h-5 w-5 mr-2" />
-                Security Settings
+                {t('settings.securitySettings')}
               </CardTitle>
               <CardDescription>
                 Manage your password and security preferences
