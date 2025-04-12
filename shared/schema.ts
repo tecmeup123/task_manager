@@ -160,6 +160,11 @@ export const auditLogs = pgTable("audit_logs", {
 export const insertAuditLogSchema = createInsertSchema(auditLogs).omit({
   id: true,
   timestamp: true,
+}).extend({
+  // Define types for previousState and newState
+  previousState: z.any().optional(),
+  newState: z.any().optional(),
+  notes: z.string().nullable().optional()
 });
 
 export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;

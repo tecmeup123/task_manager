@@ -237,9 +237,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Edition not found" });
       }
       
+      // Create audit log for the edition update
+      if (req.user) {
+        await storage.createAuditLog({
+          userId: req.user.id,
+          entityType: "edition",
+          entityId: id,
+          action: "update",
+          previousState: edition,
+          newState: { ...edition, ...req.body },
+          notes: `Edition ${edition.code} updated by ${req.user.username}`
+        });
+      }
+      
       const updatedEdition = await storage.updateEdition(id, req.body);
       res.json(updatedEdition);
     } catch (error) {
+      console.error("Error updating edition:", error);
       res.status(500).json({ message: "Failed to update edition" });
     }
   });
@@ -364,6 +378,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updatedData.completionDate = new Date(updatedData.completionDate);
       }
       
+      // Create audit log before updating the task
+      if (req.user) {
+        await storage.createAuditLog({
+          userId: req.user.id,
+          entityType: "task",
+          entityId: id,
+          action: "update",
+          previousState: task,
+          newState: { ...task, ...updatedData },
+          notes: `Task ${task.taskCode} (${task.name}) updated by ${req.user.username}`
+        });
+      }
+      
       const updatedTask = await storage.updateTask(id, updatedData);
       console.log(`Task ${id} updated successfully:`, updatedTask);
       res.json(updatedTask);
@@ -451,6 +478,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete trainer" });
+    }
+  });
+
+  // Audit logs routes
+  // Get all audit logs
+  app.get("/api/audit-logs", requireAdmin, async (req, res) => {
+    try {
+      const entityType = req.query.entityType as string | undefined;
+      const entityId = req.query.entityId ? Number(req.query.entityId) : undefined;
+      
+      const logs = await storage.getAuditLogs(entityType, entityId);
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching audit logs:", error);
+      res.status(500).json({ message: "Failed to fetch audit logs" });
+    }
+  });
+  
+  // Get audit logs for a specific entity
+  app.get("/api/audit-logs/:type/:id", requireEditor, async (req, res) => {
+    try {
+      const entityType = req.params.type;
+      const entityId = Number(req.params.id);
+      
+      const logs = await storage.getAuditLogs(entityType, entityId);
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching audit logs:", error);
+      res.status(500).json({ message: "Failed to fetch audit logs" });
     }
   });
 
