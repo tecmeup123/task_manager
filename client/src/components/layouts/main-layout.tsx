@@ -350,18 +350,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
                   <span>{t('navigation.editions')}</span>
                 </div>
               </Link>
-              <Link to="/trainers">
-                <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/trainers" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
-                  <Users className="w-5 h-5 mr-3" />
-                  <span>{t('navigation.trainers')}</span>
-                </div>
-              </Link>
-              <Link to="/reports">
-                <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/reports" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
-                  <BarChart className="w-5 h-5 mr-3" />
-                  <span>{t('navigation.reports')}</span>
-                </div>
-              </Link>
+              {/* Trainers and reports links removed to simplify navigation */}
               <Link to="/settings">
                 <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/settings" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <Settings className="w-5 h-5 mr-3" />
@@ -400,6 +389,11 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 <div className="px-4 py-3 text-neutral-500">{t('navigation.noEditions')}</div>
               )}
             </div>
+          </div>
+          
+          {/* Footer with heart symbol for mobile menu */}
+          <div className="mt-auto pt-8 pb-4 text-xs text-center text-neutral-500">
+            Training Team Task Tracker made with ♥️
           </div>
           
           {/* Language selection removed from mobile menu as requested */}
@@ -467,6 +461,11 @@ export default function MainLayout({ children }: MainLayoutProps) {
             )}
           </div>
 
+          {/* Footer with heart symbol */}
+          <div className="mt-auto px-4 py-3 text-xs text-center text-neutral-500 border-t">
+            Training Team Task Tracker made with ♥️
+          </div>
+
           {/* Language switcher removed from sidebar as requested */}
         </aside>
 
@@ -481,19 +480,19 @@ export default function MainLayout({ children }: MainLayoutProps) {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 flex justify-around items-center py-2 px-4 z-10">
           <Link to="/" className={`flex flex-col items-center ${location === '/' ? 'text-primary' : 'text-neutral-500'}`}>
             <LayoutDashboard className="h-6 w-6" />
-            <span className="text-xs mt-1">{t('navigation.home')}</span>
+            <span className="text-xs mt-1">Home</span>
           </Link>
           <Link to="/tasks" className={`flex flex-col items-center ${location.startsWith('/tasks') ? 'text-primary' : 'text-neutral-500'}`}>
             <ListTodo className="h-6 w-6" />
-            <span className="text-xs mt-1">{t('navigation.tasks')}</span>
+            <span className="text-xs mt-1">Tasks</span>
           </Link>
           <Link to="/editions" className={`flex flex-col items-center ${location === '/editions' ? 'text-primary' : 'text-neutral-500'}`}>
             <GraduationCap className="h-6 w-6" />
-            <span className="text-xs mt-1">{t('navigation.editions')}</span>
+            <span className="text-xs mt-1">Editions</span>
           </Link>
           <Link to="/settings" className={`flex flex-col items-center ${location === '/settings' ? 'text-primary' : 'text-neutral-500'}`}>
             <Settings className="h-6 w-6" />
-            <span className="text-xs mt-1">{t('navigation.settings')}</span>
+            <span className="text-xs mt-1">Settings</span>
           </Link>
         </div>
       )}
