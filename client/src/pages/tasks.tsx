@@ -406,6 +406,7 @@ export default function Tasks() {
           isOpen={isTaskModalOpen}
           task={selectedTask}
           onClose={() => {
+            console.log("Task modal onClose called from tasks page");
             setIsTaskModalOpen(false);
             setSelectedTask(null);
           }}

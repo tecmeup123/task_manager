@@ -147,6 +147,15 @@ export default function TaskDetailModal({
   // Using a more direct approach for closing the modal
   const handleClose = () => {
     console.log("Modal close function called");
+    // Try to force dialog close first
+    try {
+      document.querySelector('[data-radix-dialog-close]')?.dispatchEvent(
+        new MouseEvent('click', { bubbles: true })
+      );
+    } catch (e) {
+      console.error("Error forcing dialog close:", e);
+    }
+    // Then call the parent onClose callback
     onClose();
   };
   
