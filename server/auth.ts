@@ -97,6 +97,11 @@ export function setupAuth(app: Express) {
       if (err) return next(err);
       if (!user) return res.status(401).json({ message: "Invalid credentials" });
       
+      // Check if user is approved
+      if (user.approved === false && user.role !== 'admin') {
+        return res.status(403).json({ message: "Your account is pending approval by an administrator" });
+      }
+      
       req.login(user, (err) => {
         if (err) return next(err);
         const safeUser = { ...user };

@@ -40,7 +40,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, UserCog, UserPlus } from "lucide-react";
+import { CheckCircle, Pencil, UserCog, UserPlus, XCircle } from "lucide-react";
 import { Loader2 } from "lucide-react";
 
 // Types for users
@@ -50,6 +50,9 @@ interface User {
   fullName: string | null;
   email: string | null;
   role: "admin" | "editor" | "viewer";
+  approved: boolean;
+  forcePasswordChange: boolean;
+  passwordChangeRequired: boolean;
 }
 
 export default function UsersPage() {

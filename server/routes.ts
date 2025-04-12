@@ -570,12 +570,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Hash password
       const hashedPassword = await hashPassword(initialPassword);
       
-      // Create the user with forcePasswordChange flag
+      // Admins are auto-approved, other users need approval
+      const isAdmin = req.body.role === 'admin';
+      
+      // Create the user with appropriate flags
       const user = await storage.createUser({
         ...req.body,
         password: hashedPassword,
         forcePasswordChange: true, // Force password change on first login
-        passwordChangeRequired: true // Mark that password change is required
+        passwordChangeRequired: true, // Mark that password change is required
+        approved: isAdmin // Automatically approve admins, regular users need approval
       });
       
       // Create audit log
@@ -637,6 +641,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating user:", error);
       res.status(500).json({ message: "Failed to update user" });
+    }
+  });
+  
+  // Approve a user (admin only)
+  app.post("/api/users/:id/approve", requireAdmin, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      
+      const user = await storage.getUser(id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Create audit log before updating
+      if (req.user) {
+        await storage.createAuditLog({
+          userId: req.user.id,
+          entityType: "user",
+          entityId: id,
+          action: "update",
+          previousState: { ...user, password: "[REDACTED]" },
+          newState: { ...user, approved: true, password: "[REDACTED]" },
+          notes: `User ${user.username} approved by ${req.user.username}`
+        });
+      }
+      
+      const updatedUser = await storage.updateUser(id, { approved: true });
+      
+      // Remove password from response
+      const { password, ...safeUser } = updatedUser;
+      
+      res.json(safeUser);
+    } catch (error) {
+      console.error("Error approving user:", error);
+      res.status(500).json({ message: "Failed to approve user" });
     }
   });
   
