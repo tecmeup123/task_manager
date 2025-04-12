@@ -788,13 +788,15 @@ export default function Settings() {
       </div>
 
       <Tabs defaultValue="dashboard" className="mb-6">
-        <TabsList className="mb-4 flex flex-wrap gap-2 justify-start">
-          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-          <TabsTrigger value="tasks">Tasks</TabsTrigger>
-          <TabsTrigger value="account">Account</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
-        </TabsList>
+        <div className="mb-4 overflow-x-auto pb-1">
+          <TabsList className="flex w-fit flex-wrap gap-1">
+            <TabsTrigger value="dashboard" className="px-2 md:px-3">Dashboard</TabsTrigger>
+            <TabsTrigger value="tasks" className="px-2 md:px-3">Tasks</TabsTrigger>
+            <TabsTrigger value="account" className="px-2 md:px-3">Account</TabsTrigger>
+            <TabsTrigger value="notifications" className="px-2 md:px-3">Notifications</TabsTrigger>
+            <TabsTrigger value="security" className="px-2 md:px-3">Security</TabsTrigger>
+          </TabsList>
+        </div>
         
         <TabsContent value="dashboard" className="space-y-4">
           <Card>
