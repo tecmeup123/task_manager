@@ -39,7 +39,6 @@ export default function Settings() {
   const [email, setEmail] = useState(user?.email || '');
   const [language, setLanguage] = useState("en");
   const [timezone, setTimezone] = useState("utc");
-  const [useDarkTheme, setUseDarkTheme] = useState(false);
   
   // Notification settings
   const [playSound, setPlaySound] = useState(true);

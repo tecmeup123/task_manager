@@ -402,13 +402,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             </div>
           </div>
           
-          {/* Language selection in mobile menu */}
-          <div className="mt-8">
-            <h3 className="px-4 text-base font-medium text-neutral-500">{t('settings.language')}</h3>
-            <div className="mt-2 px-4">
-              <LanguageSwitcher />
-            </div>
-          </div>
+          {/* Language selection removed from mobile menu as requested */}
         </div>
       )}
 
@@ -493,11 +487,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             )}
           </div>
 
-          {/* Language switcher in desktop sidebar */}
-          <div className="mt-6 px-4">
-            <div className="text-sm font-medium text-neutral-500 uppercase mb-2">{t('settings.language')}</div>
-            <LanguageSwitcher />
-          </div>
+          {/* Language switcher removed from sidebar as requested */}
         </aside>
 
         {/* Main Content */}
