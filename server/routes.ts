@@ -180,16 +180,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user!.id;
       
+      // Find a valid task to use as entity
+      const tasks = await storage.getAllTasks();
+      const task = tasks.length > 0 ? tasks[0] : null;
+      
       // Create a test notification
       const notification = await storage.createNotification({
         userId,
         type: "task_assigned",
         title: "Test Notification",
-        message: "This is a test notification to verify notification system functionality",
+        message: "This is a test notification created at " + new Date().toLocaleTimeString(),
         entityType: "task",
-        entityId: 1, // Dummy ID
-        actionUrl: "/tasks",
-        metadata: { test: true }
+        entityId: task ? task.id : 1,
+        actionUrl: task ? `/tasks/${task.id}` : "/tasks",
+        metadata: { 
+          test: true, 
+          timestamp: new Date().toISOString(),
+          created_by: "admin"
+        }
       });
       
       console.log("Created test notification:", notification);
@@ -1347,56 +1355,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Notification routes
-  app.get("/api/notifications", requireAuth, async (req, res) => {
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
-    const includeRead = req.query.includeRead === 'true';
-    
-    try {
-      const notifications = await storage.getUserNotifications(req.user!.id, limit, includeRead);
-      res.json(notifications);
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
-      res.status(500).json({ message: "Failed to fetch notifications" });
-    }
-  });
-  
-  app.get("/api/notifications/count", requireAuth, async (req, res) => {
-    try {
-      const count = await storage.getUnreadNotificationCount(req.user!.id);
-      res.json({ count });
-    } catch (error) {
-      console.error("Error counting notifications:", error);
-      res.status(500).json({ message: "Failed to count notifications" });
-    }
-  });
-  
-  app.post("/api/notifications/mark-read/:id", requireAuth, async (req, res) => {
-    try {
-      const notification = await storage.getNotification(parseInt(req.params.id));
-      
-      // Check if notification exists and belongs to the user
-      if (!notification || notification.userId !== req.user!.id) {
-        return res.status(404).json({ message: "Notification not found" });
-      }
-      
-      const updatedNotification = await storage.markNotificationAsRead(parseInt(req.params.id));
-      res.json(updatedNotification);
-    } catch (error) {
-      console.error("Error marking notification as read:", error);
-      res.status(500).json({ message: "Failed to mark notification as read" });
-    }
-  });
-  
-  app.post("/api/notifications/mark-all-read", requireAuth, async (req, res) => {
-    try {
-      const success = await storage.markAllNotificationsAsRead(req.user!.id);
-      res.json({ success });
-    } catch (error) {
-      console.error("Error marking all notifications as read:", error);
-      res.status(500).json({ message: "Failed to mark all notifications as read" });
-    }
-  });
+  // Note: Notification routes are defined earlier in this file
   
   // System backup and restore endpoints
   app.get("/api/system/backup", requireAdmin, async (req, res) => {
