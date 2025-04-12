@@ -320,7 +320,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
                         className="text-xs"
                         onClick={() => createTestNotification()}
                       >
-                        Create Test Notification
+                        {t('notifications.createTest')}
                       </Button>
                     )}
                   </div>
@@ -347,19 +347,19 @@ export default function MainLayout({ children }: MainLayoutProps) {
               <Link to="/">
                 <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <LayoutDashboard className="w-5 h-5 mr-3" />
-                  <span>Dashboard</span>
+                  <span>{t('menu_dashboard')}</span>
                 </div>
               </Link>
               <Link to="/tasks">
                 <div className={`flex items-center px-4 py-3 text-base rounded-md ${location.startsWith("/tasks") ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <ListTodo className="w-5 h-5 mr-3" />
-                  <span>Tasks</span>
+                  <span>{t('menu_tasks')}</span>
                 </div>
               </Link>
               <Link to="/editions">
                 <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/editions" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <GraduationCap className="w-5 h-5 mr-3" />
-                  <span>Editions</span>
+                  <span>{t('menu_editions')}</span>
                 </div>
               </Link>
               {/* Trainers and reports links removed to simplify navigation */}
@@ -421,7 +421,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
               <Link to="/">
                 <div className={`flex items-center px-4 py-2 text-sm ${location === "/" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <LayoutDashboard className="w-5 h-5 mr-2" />
-                  <span>Dashboard</span>
+                  <span>{t('menu_dashboard')}</span>
                 </div>
               </Link>
             </div>
@@ -492,19 +492,19 @@ export default function MainLayout({ children }: MainLayoutProps) {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 flex justify-around items-center py-2 px-4 z-10">
           <Link to="/" className={`flex flex-col items-center ${location === '/' ? 'text-primary' : 'text-neutral-500'}`}>
             <LayoutDashboard className="h-6 w-6" />
-            <span className="text-xs mt-1">Home</span>
+            <span className="text-xs mt-1">{t('menu_home')}</span>
           </Link>
           <Link to="/tasks" className={`flex flex-col items-center ${location.startsWith('/tasks') ? 'text-primary' : 'text-neutral-500'}`}>
             <ListTodo className="h-6 w-6" />
-            <span className="text-xs mt-1">Tasks</span>
+            <span className="text-xs mt-1">{t('menu_tasks')}</span>
           </Link>
           <Link to="/editions" className={`flex flex-col items-center ${location === '/editions' ? 'text-primary' : 'text-neutral-500'}`}>
             <GraduationCap className="h-6 w-6" />
-            <span className="text-xs mt-1">Editions</span>
+            <span className="text-xs mt-1">{t('menu_editions')}</span>
           </Link>
           <Link to="/settings" className={`flex flex-col items-center ${location === '/settings' ? 'text-primary' : 'text-neutral-500'}`}>
             <Settings className="h-6 w-6" />
-            <span className="text-xs mt-1">Settings</span>
+            <span className="text-xs mt-1">{t('menu_settings')}</span>
           </Link>
         </div>
       )}
