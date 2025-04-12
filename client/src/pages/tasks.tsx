@@ -64,6 +64,8 @@ export default function Tasks() {
   const { data: tasks = [], isLoading: tasksLoading, refetch: refetchTasks } = useQuery<any[]>({
     queryKey: [`/api/editions/${currentEdition?.id}/tasks`],
     enabled: !!currentEdition?.id,
+    staleTime: 60000, // Consider data fresh for 1 minute to reduce API calls
+    refetchOnWindowFocus: false, // Disable refetching on window focus
   });
 
   // Initialize expanded state for all weeks

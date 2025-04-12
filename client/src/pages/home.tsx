@@ -22,44 +22,41 @@ export default function Home() {
   const [allTasks, setAllTasks] = useState<any[]>([]);
   const [tasksLoading, setTasksLoading] = useState(true);
   
-  // Query all tasks for all editions
-  useEffect(() => {
-    if (!editionIds.length) {
-      setTasksLoading(false);
-      return;
-    }
-    
-    // Create a flag to track if the component is still mounted
-    let isMounted = true;
-    
-    // Create an array of promises, one for each edition's tasks
-    const fetchPromises = editionIds.map(id => 
-      fetch(`/api/editions/${id}/tasks`).then(res => res.json())
-    );
-    
-    // Wait for all promises to resolve
-    Promise.all(fetchPromises)
-      .then(results => {
-        // Only update state if component is still mounted
-        if (isMounted) {
-          // Flatten the array of arrays into a single array of tasks
-          const combinedTasks = results.flat();
-          setAllTasks(combinedTasks);
-          setTasksLoading(false);
-        }
-      })
-      .catch(error => {
-        if (isMounted) {
-          console.error("Error fetching tasks:", error);
-          setTasksLoading(false);
-        }
-      });
+  // Query all tasks for all editions using TanStack Query instead of raw fetch
+  const { data: taskData, isLoading: isTaskDataLoading } = useQuery<any[][]>({
+    queryKey: ['/api/all-edition-tasks', editionIds],
+    queryFn: async () => {
+      if (!editionIds.length) {
+        return [];
+      }
       
-    // Cleanup function to cancel the effect when component unmounts
-    return () => {
-      isMounted = false;
-    };
-  }, [editionIds]);
+      // Create an array of promises, one for each edition's tasks
+      const fetchPromises = editionIds.map(id => 
+        fetch(`/api/editions/${id}/tasks`).then(res => res.json())
+      );
+      
+      // Wait for all promises to resolve
+      return Promise.all(fetchPromises);
+    },
+    enabled: editionIds.length > 0,
+    staleTime: 60000, // Consider data fresh for 1 minute to reduce API calls
+    refetchOnWindowFocus: false, // Disable refetching on window focus
+  });
+  
+  // Update tasks state when task data changes
+  useEffect(() => {
+    if (taskData) {
+      // Flatten the array of arrays into a single array of tasks
+      const combinedTasks = taskData.flat();
+      setAllTasks(combinedTasks);
+      setTasksLoading(false);
+    }
+  }, [taskData]);
+  
+  // Set loading state based on query loading state
+  useEffect(() => {
+    setTasksLoading(isTaskDataLoading);
+  }, [isTaskDataLoading]);
   
   // Keep this for backward compatibility with existing code
   const tasks = allTasks;

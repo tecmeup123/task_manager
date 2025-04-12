@@ -54,8 +54,10 @@ export default function Editions() {
   const [editionToDelete, setEditionToDelete] = useState<any | null>(null);
 
   // Fetch all editions
-  const { data: editions, isLoading } = useQuery({
+  const { data: editions, isLoading } = useQuery<any[]>({
     queryKey: ["/api/editions"],
+    staleTime: 60000, // Consider data fresh for 1 minute
+    refetchOnWindowFocus: false, // Don't refetch when window gets focus
   });
 
   // Delete edition mutation

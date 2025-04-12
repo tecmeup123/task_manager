@@ -53,6 +53,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
   // Fetch editions for the sidebar
   const { data: editions = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/editions"],
+    staleTime: 60000, // Consider data fresh for 1 minute
+    refetchOnWindowFocus: false, // Don't refetch when window gets focus
   });
 
   // Set the first edition as current if available
