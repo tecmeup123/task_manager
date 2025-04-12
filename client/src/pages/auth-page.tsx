@@ -36,6 +36,7 @@ export default function AuthPage() {
     defaultValues: {
       username: "",
       password: "",
+      rememberMe: false,
     },
   });
 
@@ -118,6 +119,27 @@ export default function AuthPage() {
                             <Input type="password" placeholder="Password" {...field} />
                           </FormControl>
                           <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={loginForm.control}
+                      name="rememberMe"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 mt-1">
+                          <FormControl>
+                            <div className="flex items-center space-x-2">
+                              <input 
+                                type="checkbox" 
+                                className="h-4 w-4 rounded border-gray-300" 
+                                checked={field.value}
+                                onChange={field.onChange}
+                              />
+                              <label className="text-sm font-normal text-gray-600">
+                                Keep me logged in (8 hours)
+                              </label>
+                            </div>
+                          </FormControl>
                         </FormItem>
                       )}
                     />

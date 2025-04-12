@@ -35,7 +35,7 @@ export function setupAuth(app: Express) {
     saveUninitialized: false,
     store: storage.sessionStore,
     cookie: {
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      maxAge: 2 * 60 * 60 * 1000 // Default to 2 hours
     }
   };
 
@@ -100,6 +100,15 @@ export function setupAuth(app: Express) {
       // Check if user is approved
       if (user.approved === false && user.role !== 'admin') {
         return res.status(403).json({ message: "Your account is pending approval by an administrator" });
+      }
+      
+      // Set custom session expiration time if "Remember Me" option is selected
+      if (req.body.rememberMe) {
+        // Set session cookie to expire in 8 hours
+        req.session.cookie.maxAge = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
+      } else {
+        // Use default session duration (2 hours)
+        req.session.cookie.maxAge = 2 * 60 * 60 * 1000; // 2 hours
       }
       
       req.login(user, (err) => {
