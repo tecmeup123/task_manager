@@ -18,6 +18,10 @@ export default function Settings() {
   const [isAccountSettingsChanged, setIsAccountSettingsChanged] = useState(false);
   const [isSecuritySettingsChanged, setIsSecuritySettingsChanged] = useState(false);
   
+  // Template management
+  const [templateFile, setTemplateFile] = useState<File | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState("default");
+  
   // Dashboard settings
   const [collapseOverdueTasks, setCollapseOverdueTasks] = useState(true);
   const [collapseUpcomingTasks, setCollapseUpcomingTasks] = useState(true);
@@ -157,6 +161,47 @@ export default function Settings() {
         title: "Export completed",
         description: "Data has been successfully exported"
       });
+    }, 2000);
+  };
+  
+  // Template management handler functions
+  const handleDownloadTemplate = () => {
+    toast({
+      title: "Downloading template...",
+      description: `Downloading ${selectedTemplate} template`
+    });
+    
+    // Simulate a download process
+    setTimeout(() => {
+      toast({
+        title: "Template downloaded",
+        description: "Task template has been successfully downloaded"
+      });
+    }, 1500);
+  };
+  
+  const handleUploadTemplate = () => {
+    if (!templateFile) {
+      toast({
+        title: "Error",
+        description: "Please select a file to upload",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    toast({
+      title: "Uploading template...",
+      description: `Uploading ${templateFile.name}`
+    });
+    
+    // Simulate an upload process
+    setTimeout(() => {
+      toast({
+        title: "Template uploaded",
+        description: "Task template has been successfully uploaded and applied"
+      });
+      setTemplateFile(null);
     }, 2000);
   };
   
@@ -817,16 +862,76 @@ export default function Settings() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col space-y-4">
-            <Button variant="outline" className="justify-start" onClick={handleCreateBackup}>
-              Create Database Backup
-            </Button>
-            <Button variant="outline" className="justify-start" onClick={handleImportData}>
-              Import Data
-            </Button>
-            <Button variant="outline" className="justify-start" onClick={handleExportData}>
-              Export Data
-            </Button>
+          <div className="flex flex-col space-y-6">
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Database Operations</h3>
+              <div className="flex flex-col space-y-2">
+                <Button variant="outline" className="justify-start" onClick={handleCreateBackup}>
+                  Create Database Backup
+                </Button>
+                <Button variant="outline" className="justify-start" onClick={handleImportData}>
+                  Import Data
+                </Button>
+                <Button variant="outline" className="justify-start" onClick={handleExportData}>
+                  Export Data
+                </Button>
+              </div>
+            </div>
+            
+            <div className="space-y-4 pt-4 border-t">
+              <h3 className="text-lg font-medium">Template Management</h3>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="templateSelect">Select Template to Download</Label>
+                  <div className="flex items-center space-x-2 mt-2">
+                    <Select 
+                      value={selectedTemplate}
+                      onValueChange={setSelectedTemplate}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select template" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="default">Default Template</SelectItem>
+                        <SelectItem value="glr">GLR Template</SelectItem>
+                        <SelectItem value="slr">SLR Template</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button onClick={handleDownloadTemplate}>
+                      Download
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="templateFile">Upload Template</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <div className="md:col-span-2">
+                      <Input 
+                        id="templateFile" 
+                        type="file" 
+                        accept=".json,.csv"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          const files = e.target.files;
+                          if (files && files.length > 0) {
+                            setTemplateFile(files[0]);
+                          }
+                        }}
+                      />
+                    </div>
+                    <Button 
+                      onClick={handleUploadTemplate}
+                      disabled={!templateFile}
+                    >
+                      Upload
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Upload a JSON or CSV file with task templates. This will update your template tasks.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
