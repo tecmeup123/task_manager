@@ -435,16 +435,16 @@ export default function Home() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="status-filter">Status</Label>
+                  <Label htmlFor="status-filter">{t('tasks.status')}</Label>
                   <Select 
                     value={statusFilter} 
                     onValueChange={setStatusFilter}
                   >
                     <SelectTrigger id="status-filter">
-                      <SelectValue placeholder="Filter by status" />
+                      <SelectValue placeholder={t('dashboard.filterByStatus')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Statuses</SelectItem>
+                      <SelectItem value="all">{t('dashboard.allStatuses')}</SelectItem>
                       {uniqueStatuses.map((status: string) => (
                         <SelectItem key={status} value={status}>
                           {status}
@@ -455,16 +455,16 @@ export default function Home() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="week-filter">Week</Label>
+                  <Label htmlFor="week-filter">{t('tasks.week')}</Label>
                   <Select 
                     value={weekFilter} 
                     onValueChange={setWeekFilter}
                   >
                     <SelectTrigger id="week-filter">
-                      <SelectValue placeholder="Filter by week" />
+                      <SelectValue placeholder={t('dashboard.filterByWeek')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Weeks</SelectItem>
+                      <SelectItem value="all">{t('dashboard.allWeeks')}</SelectItem>
                       {uniqueWeeks.map((week: string) => (
                         <SelectItem key={week} value={week}>
                           {week}
@@ -475,16 +475,16 @@ export default function Home() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="edition-filter">Edition</Label>
+                  <Label htmlFor="edition-filter">{t('editions.title')}</Label>
                   <Select 
                     value={editionFilter} 
                     onValueChange={setEditionFilter}
                   >
                     <SelectTrigger id="edition-filter">
-                      <SelectValue placeholder="Filter by edition" />
+                      <SelectValue placeholder={t('dashboard.filterByEdition')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Editions</SelectItem>
+                      <SelectItem value="all">{t('dashboard.allEditions')}</SelectItem>
                       {editions && editions.map((edition: any) => (
                         <SelectItem key={edition.id} value={edition.code}>
                           {edition.code}
@@ -495,16 +495,16 @@ export default function Home() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="owner-filter">Owner</Label>
+                  <Label htmlFor="owner-filter">{t('tasks.owner')}</Label>
                   <Select 
                     value={ownerFilter} 
                     onValueChange={setOwnerFilter}
                   >
                     <SelectTrigger id="owner-filter">
-                      <SelectValue placeholder="Filter by owner" />
+                      <SelectValue placeholder={t('dashboard.filterByOwner')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Owners</SelectItem>
+                      <SelectItem value="all">{t('dashboard.allOwners')}</SelectItem>
                       {uniqueOwners.map((owner: string) => (
                         <SelectItem key={owner} value={owner}>
                           {owner}
@@ -525,7 +525,7 @@ export default function Home() {
                       setOwnerFilter("all");
                     }}
                   >
-                    Reset Filters
+                    {t('dashboard.resetFilters')}
                   </Button>
                 </div>
               </div>
@@ -560,7 +560,7 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-            <CardDescription>Tasks that are past their due date</CardDescription>
+            <CardDescription>{t('dashboard.tasksDueSoon')}</CardDescription>
           </CardHeader>
           <CardContent className={`transition-all duration-300 ease-in-out ${overdueCollapsed ? 'hidden' : ''}`}>
             {isLoading ? (
@@ -638,7 +638,7 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-            <CardDescription>Tasks due in the next 7 days</CardDescription>
+            <CardDescription>{t('dashboard.tasksInNext7Days')}</CardDescription>
           </CardHeader>
           <CardContent className={`transition-all duration-300 ease-in-out ${upcomingCollapsed ? 'hidden' : ''}`}>
             {isLoading ? (

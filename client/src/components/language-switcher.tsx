@@ -26,7 +26,7 @@ export function LanguageSwitcher() {
     const savedLanguage = localStorage.getItem('i18nextLng') || 'en';
     
     // Make sure we're using a supported language code
-    const supportedLanguages = ['en', 'es', 'fr', 'de', 'pt'];
+    const supportedLanguages = ['en', 'es', 'fr', 'de', 'pt', 'zh'];
     const language = supportedLanguages.includes(savedLanguage.split('-')[0]) 
       ? savedLanguage.split('-')[0] 
       : 'en';
@@ -55,6 +55,7 @@ export function LanguageSwitcher() {
         <SelectItem value="fr">Français</SelectItem>
         <SelectItem value="de">Deutsch</SelectItem>
         <SelectItem value="pt">Português</SelectItem>
+        <SelectItem value="zh">中文</SelectItem>
       </SelectContent>
     </Select>
   );
