@@ -58,7 +58,7 @@ export function useNotifications(limit: number = 5, includeRead: boolean = false
 
   return {
     notifications,
-    unreadCount: unreadCount.count || 0,
+    unreadCount: unreadCount && typeof unreadCount === 'object' ? unreadCount.count : 0,
     isLoading,
     error,
     refetch,

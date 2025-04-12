@@ -55,7 +55,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
     unreadCount, 
     isLoading: isNotificationsLoading, 
     markAsRead, 
-    markAllAsRead 
+    markAllAsRead,
+    isMarkingAsRead,
+    isMarkingAllAsRead
   } = useNotifications();
 
   // Fetch all tasks for all editions to get upcoming tasks

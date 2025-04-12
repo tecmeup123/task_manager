@@ -151,6 +151,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve static files from public directory
   app.use('/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
   
+  // Notification endpoints
+  app.get("/api/notifications", requireAuth, async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+      const includeRead = req.query.includeRead === 'true';
+      const userId = req.user!.id;
+      
+      const notifications = await storage.getUserNotifications(userId, limit, includeRead);
+      res.json(notifications);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
+  
+  app.get("/api/notifications/count", requireAuth, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const count = await storage.getUnreadNotificationCount(userId);
+      res.json({ count });
+    } catch (error) {
+      console.error("Error counting notifications:", error);
+      res.status(500).json({ message: "Failed to count notifications" });
+    }
+  });
+  
+  app.post("/api/notifications/mark-read/:id", requireAuth, async (req, res) => {
+    try {
+      const notificationId = parseInt(req.params.id);
+      const notification = await storage.markNotificationAsRead(notificationId);
+      res.json(notification);
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      res.status(500).json({ message: "Failed to mark notification as read" });
+    }
+  });
+  
+  app.post("/api/notifications/mark-all-read", requireAuth, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      await storage.markAllNotificationsAsRead(userId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+      res.status(500).json({ message: "Failed to mark all notifications as read" });
+    }
+  });
+  
   // put application routes here
   // prefix all routes with /api
   const apiRouter = app.route("/api");
