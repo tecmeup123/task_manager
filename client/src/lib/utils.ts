@@ -157,9 +157,13 @@ export function getStatusColor(status: string): {bg: "default" | "destructive" |
     case 'In Progress':
       return { bg: "default", text: 'text-white' };
     case 'Pending':
-      return { bg: "secondary", text: 'text-neutral-900' };
+      return { bg: "secondary", text: 'text-white' };
+    case 'Not Started':
+      return { bg: "outline", text: 'text-white' };
+    case 'Blocked':
+      return { bg: "destructive", text: 'text-white' };
     default:
-      return { bg: "outline", text: 'text-neutral-700' };
+      return { bg: "outline", text: 'text-white' };
   }
 }
 
