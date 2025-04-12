@@ -4,7 +4,14 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getStatusColor, formatDate } from "@/lib/utils";
+import { 
+  getStatusColor, 
+  formatDate, 
+  parseDate, 
+  isDateOverdue, 
+  isDateUpcoming,
+  getRelativeDateDescription
+} from "@/lib/utils";
 import { ListTodo, Calendar, Layers, CheckCircle, Clock, AlertTriangle, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -76,13 +83,17 @@ export default function Home() {
   const overdueTasks = tasks ? tasks.filter((task: any) => {
     if (task.status === 'Done') return false;
     if (!task.dueDate) return false;
-    const dueDate = new Date(task.dueDate);
-    console.log("Task due date:", task.name, dueDate, "Is overdue:", dueDate < today);
-    return dueDate < today;
+    
+    const isOverdue = isDateOverdue(task.dueDate);
+    console.log("Task due date:", task.name, task.dueDate, "Is overdue:", isOverdue);
+    return isOverdue;
   }).sort((a: any, b: any) => {
-    if (!a.dueDate) return 1;
-    if (!b.dueDate) return -1;
-    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    // Sort by due date (earliest first)
+    const dateA = parseDate(a.dueDate);
+    const dateB = parseDate(b.dueDate);
+    if (!dateA) return 1;
+    if (!dateB) return -1;
+    return dateA.getTime() - dateB.getTime();
   }) : [];
   
   console.log("Overdue tasks count:", overdueTasks?.length);
@@ -95,14 +106,18 @@ export default function Home() {
   const upcomingTasks = tasks ? tasks.filter((task: any) => {
     if (task.status === 'Done') return false;
     if (!task.dueDate) return false;
-    const dueDate = new Date(task.dueDate);
-    const isUpcoming = dueDate >= today && dueDate <= nextWeek;
-    console.log("Task due date:", task.name, dueDate, "Is upcoming:", isUpcoming);
+    
+    // Use our utility function with default 7-day window
+    const isUpcoming = isDateUpcoming(task.dueDate);
+    console.log("Task due date:", task.name, task.dueDate, "Is upcoming:", isUpcoming);
     return isUpcoming;
   }).sort((a: any, b: any) => {
-    if (!a.dueDate) return 1;
-    if (!b.dueDate) return -1;
-    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    // Sort by due date (earliest first)
+    const dateA = parseDate(a.dueDate);
+    const dateB = parseDate(b.dueDate);
+    if (!dateA) return 1;
+    if (!dateB) return -1;
+    return dateA.getTime() - dateB.getTime();
   }) : [];
   
   console.log("Upcoming tasks count:", upcomingTasks?.length);
@@ -322,7 +337,7 @@ export default function Home() {
                           <Badge variant="outline">{task.week}</Badge>
                           <Badge variant={getStatusColor(task.status).bg}>{task.status}</Badge>
                           <span className="text-xs text-red-500">
-                            Due: {formatDate(task.dueDate)}
+                            Due: {formatDate(task.dueDate)} ({getRelativeDateDescription(task.dueDate)})
                           </span>
                         </div>
                       </div>
