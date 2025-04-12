@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Search, Bell, ChevronDown, Menu, X, ArrowLeft, LogOut } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { 
   LayoutDashboard, 
   ListTodo,
@@ -50,6 +52,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const isMobile = useIsMobile();
   const { user, logoutMutation } = useAuth();
+  const { t } = useTranslation();
   const { 
     notifications, 
     unreadCount, 
@@ -396,6 +399,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
               ) : (
                 <div className="px-4 py-3 text-neutral-500">No editions available</div>
               )}
+            </div>
+          </div>
+          
+          {/* Language selection in mobile menu */}
+          <div className="mt-8">
+            <h3 className="px-4 text-base font-medium text-neutral-500">{t('settings.language')}</h3>
+            <div className="mt-2 px-4">
+              <LanguageSwitcher />
             </div>
           </div>
         </div>
