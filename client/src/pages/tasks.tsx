@@ -401,18 +401,16 @@ export default function Tasks() {
       />
 
       {/* Task Detail Modal */}
-      {selectedTask && (
-        <TaskDetailModal
-          isOpen={isTaskModalOpen}
-          task={selectedTask}
-          onClose={() => {
-            console.log("Task modal onClose called from tasks page");
-            setIsTaskModalOpen(false);
-            setSelectedTask(null);
-          }}
-          onSave={handleTaskSave}
-        />
-      )}
+      <TaskDetailModal
+        isOpen={isTaskModalOpen}
+        task={selectedTask || {}}
+        onClose={() => {
+          console.log("Task modal onClose called from tasks page");
+          setIsTaskModalOpen(false);
+          setSelectedTask(null);
+        }}
+        onSave={handleTaskSave}
+      />
     </div>
   );
 }
