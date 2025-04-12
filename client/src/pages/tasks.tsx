@@ -290,13 +290,7 @@ export default function Tasks() {
               <Copy className="mr-1 h-4 w-4" /> Duplicate
             </Button>
             
-            <Button 
-              variant="outline" 
-              className="flex-1 md:flex-initial"
-              disabled={isLoading || !currentEdition}
-            >
-              <Download className="mr-1 h-4 w-4" /> Export
-            </Button>
+            {/* Export button removed as requested */}
           </div>
         </div>
       </div>

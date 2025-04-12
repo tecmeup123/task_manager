@@ -135,6 +135,53 @@ export default function TaskDetailModal({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Task Status Progress Bar */}
+            <div className="mb-4">
+              <h3 className="text-sm font-semibold mb-2">Status</h3>
+              <div className="p-4 bg-neutral-50 rounded-lg border border-neutral-200">
+                <div className="flex items-center justify-between mb-2">
+                  <Badge 
+                    variant={
+                      task?.status === "Done" ? "success" : 
+                      task?.status === "In Progress" ? "default" : 
+                      "outline"
+                    }
+                    className={
+                      task?.status === "In Progress" ? "bg-yellow-100 hover:bg-yellow-200 text-yellow-800 border-yellow-200" : ""
+                    }
+                  >
+                    {task?.status || "Not Started"}
+                  </Badge>
+                  <span className="text-sm text-muted-foreground">
+                    {task?.week || "Week Unknown"}
+                  </span>
+                </div>
+                
+                <div className="h-2 bg-neutral-200 rounded-full overflow-hidden mb-2">
+                  <div 
+                    className={
+                      task?.status === "Done" ? "h-2 bg-green-500 rounded-full" : 
+                      task?.status === "In Progress" ? "h-2 bg-yellow-500 rounded-full" : 
+                      task?.status === "Blocked" ? "h-2 bg-red-500 rounded-full" : 
+                      "h-2 bg-neutral-300 rounded-full"
+                    }
+                    style={{ 
+                      width: task?.status === "Done" ? "100%" : 
+                             task?.status === "In Progress" ? "50%" : 
+                             task?.status === "Blocked" ? "25%" : 
+                             "5%" 
+                    }}
+                  />
+                </div>
+                
+                {task?.dueDate && (
+                  <div className="text-xs text-muted-foreground">
+                    Due: {task.dueDate ? format(new Date(task.dueDate), "MMM d, yyyy") : "No due date"}
+                  </div>
+                )}
+              </div>
+            </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
