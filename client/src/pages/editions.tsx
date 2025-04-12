@@ -103,6 +103,13 @@ export default function Editions() {
     const endDate = addWeeks(startDate, 8);
     return startDate <= now && now <= endDate;
   };
+  
+  const isEditionFinished = (edition: any) => {
+    const startDate = new Date(edition.startDate);
+    const now = new Date();
+    const endDate = addWeeks(startDate, 8);
+    return now > endDate;
+  };
 
   const handleDuplicateEdition = (edition: any) => {
     setSourceEditionId(edition.id);

@@ -56,6 +56,7 @@ export const editions = pgTable("editions", {
   tasksStartDate: timestamp("tasks_start_date").notNull(),
   status: varchar("status", { length: 20 }).default("active"),
   currentWeek: integer("current_week").default(1),
+  archived: boolean("archived").default(false),
 });
 
 export const insertEditionSchema = createInsertSchema(editions).omit({

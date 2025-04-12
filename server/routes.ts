@@ -328,6 +328,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Archive an edition
+  app.patch("/api/editions/:id/archive", async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const edition = await storage.getEdition(id);
+      
+      if (!edition) {
+        return res.status(404).json({ message: "Edition not found" });
+      }
+      
+      // Create audit log
+      if (req.isAuthenticated()) {
+        await storage.createAuditLog({
+          userId: req.user.id,
+          entityType: "edition",
+          entityId: id,
+          action: "update",
+          previousState: edition,
+          newState: { ...edition, archived: true },
+          notes: `Edition ${edition.code} archived by ${req.user.username}`
+        });
+      }
+      
+      const updatedEdition = await storage.updateEdition(id, { archived: true });
+      res.json(updatedEdition);
+    } catch (error) {
+      console.error("Error archiving edition:", error);
+      res.status(500).json({ message: "Failed to archive edition" });
+    }
+  });
+
   // Duplicate an edition
   app.post("/api/editions/:id/duplicate", async (req, res) => {
     try {
