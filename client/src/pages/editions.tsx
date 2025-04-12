@@ -40,7 +40,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, MoreVertical, Copy, Trash2, Edit, CalendarDays, Layers, ArrowRight } from "lucide-react";
+import { Plus, MoreVertical, Copy, Trash2, Edit, CalendarDays, Layers, ArrowRight, Archive, ArchiveRestore } from "lucide-react";
 import WeekProgressIndicator from "@/components/week-progress-indicator";
 import CreateEditionForm from "@/components/create-edition-form";
 import { formatDate } from "@/lib/utils";
@@ -53,12 +53,18 @@ export default function Editions() {
   const [sourceEditionId, setSourceEditionId] = useState<number | null>(null);
   const [editionToDelete, setEditionToDelete] = useState<any | null>(null);
 
+  // Show archived editions state
+  const [showArchived, setShowArchived] = useState(false);
+  
   // Fetch all editions
-  const { data: editions, isLoading } = useQuery<any[]>({
+  const { data: allEditions, isLoading } = useQuery<any[]>({
     queryKey: ["/api/editions"],
     staleTime: 60000, // Consider data fresh for 1 minute
     refetchOnWindowFocus: false, // Don't refetch when window gets focus
   });
+  
+  // Filter editions based on archived status
+  const editions = allEditions ? allEditions.filter(edition => showArchived ? edition.archived : !edition.archived) : [];
 
   // Delete edition mutation
   const deleteEdition = useMutation({
@@ -109,6 +115,31 @@ export default function Editions() {
     const now = new Date();
     const endDate = addWeeks(startDate, 8);
     return now > endDate;
+  };
+
+  // Archive edition mutation
+  const archiveEdition = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest("PATCH", `/api/editions/${id}/archive`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/editions"] });
+      toast({
+        title: "Edition archived",
+        description: "The edition has been successfully archived.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to archive the edition.",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const handleArchiveEdition = (edition: any) => {
+    archiveEdition.mutate(edition.id);
   };
 
   const handleDuplicateEdition = (edition: any) => {
@@ -199,6 +230,12 @@ export default function Editions() {
                             <Copy className="mr-2 h-4 w-4" />
                             Duplicate
                           </DropdownMenuItem>
+                          {isEditionFinished(edition) && !edition.archived && (
+                            <DropdownMenuItem onClick={() => handleArchiveEdition(edition)}>
+                              <Archive className="mr-2 h-4 w-4" />
+                              Archive
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem onClick={() => setEditionToDelete(edition)}>
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete
@@ -298,6 +335,15 @@ export default function Editions() {
                             <Copy className="mr-2 h-4 w-4" />
                             Duplicate
                           </DropdownMenuItem>
+                          {isEditionFinished(edition) && !edition.archived && (
+                            <DropdownMenuItem onClick={(e) => {
+                              e.stopPropagation();
+                              handleArchiveEdition(edition);
+                            }}>
+                              <Archive className="mr-2 h-4 w-4" />
+                              Archive
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem onClick={(e) => {
                             e.stopPropagation();
                             setEditionToDelete(edition);
