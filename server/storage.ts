@@ -11,12 +11,21 @@ import {
   InsertAuditLog,
   Notification,
   InsertNotification,
+  Resource,
+  InsertResource,
+  Mention,
+  InsertMention,
+  TaskComment,
+  InsertTaskComment,
   users,
   trainers,
   editions,
   tasks,
   auditLogs,
-  notifications
+  notifications,
+  resources,
+  mentions,
+  taskComments
 } from "@shared/schema";
 import { add, format, parseISO, isBefore, subWeeks } from "date-fns";
 import { and, eq, count } from "drizzle-orm";

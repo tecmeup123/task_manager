@@ -192,6 +192,76 @@ export const notificationTypeEnum = z.enum([
 
 export type NotificationType = z.infer<typeof notificationTypeEnum>;
 
+// Resource types
+export const resourceTypeEnum = z.enum([
+  "file",
+  "link",
+  "document"
+]);
+
+export type ResourceType = z.infer<typeof resourceTypeEnum>;
+
+// Resources/attachments table
+export const resources = pgTable("resources", {
+  id: serial("id").primaryKey(),
+  taskId: integer("task_id").notNull().references(() => tasks.id),
+  name: text("name").notNull(),
+  type: text("type").notNull(),
+  url: text("url").notNull(),
+  size: integer("size"),
+  format: text("format"),
+  uploadedBy: integer("uploaded_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  description: text("description"),
+});
+
+export const insertResourceSchema = createInsertSchema(resources).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertResource = z.infer<typeof insertResourceSchema>;
+export type Resource = typeof resources.$inferSelect;
+
+// Mentions table to implement @mentions functionality
+export const mentions = pgTable("mentions", {
+  id: serial("id").primaryKey(),
+  taskId: integer("task_id").notNull().references(() => tasks.id),
+  userId: integer("user_id").notNull().references(() => users.id),
+  commentId: integer("comment_id"), // Optional reference to a comment if implemented
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdBy: integer("created_by").references(() => users.id),
+  isRead: boolean("is_read").default(false).notNull(),
+});
+
+export const insertMentionSchema = createInsertSchema(mentions).omit({
+  id: true,
+  createdAt: true,
+  isRead: true,
+});
+
+export type InsertMention = z.infer<typeof insertMentionSchema>;
+export type Mention = typeof mentions.$inferSelect;
+
+// Task comments table
+export const taskComments = pgTable("task_comments", {
+  id: serial("id").primaryKey(),
+  taskId: integer("task_id").notNull().references(() => tasks.id),
+  userId: integer("user_id").notNull().references(() => users.id),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at"),
+});
+
+export const insertTaskCommentSchema = createInsertSchema(taskComments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTaskComment = z.infer<typeof insertTaskCommentSchema>;
+export type TaskComment = typeof taskComments.$inferSelect;
+
 // Notification table to store user notifications
 export const notifications = pgTable("notifications", {
   id: serial("id").primaryKey(),
