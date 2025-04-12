@@ -742,6 +742,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const previousAssignedUserId = task.assignedUserId;
       const newAssignedUserId = req.body.assignedUserId !== undefined ? req.body.assignedUserId : previousAssignedUserId;
       
+      // Verify assignedUserId is valid if provided and not null
+      if (newAssignedUserId !== null && newAssignedUserId !== undefined) {
+        const assignedUser = await storage.getUser(newAssignedUserId);
+        if (!assignedUser) {
+          return res.status(400).json({ 
+            message: "Invalid user assignment. User does not exist.", 
+            field: "assignedUserId" 
+          });
+        }
+      }
+      
       // If status is being updated to "Done", add completion date if not provided
       if (req.body.status === "Done" && !req.body.completionDate) {
         req.body.completionDate = new Date();
