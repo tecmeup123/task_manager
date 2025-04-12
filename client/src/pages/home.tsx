@@ -21,8 +21,14 @@ import {
   AlertTriangle, 
   ChevronRight,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Filter,
+  Search,
+  X
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
@@ -138,6 +144,49 @@ export default function Home() {
   // State for collapsible sections - collapsed by default
   const [overdueCollapsed, setOverdueCollapsed] = useState(true);
   const [upcomingCollapsed, setUpcomingCollapsed] = useState(true);
+  
+  // Task filtering variables
+  const [isFiltersVisible, setIsFiltersVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [weekFilter, setWeekFilter] = useState("all");
+  const [editionFilter, setEditionFilter] = useState("all");
+  const [ownerFilter, setOwnerFilter] = useState("all");
+  
+  // Get unique task weeks, statuses, and owners for filter dropdowns
+  const uniqueWeeks = tasks ? [...new Set(tasks.map((task: any) => task.week))].sort() : [];
+  const uniqueStatuses = tasks ? [...new Set(tasks.map((task: any) => task.status))].sort() : [];
+  const uniqueOwners = tasks ? [...new Set(tasks.map((task: any) => task.owner).filter(Boolean))].sort() : [];
+  
+  // Apply filters to tasks
+  const filterTasks = (taskList: any[]) => {
+    return taskList.filter((task: any) => {
+      // Search query filter
+      const matchesSearch = searchQuery === "" || 
+        (task.name && task.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (task.owner && task.owner.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (task.status && task.status.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      // Status filter
+      const matchesStatus = statusFilter === "all" || task.status === statusFilter;
+      
+      // Week filter
+      const matchesWeek = weekFilter === "all" || task.week === weekFilter;
+      
+      // Edition filter
+      const matchesEdition = editionFilter === "all" || 
+        (editions && editions.find((e: any) => e.id === task.editionId && e.code === editionFilter));
+      
+      // Owner filter
+      const matchesOwner = ownerFilter === "all" || task.owner === ownerFilter;
+      
+      return matchesSearch && matchesStatus && matchesWeek && matchesEdition && matchesOwner;
+    });
+  };
+  
+  // Apply filters to overdue and upcoming tasks
+  const filteredOverdueTasks = isFiltersVisible && overdueTasks ? filterTasks(overdueTasks) : overdueTasks;
+  const filteredUpcomingTasks = isFiltersVisible && upcomingTasks ? filterTasks(upcomingTasks) : upcomingTasks;
 
   return (
     <div>
@@ -351,7 +400,7 @@ export default function Home() {
                 <Skeleton className="h-12 w-full" />
               </>
             ) : overdueTasks.length > 0 ? (
-              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+              <div className="space-y-4 max-h-[calc(40vh-50px)] overflow-y-auto pr-2">
                 {overdueTasks.map((task: any) => (
                   <div key={task.id} className="flex justify-between items-start border-b pb-3">
                     <div className="flex items-start gap-3">
@@ -427,7 +476,7 @@ export default function Home() {
                 <Skeleton className="h-12 w-full" />
               </>
             ) : upcomingTasks.length > 0 ? (
-              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+              <div className="space-y-4 max-h-[calc(40vh-50px)] overflow-y-auto pr-2">
                 {upcomingTasks.map((task: any) => (
                   <div key={task.id} className="flex justify-between items-start border-b pb-3">
                     <div className="flex items-start gap-3">
