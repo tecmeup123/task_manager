@@ -961,6 +961,92 @@ export class DatabaseStorage implements IStorage {
     return newEdition;
   }
 
+  // Notification methods
+  async createNotification(notification: InsertNotification): Promise<Notification> {
+    const { db } = await import("./db");
+    const [newNotification] = await db.insert(notifications).values({
+      ...notification,
+      isRead: false,
+      createdAt: new Date()
+    }).returning();
+    return newNotification;
+  }
+
+  async getUserNotifications(userId: number, limit: number = 10, includeRead: boolean = false): Promise<Notification[]> {
+    const { db } = await import("./db");
+    const { and, eq, desc } = await import("drizzle-orm");
+    
+    let query = db.select().from(notifications)
+      .where(eq(notifications.userId, userId));
+    
+    if (!includeRead) {
+      query = query.where(eq(notifications.isRead, false));
+    }
+    
+    return query.orderBy(desc(notifications.createdAt)).limit(limit);
+  }
+
+  async getNotification(id: number): Promise<Notification | undefined> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    
+    const [notification] = await db.select().from(notifications)
+      .where(eq(notifications.id, id));
+    
+    return notification || undefined;
+  }
+
+  async markNotificationAsRead(id: number): Promise<Notification> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    
+    const [updatedNotification] = await db.update(notifications)
+      .set({ isRead: true })
+      .where(eq(notifications.id, id))
+      .returning();
+    
+    if (!updatedNotification) {
+      throw new Error(`Notification with id ${id} not found`);
+    }
+    
+    return updatedNotification;
+  }
+
+  async markAllNotificationsAsRead(userId: number): Promise<boolean> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    
+    const result = await db.update(notifications)
+      .set({ isRead: true })
+      .where(eq(notifications.userId, userId))
+      .returning();
+    
+    return result.length > 0;
+  }
+
+  async deleteNotification(id: number): Promise<boolean> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    
+    const result = await db.delete(notifications)
+      .where(eq(notifications.id, id))
+      .returning();
+    
+    return result.length > 0;
+  }
+
+  async getUnreadNotificationCount(userId: number): Promise<number> {
+    const { db } = await import("./db");
+    const { eq, count } = await import("drizzle-orm");
+    
+    const [result] = await db.select({ count: count() })
+      .from(notifications)
+      .where(eq(notifications.userId, userId))
+      .where(eq(notifications.isRead, false));
+    
+    return result ? result.count : 0;
+  }
+
   // Method to seed initial data for the database
   async seedInitialData(): Promise<void> {
     const { db } = await import("./db");
