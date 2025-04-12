@@ -825,7 +825,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Track assignment changes for notifications
       const previousAssignedUserId = task.assignedUserId;
+      const previousAssignedTo = task.assignedTo;
       const newAssignedUserId = req.body.assignedUserId !== undefined ? req.body.assignedUserId : previousAssignedUserId;
+      const newAssignedTo = req.body.assignedTo !== undefined ? req.body.assignedTo : previousAssignedTo;
       
       // Verify assignedUserId is valid if provided and not null
       if (newAssignedUserId !== null && newAssignedUserId !== undefined) {
@@ -835,6 +837,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
             message: "Invalid user assignment. User does not exist.", 
             field: "assignedUserId" 
           });
+        }
+      }
+      
+      // If assignedTo is a username, try to find the corresponding user
+      let assignToUserId = null;
+      if (newAssignedTo && newAssignedTo !== previousAssignedTo) {
+        // Check if the assignedTo value matches any username in the system
+        const allUsers = await storage.getAllUsers();
+        const matchedUser = allUsers.find(user => 
+          user.username === newAssignedTo || 
+          user.fullName === newAssignedTo
+        );
+        
+        if (matchedUser) {
+          assignToUserId = matchedUser.id;
         }
       }
       
@@ -870,11 +887,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create notifications based on task updates
       if (req.isAuthenticated()) {
-        // If task is newly assigned to a user
+        // Get the edition details for notifications
+        const edition = await storage.getEdition(task.editionId);
+        const editionCode = edition ? edition.code : "Unknown";
+        
+        // If task is newly assigned to a user via assignedUserId
         if (newAssignedUserId && newAssignedUserId !== previousAssignedUserId) {
-          const edition = await storage.getEdition(task.editionId);
-          const editionCode = edition ? edition.code : "Unknown";
-          
           // Create notification for the assigned user
           await storage.createNotification({
             userId: newAssignedUserId,
@@ -888,14 +906,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
         
-        // If task status is changed to "Done"
-        if (req.body.status === "Done" && task.status !== "Done" && task.assignedUserId) {
-          // Create completion notification
+        // If task is newly assigned to a user via assignedTo field
+        if (assignToUserId && newAssignedTo !== previousAssignedTo) {
+          // Create notification for the assigned user
           await storage.createNotification({
-            userId: task.assignedUserId,
-            type: "task_completed",
-            title: "Task Completed",
-            message: `Task "${task.name}" has been marked as completed`,
+            userId: assignToUserId,
+            type: "task_assigned",
+            title: "Task Assigned",
+            message: `You have been assigned to task "${task.name}" (${editionCode})`,
             entityType: "task",
             entityId: task.id,
             actionUrl: `/tasks/${task.id}`,
@@ -903,10 +921,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
         
+        // If task status is changed to "Done"
+        if (req.body.status === "Done" && task.status !== "Done") {
+          // Check if we have a direct user ID assigned
+          if (task.assignedUserId) {
+            // Create completion notification for the assigned user
+            await storage.createNotification({
+              userId: task.assignedUserId,
+              type: "task_completed",
+              title: "Task Completed",
+              message: `Task "${task.name}" has been marked as completed`,
+              entityType: "task",
+              entityId: task.id,
+              actionUrl: `/tasks/${task.id}`,
+              metadata: { taskId: task.id, editionId: task.editionId }
+            });
+          } 
+          // Check if there's a matching user for assignedTo value
+          else if (task.assignedTo) {
+            const allUsers = await storage.getAllUsers();
+            const matchedUser = allUsers.find(user => 
+              user.username === task.assignedTo || 
+              user.fullName === task.assignedTo
+            );
+            
+            if (matchedUser) {
+              // Create completion notification for the matched user
+              await storage.createNotification({
+                userId: matchedUser.id,
+                type: "task_completed",
+                title: "Task Completed",
+                message: `Task "${task.name}" has been marked as completed`,
+                entityType: "task",
+                entityId: task.id,
+                actionUrl: `/tasks/${task.id}`,
+                metadata: { taskId: task.id, editionId: task.editionId }
+              });
+            }
+          }
+        }
+        
         // If task is updated with changes other than assignment
-        if (Object.keys(updatedData).some(key => key !== 'assignedUserId') && 
-            newAssignedUserId && 
-            newAssignedUserId === previousAssignedUserId) {
+        // Check if there are updates beyond assignment changes
+        const hasNonAssignmentChanges = Object.keys(updatedData).some(key => 
+          key !== 'assignedUserId' && key !== 'assignedTo');
+          
+        // Notify assigned user through assignedUserId
+        if (hasNonAssignmentChanges && newAssignedUserId && newAssignedUserId === previousAssignedUserId) {
           // Only notify for other updates if the user was already assigned and not just now
           await storage.createNotification({
             userId: newAssignedUserId,
@@ -918,6 +979,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
             actionUrl: `/tasks/${task.id}`,
             metadata: { taskId: task.id, editionId: task.editionId }
           });
+        }
+        
+        // Notify assigned user through assignedTo if it's not changing
+        if (hasNonAssignmentChanges && 
+            newAssignedTo && 
+            newAssignedTo === previousAssignedTo && 
+            !newAssignedUserId) {
+          // Find user by name if no direct assignment
+          const allUsers = await storage.getAllUsers();
+          const matchedUser = allUsers.find(user => 
+            user.username === newAssignedTo || 
+            user.fullName === newAssignedTo
+          );
+          
+          if (matchedUser) {
+            await storage.createNotification({
+              userId: matchedUser.id,
+              type: "task_updated",
+              title: "Task Updated",
+              message: `Task "${task.name}" has been updated`,
+              entityType: "task",
+              entityId: task.id,
+              actionUrl: `/tasks/${task.id}`,
+              metadata: { taskId: task.id, editionId: task.editionId }
+            });
+          }
         }
       }
       
