@@ -256,3 +256,61 @@ export function getAllWeeks(): string[] {
 export function getCurrentWeek(edition: any): number {
   return edition?.currentWeek || 5; // Default to week 5 if not specified
 }
+
+/**
+ * Add business days to a date (skipping weekends)
+ * @param date The starting date
+ * @param days Number of business days to add
+ * @returns A new date with the business days added
+ */
+export function addBusinessDays(date: Date, days: number): Date {
+  const result = new Date(date);
+  let daysAdded = 0;
+  
+  while (daysAdded < days) {
+    // Move to the next day
+    result.setDate(result.getDate() + 1);
+    
+    // Skip weekends (0 = Sunday, 6 = Saturday)
+    const dayOfWeek = result.getDay();
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+      daysAdded++;
+    }
+  }
+  
+  return result;
+}
+
+/**
+ * Calculate a due date based on week number and the training start date
+ * @param week Week number (e.g., "-5", "2", etc.)
+ * @param trainingStartDate The start date of the training
+ * @returns The calculated due date
+ */
+export function calculateTaskDueDate(week: string, trainingStartDate: Date): Date {
+  const weekNum = getWeekNumber(week);
+  const startDate = new Date(trainingStartDate);
+  
+  // Tasks are generally due 5 business days before the week starts
+  // For week -5, that's 5 weeks before training start + 5 business days earlier
+  // For week 1, that's the training start date - 5 business days
+  
+  // First, calculate when this week starts relative to the training start date
+  let weekStartDate: Date;
+  if (weekNum <= 0) {
+    // For negative weeks (pre-training preparation), go back from training start
+    weekStartDate = new Date(startDate);
+    weekStartDate.setDate(weekStartDate.getDate() + (weekNum * 7));
+  } else {
+    // For positive weeks (during training), go forward from training start
+    weekStartDate = new Date(startDate);
+    weekStartDate.setDate(weekStartDate.getDate() + ((weekNum - 1) * 7));
+  }
+  
+  // Then go back 5 business days to set the due date
+  // This ensures the task is completed before the week starts
+  const dueDate = new Date(weekStartDate);
+  dueDate.setDate(dueDate.getDate() - 7); // Go back 1 week
+  
+  return dueDate;
+}

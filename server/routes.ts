@@ -180,10 +180,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Add template tasks to the new edition
       const { TASK_TEMPLATE } = await import("../client/src/lib/constants");
+      const { calculateTaskDueDate } = await import("../client/src/lib/utils");
       
       // Loop through all weeks and tasks in the template
       for (const [week, weekTasks] of Object.entries(TASK_TEMPLATE)) {
         for (const templateTask of weekTasks) {
+          // Calculate due date based on week number and training start date
+          const dueDate = calculateTaskDueDate(week.replace("Week ", ""), edition.startDate);
+          
           // Create a task in the database for each template task
           const task = {
             editionId: edition.id,
@@ -195,7 +199,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             duration: templateTask.duration || null,
             assignedTo: templateTask.assignedTo || null,
             owner: templateTask.owner || null,
-            dueDate: null,
+            dueDate: dueDate,
             links: null,
             inflexible: false,
             notes: null
