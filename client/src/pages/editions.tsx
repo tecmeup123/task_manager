@@ -140,8 +140,33 @@ export default function Editions() {
     },
   });
   
+  // Restore edition mutation
+  const restoreEdition = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest("PATCH", `/api/editions/${id}/restore`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/editions"] });
+      toast({
+        title: "Edition restored",
+        description: "The edition has been successfully restored from the archive.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to restore the edition.",
+        variant: "destructive",
+      });
+    },
+  });
+  
   const handleArchiveEdition = (edition: any) => {
     archiveEdition.mutate(edition.id);
+  };
+  
+  const handleRestoreEdition = (edition: any) => {
+    restoreEdition.mutate(edition.id);
   };
 
   const handleDuplicateEdition = (edition: any) => {
@@ -267,6 +292,12 @@ export default function Editions() {
                               Archive
                             </DropdownMenuItem>
                           )}
+                          {edition.archived && (
+                            <DropdownMenuItem onClick={() => handleRestoreEdition(edition)}>
+                              <ArchiveRestore className="mr-2 h-4 w-4" />
+                              Restore
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem onClick={() => setEditionToDelete(edition)}>
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete
@@ -384,6 +415,15 @@ export default function Editions() {
                             }}>
                               <Archive className="mr-2 h-4 w-4" />
                               Archive
+                            </DropdownMenuItem>
+                          )}
+                          {edition.archived && (
+                            <DropdownMenuItem onClick={(e) => {
+                              e.stopPropagation();
+                              handleRestoreEdition(edition);
+                            }}>
+                              <ArchiveRestore className="mr-2 h-4 w-4" />
+                              Restore
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem onClick={(e) => {
