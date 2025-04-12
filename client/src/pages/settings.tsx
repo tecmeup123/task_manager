@@ -20,7 +20,6 @@ export default function Settings() {
   
   // Template management
   const [templateFile, setTemplateFile] = useState<File | null>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState("default");
   
   // Dashboard settings
   const [collapseOverdueTasks, setCollapseOverdueTasks] = useState(true);
@@ -168,11 +167,11 @@ export default function Settings() {
   const handleDownloadTemplate = () => {
     toast({
       title: "Preparing template...",
-      description: `Generating ${selectedTemplate} template`
+      description: "Generating default template"
     });
 
-    // Create sample template data based on selected template type
-    const templateData = generateTemplateData(selectedTemplate);
+    // Create sample template data - always use default template
+    const templateData = generateTemplateData('default');
     
     // Convert template data to JSON string
     const jsonString = JSON.stringify(templateData, null, 2);
@@ -184,7 +183,7 @@ export default function Settings() {
     // Create and trigger download
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${selectedTemplate}-template-tasks.json`;
+    a.download = `task-template.json`;
     document.body.appendChild(a);
     a.click();
     
@@ -195,7 +194,7 @@ export default function Settings() {
       
       toast({
         title: "Template downloaded",
-        description: "Task template has been successfully downloaded"
+        description: `${templateData.length} tasks template has been successfully downloaded`
       });
     }, 500);
   };
@@ -1369,21 +1368,11 @@ export default function Settings() {
                 <div>
                   <Label htmlFor="templateSelect">Select Template to Download</Label>
                   <div className="flex items-center space-x-2 mt-2">
-                    <Select 
-                      value={selectedTemplate}
-                      onValueChange={setSelectedTemplate}
+                    <Button 
+                      onClick={handleDownloadTemplate}
+                      className="w-full"
                     >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select template" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="default">Default Template (All Weeks)</SelectItem>
-                        <SelectItem value="glr">GLR Template (All Weeks)</SelectItem>
-                        <SelectItem value="slr">SLR Template (All Weeks)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Button onClick={handleDownloadTemplate}>
-                      Download ({generateTemplateData(selectedTemplate).length} tasks)
+                      Download Default Template ({generateTemplateData('default').length} tasks)
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
