@@ -420,7 +420,7 @@ export default function TaskDetailModal({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">None</SelectItem>
+                        <SelectItem value="none">None</SelectItem>
                         {isLoadingUsers ? (
                           <div className="flex items-center justify-center p-2">
                             <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -433,7 +433,7 @@ export default function TaskDetailModal({
                             </SelectItem>
                           ))
                         ) : (
-                          <SelectItem value="" disabled>No users available</SelectItem>
+                          <SelectItem value="no-users" disabled>No users available</SelectItem>
                         )}
                       </SelectContent>
                     </Select>
