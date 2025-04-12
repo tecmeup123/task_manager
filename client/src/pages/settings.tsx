@@ -21,6 +21,7 @@ export default function Settings() {
   
   // Template management
   const [templateFile, setTemplateFile] = useState<File | null>(null);
+  const [isUpdatingTerminology, setIsUpdatingTerminology] = useState(false);
   
   // Dashboard settings
   const [collapseOverdueTasks, setCollapseOverdueTasks] = useState(true);
@@ -312,6 +313,46 @@ export default function Settings() {
     };
     
     reader.readAsText(templateFile);
+  };
+  
+  // Handle updating task terminology in existing data
+  const handleUpdateTerminology = async () => {
+    setIsUpdatingTerminology(true);
+    
+    try {
+      toast({
+        title: "Updating terminology...",
+        description: "Replacing email and mailing list references in task names"
+      });
+      
+      const response = await fetch('/api/tasks/update-terminology', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to update terminology: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      
+      toast({
+        title: "Terminology updated",
+        description: result.message
+      });
+    } catch (error) {
+      console.error('Error updating terminology:', error);
+      toast({
+        title: "Update failed",
+        description: error instanceof Error ? error.message : "Failed to update task terminology",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUpdatingTerminology(false);
+    }
   };
   
   // Helper function to generate comprehensive template data for all weeks
@@ -1511,6 +1552,26 @@ export default function Settings() {
                       Upload a JSON or CSV file with task templates. This will update your template tasks.
                     </p>
                   </div>
+                  
+                  {/* Update Email Terminology Button - Admin only */}
+                  {user?.role === 'admin' && (
+                    <div className="space-y-2">
+                      <Label>Update Terminology in Existing Tasks</Label>
+                      <div className="grid grid-cols-1 gap-2">
+                        <Button 
+                          onClick={handleUpdateTerminology}
+                          disabled={isUpdatingTerminology}
+                          className="w-full"
+                          variant="outline"
+                        >
+                          {isUpdatingTerminology ? 'Updating...' : 'Replace Email/Mailing References in Tasks'}
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        This will update all tasks in the database to use new terminology (e.g., "Create participant list" instead of "Create mailing list").
+                      </p>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <Alert className="my-2">
