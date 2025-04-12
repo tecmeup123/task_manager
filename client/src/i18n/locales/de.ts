@@ -45,6 +45,22 @@ const de = {
     'settings.language': 'Sprache',
     'settings.darkTheme': 'Dunkles Theme',
     
+    // Notifications
+    'notifications.title': 'Benachrichtigungen',
+    'notifications.markAllAsRead': 'Alle als gelesen markieren',
+    'notifications.markAsRead': 'Als gelesen markieren',
+    'notifications.goToTask': 'Zur Aufgabe',
+    'notifications.viewEdition': 'Edition anzeigen',
+    'notifications.loading': 'Benachrichtigungen werden geladen...',
+    'notifications.assigned': 'Zugewiesen',
+    'notifications.updated': 'Aktualisiert',
+    'notifications.dueSoon': 'Bald fällig',
+    'notifications.createTest': 'Testbenachrichtigung erstellen',
+    'notifications.viewAll': 'Alle Benachrichtigungen anzeigen',
+    'notifications.empty': 'Keine neuen Benachrichtigungen',
+    'notifications.new': 'Neu',
+    'notifications.earlier': 'Früher',
+    
     // Tasks
     'tasks.title': 'Aufgaben',
     'tasks.backToList': 'Zurück zur Aufgabenliste',

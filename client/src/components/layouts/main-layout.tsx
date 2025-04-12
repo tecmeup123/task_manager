@@ -280,7 +280,11 @@ export default function MainLayout({ children }: MainLayoutProps) {
                             {formatDate(notification.createdAt, "MMM d")}
                           </span>
                         </div>
-                        <p className="text-sm mb-1">{notification.message}</p>
+                        <p className="text-sm mb-1">
+                          {notification.message && notification.message.startsWith('notifications.') 
+                            ? t(notification.message) 
+                            : notification.message}
+                        </p>
                         <div className="flex justify-between">
                           {!notification.isRead && (
                             <Button 

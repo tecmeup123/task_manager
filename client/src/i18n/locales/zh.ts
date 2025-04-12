@@ -290,6 +290,13 @@ const zh = {
     // Notifications
     'notifications.title': '通知',
     'notifications.markAllAsRead': '标记所有为已读',
+    'notifications.markAsRead': '标记为已读',
+    'notifications.goToTask': '查看任务',
+    'notifications.viewEdition': '查看版本',
+    'notifications.loading': '加载通知中...',
+    'notifications.assigned': '已分配',
+    'notifications.updated': '已更新',
+    'notifications.dueSoon': '即将到期',
     'notifications.createTest': '创建测试通知',
     'notifications.viewAll': '查看所有通知',
     'notifications.empty': '没有新通知',
