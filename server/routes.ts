@@ -1,10 +1,49 @@
-import type { Express, Request, Response, NextFunction } from "express";
+import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertEditionSchema, insertTaskSchema, insertTrainerSchema, taskStatusEnum, trainerStatusEnum } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth, hashPassword, comparePasswords } from "./auth";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+
+// Configure multer for avatar uploads
+const avatarStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(process.cwd(), "public/uploads/avatars");
+    // Ensure the directory exists
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    // Generate a unique filename with timestamp and user ID
+    const userId = req.user?.id || "unknown";
+    const timestamp = Date.now();
+    const fileExt = path.extname(file.originalname).toLowerCase();
+    cb(null, `avatar-${userId}-${timestamp}${fileExt}`);
+  }
+});
+
+// Set up multer with file filters
+const avatarUpload = multer({
+  storage: avatarStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max file size
+  },
+  fileFilter: (req, file, cb) => {
+    // Accept only image files
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowedMimeTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed."));
+    }
+  }
+});
 
 // Middleware to check for admin role
 function requireAdmin(req: Request, res: Response, next: NextFunction) {
@@ -101,9 +140,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication
   setupAuth(app);
   
+  // Serve static files from public directory
+  app.use('/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
+  
   // put application routes here
   // prefix all routes with /api
   const apiRouter = app.route("/api");
+  
+  // User profile endpoint
+  app.get("/api/user/profile", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    
+    try {
+      const user = await storage.getUser(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Return user without password
+      const { password, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      res.status(500).json({ message: "Failed to fetch user profile" });
+    }
+  });
+  
+  // Update user profile
+  app.patch("/api/user/profile", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    
+    try {
+      const { fullName, email, avatarUrl, avatarColor, avatarShape, avatarIcon, avatarBackground } = req.body;
+      
+      // Get the current user for the audit log
+      const currentUser = await storage.getUser(req.user.id);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Update only the fields provided
+      const updatedFields: any = {};
+      if (fullName !== undefined) updatedFields.fullName = fullName;
+      if (email !== undefined) updatedFields.email = email;
+      if (avatarUrl !== undefined) updatedFields.avatarUrl = avatarUrl;
+      if (avatarColor !== undefined) updatedFields.avatarColor = avatarColor;
+      if (avatarShape !== undefined) updatedFields.avatarShape = avatarShape;
+      if (avatarIcon !== undefined) updatedFields.avatarIcon = avatarIcon;
+      if (avatarBackground !== undefined) updatedFields.avatarBackground = avatarBackground;
+      
+      // Skip update if no fields provided
+      if (Object.keys(updatedFields).length === 0) {
+        const { password, ...userWithoutPassword } = currentUser;
+        return res.json(userWithoutPassword);
+      }
+      
+      // Update the user profile
+      const updatedUser = await storage.updateUser(req.user.id, updatedFields);
+      
+      // Create audit log for profile update
+      await storage.createAuditLog({
+        userId: req.user.id,
+        entityType: "user",
+        entityId: req.user.id,
+        action: "update",
+        previousState: { ...currentUser, password: "[REDACTED]" },
+        newState: { ...updatedUser, password: "[REDACTED]" },
+        notes: "User profile updated"
+      });
+      
+      // Return updated user without password
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      res.status(500).json({ message: "Failed to update user profile" });
+    }
+  });
+  
+  // Upload avatar
+  app.post("/api/user/avatar", avatarUpload.single('avatar'), async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    
+    try {
+      const file = req.file;
+      if (!file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      // Generate URL for the uploaded file
+      const avatarUrl = `/uploads/avatars/${file.filename}`;
+      
+      // Update user with avatar URL
+      const updatedUser = await storage.updateUser(req.user.id, { avatarUrl });
+      
+      // Create audit log for avatar upload
+      await storage.createAuditLog({
+        userId: req.user.id,
+        entityType: "user",
+        entityId: req.user.id,
+        action: "update",
+        previousState: { avatarUrl: req.user.avatarUrl || null },
+        newState: { avatarUrl },
+        notes: "User avatar updated"
+      });
+      
+      // Return success with the URL
+      res.json({ 
+        message: "Avatar uploaded successfully", 
+        avatarUrl 
+      });
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      res.status(500).json({ message: "Failed to upload avatar" });
+    }
+  });
   
   // Change password endpoint
   app.post("/api/change-password", async (req, res) => {
