@@ -370,11 +370,20 @@ export default function TaskDetailModal({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {OWNER_OPTIONS.map(option => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
+                        {isLoadingUsers ? (
+                          <div className="flex items-center justify-center p-2">
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            <span>Loading users...</span>
+                          </div>
+                        ) : users && users.length > 0 ? (
+                          users.map(user => (
+                            <SelectItem key={user.username} value={user.username}>
+                              {user.fullName || user.username}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="no-users" disabled>No users available</SelectItem>
+                        )}
                       </SelectContent>
                     </Select>
                     <FormMessage />
