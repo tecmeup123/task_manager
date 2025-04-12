@@ -326,36 +326,7 @@ export default function Tasks() {
                   </span>
                 </div>
                 
-                {/* Week status buttons - using the design from screenshot */}
-                <div className="flex gap-1 rounded-lg border border-neutral-200 p-1 w-full">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={`flex-1 rounded-md ${
-                      pastWeeks > 0 ? "text-neutral-500" : "text-neutral-400"
-                    }`}
-                    disabled={pastWeeks === 0}
-                  >
-                    PAST WEEKS
-                  </Button>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="flex-1 rounded-md bg-neutral-900 text-white"
-                  >
-                    CURRENT WEEK
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={`flex-1 rounded-md ${
-                      futureWeeks > 0 ? "text-neutral-500" : "text-neutral-400"
-                    }`}
-                    disabled={futureWeeks === 0}
-                  >
-                    FUTURE WEEKS
-                  </Button>
-                </div>
+                {/* Week progress removed as requested */}
               </div>
             </>
           ) : (

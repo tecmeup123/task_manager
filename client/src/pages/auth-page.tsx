@@ -15,7 +15,6 @@ import { useToast } from "@/hooks/use-toast";
 const loginSchema = z.object({
   username: z.string().min(2, { message: "Username must be at least 2 characters" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-  rememberMe: z.boolean().optional().default(false),
 });
 
 const registerSchema = loginSchema.extend({
@@ -36,7 +35,6 @@ export default function AuthPage() {
     defaultValues: {
       username: "",
       password: "",
-      rememberMe: false,
     },
   });
 
@@ -122,27 +120,7 @@ export default function AuthPage() {
                         </FormItem>
                       )}
                     />
-                    <FormField
-                      control={loginForm.control}
-                      name="rememberMe"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 mt-1">
-                          <FormControl>
-                            <div className="flex items-center space-x-2">
-                              <input 
-                                type="checkbox" 
-                                className="h-4 w-4 rounded border-gray-300" 
-                                checked={field.value}
-                                onChange={field.onChange}
-                              />
-                              <label className="text-sm font-normal text-gray-600">
-                                Keep me logged in (8 hours)
-                              </label>
-                            </div>
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
+                    {/* Remember me option removed - available in settings */}
                     <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
                       {loginMutation.isPending ? (
                         <>
