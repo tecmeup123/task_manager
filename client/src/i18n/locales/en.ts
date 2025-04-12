@@ -48,6 +48,7 @@ const en = {
     'auth.confirmPassword': 'Confirm Password',
     'auth.forgotPassword': 'Forgot Password?',
     'auth.rememberMe': 'Remember Me',
+    'auth.changePassword': 'Change Password',
     'auth.loginSuccess': 'Login successful',
     'auth.loginError': 'Login failed',
     'auth.logoutSuccess': 'Logout successful',

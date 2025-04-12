@@ -1084,6 +1084,7 @@ export default function Settings() {
                       <SelectItem value="fr">French (Français)</SelectItem>
                       <SelectItem value="de">German (Deutsch)</SelectItem>
                       <SelectItem value="pt">Portuguese (Português)</SelectItem>
+                      <SelectItem value="zh">Chinese (中文)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -1120,7 +1121,7 @@ export default function Settings() {
                   onClick={handleSaveAccountSettings}
                   disabled={!isAccountSettingsChanged}
                 >
-                  Save Account Settings
+                  {t('app.save')} {t('settings.accountSettings')}
                 </Button>
               </div>
             </CardContent>
@@ -1254,7 +1255,7 @@ export default function Settings() {
               
               <div className="pt-4 border-t flex justify-end">
                 <Button onClick={handleSaveNotificationSettings}>
-                  Save Notification Settings
+                  {t('app.save')} {t('settings.notificationSettings')}
                 </Button>
               </div>
             </CardContent>
@@ -1325,7 +1326,7 @@ export default function Settings() {
                     onClick={handleChangePassword}
                     disabled={!currentPassword || !newPassword || !confirmPassword}
                   >
-                    Change Password
+                    {t('auth.changePassword')}
                   </Button>
                 </div>
               </div>
@@ -1410,7 +1411,7 @@ export default function Settings() {
                     onClick={handleSaveSecuritySettings}
                     disabled={!isSecuritySettingsChanged}
                   >
-                    Save Security Settings
+                    {t('app.save')} {t('settings.securitySettings')}
                   </Button>
                 </div>
               </div>
@@ -1431,7 +1432,7 @@ export default function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Database className="h-5 w-5 mr-2" />
-                Data Management
+                {t('settings.dataManagement')}
               </CardTitle>
               <CardDescription>
                 Manage system data and backups
