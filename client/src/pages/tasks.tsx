@@ -108,14 +108,22 @@ export default function Tasks() {
 
   const handleTaskSave = async (updatedTask: any) => {
     try {
+      console.log("Sending task update for:", updatedTask);
       await apiRequest('PATCH', `/api/tasks/${updatedTask.id}`, updatedTask);
+      
+      // Also invalidate the general tasks query
+      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
       queryClient.invalidateQueries({ queryKey: [`/api/editions/${currentEdition?.id}/tasks`] });
+      
       setIsTaskModalOpen(false);
       toast({
         title: "Task updated",
         description: "Task has been successfully updated",
       });
+      // Force refetch to ensure we have the latest data
+      refetchTasks();
     } catch (error) {
+      console.error("Failed to update task:", error);
       toast({
         title: "Error",
         description: "Failed to update task",
@@ -126,17 +134,25 @@ export default function Tasks() {
 
   const handleNewTask = async (newTask: any) => {
     try {
+      console.log("Creating new task:", newTask);
       await apiRequest('POST', '/api/tasks', {
         ...newTask,
         editionId: currentEdition.id,
       });
+      
+      // Also invalidate the general tasks query
+      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
       queryClient.invalidateQueries({ queryKey: [`/api/editions/${currentEdition?.id}/tasks`] });
+      
       setIsAddTaskFormOpen(false);
       toast({
         title: "Task created",
         description: "New task has been created successfully",
       });
+      // Force refetch to ensure we have the latest data
+      refetchTasks();
     } catch (error) {
+      console.error("Failed to create task:", error);
       toast({
         title: "Error",
         description: "Failed to create task",
