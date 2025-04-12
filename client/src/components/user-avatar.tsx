@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { useOnboarding } from "@/hooks/use-onboarding";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { UserProfile } from "@/components/user-profile";
 import { Button } from "@/components/ui/button";
@@ -13,10 +14,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getInitials } from "@/lib/utils";
-import { Settings, User, LogOut } from "lucide-react";
+import { Settings, User, LogOut, HelpCircle } from "lucide-react";
 
 export function UserAvatar() {
   const { user, logoutMutation } = useAuth();
+  const { startOnboarding } = useOnboarding();
   const [profileOpen, setProfileOpen] = useState(false);
   
   if (!user) return null;
@@ -53,6 +55,10 @@ export function UserAvatar() {
             <DropdownMenuItem onClick={() => window.location.href = "/settings"}>
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => startOnboarding()}>
+              <HelpCircle className="mr-2 h-4 w-4" />
+              <span>Start Onboarding</span>
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
