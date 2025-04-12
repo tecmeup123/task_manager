@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { insertEditionSchema, insertTaskSchema, insertTrainerSchema, taskStatusEnum, trainerStatusEnum } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
-import { setupAuth } from "./auth";
+import { setupAuth, hashPassword, comparePasswords } from "./auth";
 
 // Middleware to check for admin role
 function requireAdmin(req: Request, res: Response, next: NextFunction) {
@@ -495,6 +495,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching users:", error);
       res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+  
+  // Create a new user (admin only)
+  app.post("/api/users", requireAdmin, async (req, res) => {
+    try {
+      // Check if username already exists
+      const existingUser = await storage.getUserByUsername(req.body.username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+      
+      // Set a generic initial password if not provided
+      const initialPassword = req.body.password || "ChangeMe123!";
+      
+      // Hash password
+      const hashedPassword = await hashPassword(initialPassword);
+      
+      // Create the user with forcePasswordChange flag
+      const user = await storage.createUser({
+        ...req.body,
+        password: hashedPassword,
+        forcePasswordChange: true // Force password change on first login
+      });
+      
+      // Create audit log
+      if (req.user) {
+        await storage.createAuditLog({
+          userId: req.user.id,
+          entityType: "user",
+          entityId: user.id,
+          action: "create",
+          previousState: null,
+          newState: { ...user, password: "[REDACTED]" },
+          notes: "User created by admin with generic password"
+        });
+      }
+      
+      // Return user without password
+      const { password, ...userWithoutPassword } = user;
+      res.status(201).json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ message: "Failed to create user" });
     }
   });
   
