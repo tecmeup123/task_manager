@@ -791,6 +791,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Task not found" });
       }
       
+      // Since requireAuth middleware ensures req.user exists, we can safely assert it's non-null
+      if (!req.user) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
       const resourceData = {
         taskId,
         uploadedBy: req.user.id,
@@ -822,6 +827,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!resource) {
         return res.status(404).json({ message: "Resource not found" });
+      }
+      
+      if (!req.user) {
+        return res.status(401).json({ message: "User not authenticated" });
       }
       
       await storage.deleteResource(resourceId);
@@ -860,6 +869,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Task not found" });
       }
       
+      if (!req.user) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
       const commentData = {
         taskId,
         userId: req.user.id,
@@ -884,6 +897,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Comment not found" });
       }
       
+      if (!req.user) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
       // Only the comment author or admins can delete comments
       if (comment.userId !== req.user.id && req.user.role !== "admin") {
         return res.status(403).json({ message: "Not authorized to delete this comment" });
@@ -899,6 +916,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user mentions
   app.get("/api/mentions", requireAuth, async (req, res) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
       const isRead = req.query.read === "true";
       const mentions = await storage.getUserMentions(req.user.id, isRead);
       res.json(mentions);
@@ -910,6 +931,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Mark mention as read
   app.patch("/api/mentions/:id/read", requireAuth, async (req, res) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
       const mentionId = Number(req.params.id);
       const mention = await storage.markMentionAsRead(mentionId);
       res.json(mention);
