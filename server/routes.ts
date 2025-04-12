@@ -135,11 +135,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Hash the new password
       const hashedPassword = await hashPassword(newPassword);
       
-      // Update user with new password and reset password change flag
+      // Update user with new password and reset both password change flags
       const updatedUser = await storage.updateUser(user.id, {
         password: hashedPassword,
         forcePasswordChange: false,
-        ...(user.passwordChangeRequired !== undefined ? { passwordChangeRequired: false } : {}),
+        passwordChangeRequired: false, // Always set passwordChangeRequired to false
       });
       
       // Create audit log for password change
