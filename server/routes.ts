@@ -1267,19 +1267,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Audit logs routes
-  // Get all audit logs
-  app.get("/api/audit-logs", requireAdmin, async (req, res) => {
-    try {
-      const entityType = req.query.entityType as string | undefined;
-      const entityId = req.query.entityId ? Number(req.query.entityId) : undefined;
-      
-      const logs = await storage.getAuditLogs(entityType, entityId);
-      res.json(logs);
-    } catch (error) {
-      console.error("Error fetching audit logs:", error);
-      res.status(500).json({ message: "Failed to fetch audit logs" });
-    }
-  });
+  // Get all audit logs endpoint is already defined above
   
   // TEMPORARY ENDPOINT: Make Telmo an admin (will be removed after use)
   app.get("/api/make-telmo-admin", async (req, res) => {
