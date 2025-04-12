@@ -405,7 +405,10 @@ export default function Tasks() {
         <TaskDetailModal
           isOpen={isTaskModalOpen}
           task={selectedTask}
-          onClose={() => setIsTaskModalOpen(false)}
+          onClose={() => {
+            setIsTaskModalOpen(false);
+            setSelectedTask(null);
+          }}
           onSave={handleTaskSave}
         />
       )}

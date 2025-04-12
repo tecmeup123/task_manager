@@ -144,8 +144,14 @@ export default function TaskDetailModal({
     onSave(formData);
   };
 
+  // Using a more direct approach for closing the modal
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
       <DialogContent className="sm:max-w-md md:max-w-2xl">
         <DialogHeader className="flex flex-row items-center justify-start">
           <div className="flex items-center">
@@ -153,9 +159,9 @@ export default function TaskDetailModal({
               type="button" 
               variant="ghost" 
               size="icon"
-              onClick={() => onClose()}
+              onClick={onClose}
               className="mr-2 h-8 w-8 p-0"
-              aria-label="Back"
+              aria-label="Back to task list"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -549,7 +555,7 @@ export default function TaskDetailModal({
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => onClose()}
+                onClick={onClose}
                 className="flex items-center"
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
