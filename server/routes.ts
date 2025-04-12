@@ -659,6 +659,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch tasks" });
     }
   });
+  
+  // Special route to update email/mailing terminology in task names
+  app.post("/api/tasks/update-terminology", requireAuth, requireAdmin, async (req, res) => {
+    try {
+      // Define replacement pairs
+      const replacementPairs = [
+        {
+          search: "Send mail announcing start of the e-learning stage with Q&A sessions",
+          replace: "Announce start of the self-learning stage with Q&A sessions"
+        },
+        { 
+          search: "Send reminder about assignments due", 
+          replace: "Post reminder about assignments due" 
+        },
+        {
+          search: "Create mailing list (names; groups information; schedule; edition)",
+          replace: "Create participant list (names; groups information; schedule; edition)"
+        },
+        {
+          search: "Include links of the exam, mailing and edition folder to trainers",
+          replace: "Include links of the exam, participant resources and edition folder to trainers"
+        },
+        {
+          search: "Trainers should send changes in the e-learning assignment to Training Team",
+          replace: "Trainers should send changes in the self-learning assignment to Training Team"
+        },
+        {
+          search: "Send welcome to e-learning email",
+          replace: "Send welcome to self-learning resources"
+        },
+        {
+          search: "Update mailing list (names; groups information; schedule; edition)",
+          replace: "Update participant list (names; groups information; schedule; edition)"
+        },
+        {
+          search: "Verify if the e-learning group elements are correct",
+          replace: "Verify if the self-learning group elements are correct"
+        },
+        {
+          search: "Send Elearning Q&A Session invites",
+          replace: "Send self-learning Q&A Session invites"
+        }
+      ];
+
+      // Get all tasks
+      const tasks = await storage.getAllTasks();
+      let updatedCount = 0;
+
+      // Update each task if it contains one of the search terms
+      for (const task of tasks) {
+        for (const pair of replacementPairs) {
+          if (task.name === pair.search) {
+            await storage.updateTask(task.id, { name: pair.replace });
+            updatedCount++;
+            break; // Move to next task after finding a match
+          }
+        }
+      }
+
+      res.json({ 
+        success: true, 
+        message: `Successfully updated ${updatedCount} tasks with new terminology.` 
+      });
+    } catch (error) {
+      console.error("Error updating task terminology:", error);
+      res.status(500).json({ success: false, message: "Error updating task terminology." });
+    }
+  });
 
   // Get a specific task
   app.get("/api/tasks/:id", async (req, res) => {
