@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -1415,14 +1415,59 @@ export default function Settings() {
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Database Operations</h3>
               <div className="flex flex-col space-y-2">
-                <Button variant="outline" className="justify-start" onClick={handleCreateBackup}>
-                  Create Database Backup
+                <Button 
+                  variant="outline" 
+                  className="justify-start flex items-center" 
+                  onClick={handleSystemBackup}
+                >
+                  <Database className="h-4 w-4 mr-2" />
+                  Create System Backup
                 </Button>
-                <Button variant="outline" className="justify-start" onClick={handleImportData}>
-                  Import Data
-                </Button>
-                <Button variant="outline" className="justify-start" onClick={handleExportData}>
-                  Export Data
+                
+                <div className="flex flex-col">
+                  <input
+                    type="file"
+                    id="file-import"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="hidden"
+                    accept=".json"
+                  />
+                  
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Button 
+                      variant="outline" 
+                      className="justify-start flex-1 flex items-center" 
+                      onClick={handleImportClick}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      Select Backup File
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center" 
+                      onClick={handleImportData}
+                      disabled={!importFile}
+                    >
+                      Import
+                    </Button>
+                  </div>
+                  
+                  {importFile && (
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Selected: {importFile.name}
+                    </div>
+                  )}
+                </div>
+                
+                <Button 
+                  variant="outline" 
+                  className="justify-start flex items-center" 
+                  onClick={handleExportData}
+                >
+                  <EyeOff className="h-4 w-4 mr-2" />
+                  Export All System Data
                 </Button>
               </div>
             </div>

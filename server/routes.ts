@@ -1229,7 +1229,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         entityType: "system",
         entityId: 0,
         userId: req.user!.id,
-        timestamp: new Date(),
         notes: "Full system backup exported",
         previousState: null,
         newState: null
