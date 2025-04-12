@@ -79,6 +79,25 @@ export interface IStorage {
   deleteNotification(id: number): Promise<boolean>;
   getUnreadNotificationCount(userId: number): Promise<number>;
   
+  // Resource methods
+  getTaskResources(taskId: number): Promise<Resource[]>;
+  getResource(id: number): Promise<Resource | undefined>;
+  createResource(resource: InsertResource): Promise<Resource>;
+  updateResource(id: number, resource: Partial<Resource>): Promise<Resource>;
+  deleteResource(id: number): Promise<boolean>;
+  
+  // Mention methods
+  createMention(mention: InsertMention): Promise<Mention>;
+  getTaskMentions(taskId: number): Promise<Mention[]>;
+  getUserMentions(userId: number, isRead?: boolean): Promise<Mention[]>;
+  markMentionAsRead(id: number): Promise<Mention>;
+  
+  // Task comments methods
+  getTaskComments(taskId: number): Promise<TaskComment[]>;
+  createTaskComment(comment: InsertTaskComment): Promise<TaskComment>;
+  updateTaskComment(id: number, comment: Partial<TaskComment>): Promise<TaskComment>;
+  deleteTaskComment(id: number): Promise<boolean>;
+  
   // Helper method to duplicate edition with tasks
   duplicateEdition(editionId: number, newEditionData: InsertEdition): Promise<Edition>;
 }
@@ -95,12 +114,18 @@ export class MemStorage implements IStorage {
   private tasks: Map<number, Task>;
   private auditLogs: Map<number, AuditLog>;
   private notifications: Map<number, Notification>;
+  private resources: Map<number, Resource>;
+  private mentions: Map<number, Mention>;
+  private taskComments: Map<number, TaskComment>;
   private currentUserId: number;
   private currentTrainerId: number;
   private currentEditionId: number;
   private currentTaskId: number;
   private currentAuditLogId: number;
   private currentNotificationId: number;
+  private currentResourceId: number;
+  private currentMentionId: number;
+  private currentTaskCommentId: number;
   sessionStore: session.Store;
 
   constructor() {
@@ -110,12 +135,18 @@ export class MemStorage implements IStorage {
     this.tasks = new Map();
     this.auditLogs = new Map();
     this.notifications = new Map();
+    this.resources = new Map();
+    this.mentions = new Map();
+    this.taskComments = new Map();
     this.currentUserId = 1;
     this.currentTrainerId = 1;
     this.currentEditionId = 1;
     this.currentTaskId = 1;
     this.currentAuditLogId = 1;
     this.currentNotificationId = 1;
+    this.currentResourceId = 1;
+    this.currentMentionId = 1;
+    this.currentTaskCommentId = 1;
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000 // 24 hours
     });
@@ -433,6 +464,163 @@ export class MemStorage implements IStorage {
     return Array.from(this.notifications.values())
       .filter(notification => notification.userId === userId && !notification.isRead)
       .length;
+  }
+
+  // Resource methods
+  async getTaskResources(taskId: number): Promise<Resource[]> {
+    return Array.from(this.resources.values())
+      .filter(resource => resource.taskId === taskId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getResource(id: number): Promise<Resource | undefined> {
+    return this.resources.get(id);
+  }
+
+  async createResource(resource: InsertResource): Promise<Resource> {
+    const id = this.currentResourceId++;
+    const newResource: Resource = {
+      ...resource,
+      id,
+      size: resource.size || null,
+      format: resource.format || null,
+      uploadedBy: resource.uploadedBy || null,
+      createdAt: new Date(),
+      description: resource.description || null
+    };
+    this.resources.set(id, newResource);
+    return newResource;
+  }
+
+  async updateResource(id: number, resourceData: Partial<Resource>): Promise<Resource> {
+    const resource = this.resources.get(id);
+    if (!resource) {
+      throw new Error(`Resource with id ${id} not found`);
+    }
+    
+    const updatedResource = { ...resource, ...resourceData };
+    this.resources.set(id, updatedResource);
+    return updatedResource;
+  }
+
+  async deleteResource(id: number): Promise<boolean> {
+    return this.resources.delete(id);
+  }
+  
+  // Mention methods
+  async createMention(mention: InsertMention): Promise<Mention> {
+    const id = this.currentMentionId++;
+    const newMention: Mention = {
+      ...mention,
+      id,
+      commentId: mention.commentId || null,
+      createdAt: new Date(),
+      createdBy: mention.createdBy || null,
+      isRead: false
+    };
+    this.mentions.set(id, newMention);
+    
+    // Create a notification for the mentioned user
+    await this.createNotification({
+      userId: mention.userId,
+      type: "task_assigned",
+      title: "You were mentioned in a task",
+      message: `You were mentioned in task`,
+      entityType: "task",
+      entityId: mention.taskId,
+      actionUrl: `/tasks/${mention.taskId}`
+    });
+    
+    return newMention;
+  }
+
+  async getTaskMentions(taskId: number): Promise<Mention[]> {
+    return Array.from(this.mentions.values())
+      .filter(mention => mention.taskId === taskId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getUserMentions(userId: number, isRead?: boolean): Promise<Mention[]> {
+    let mentions = Array.from(this.mentions.values())
+      .filter(mention => mention.userId === userId);
+    
+    if (isRead !== undefined) {
+      mentions = mentions.filter(mention => mention.isRead === isRead);
+    }
+    
+    return mentions.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async markMentionAsRead(id: number): Promise<Mention> {
+    const mention = this.mentions.get(id);
+    if (!mention) {
+      throw new Error(`Mention with id ${id} not found`);
+    }
+    
+    const updatedMention = { ...mention, isRead: true };
+    this.mentions.set(id, updatedMention);
+    return updatedMention;
+  }
+  
+  // Task comment methods
+  async getTaskComments(taskId: number): Promise<TaskComment[]> {
+    return Array.from(this.taskComments.values())
+      .filter(comment => comment.taskId === taskId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async createTaskComment(comment: InsertTaskComment): Promise<TaskComment> {
+    const id = this.currentTaskCommentId++;
+    const newComment: TaskComment = {
+      ...comment,
+      id,
+      createdAt: new Date(),
+      updatedAt: null
+    };
+    this.taskComments.set(id, newComment);
+    
+    // Process mentions in the comment content
+    const mentionRegex = /@(\w+)/g;
+    let match;
+    const mentionedUsers = new Set();
+    
+    while ((match = mentionRegex.exec(comment.content)) !== null) {
+      const username = match[1];
+      const user = await this.getUserByUsername(username);
+      
+      if (user && !mentionedUsers.has(user.id)) {
+        mentionedUsers.add(user.id);
+        
+        // Create a mention
+        await this.createMention({
+          taskId: comment.taskId,
+          userId: user.id,
+          commentId: id,
+          createdBy: comment.userId
+        });
+      }
+    }
+    
+    return newComment;
+  }
+
+  async updateTaskComment(id: number, commentData: Partial<TaskComment>): Promise<TaskComment> {
+    const comment = this.taskComments.get(id);
+    if (!comment) {
+      throw new Error(`Comment with id ${id} not found`);
+    }
+    
+    const updatedComment = { 
+      ...comment, 
+      ...commentData,
+      updatedAt: new Date()
+    };
+    this.taskComments.set(id, updatedComment);
+    return updatedComment;
+  }
+
+  async deleteTaskComment(id: number): Promise<boolean> {
+    return this.taskComments.delete(id);
   }
 
   // Seed some initial data

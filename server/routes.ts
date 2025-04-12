@@ -771,6 +771,152 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch task" });
     }
   });
+  
+  // Get task resources
+  app.get("/api/tasks/:id/resources", requireAuth, async (req, res) => {
+    try {
+      const resources = await storage.getTaskResources(Number(req.params.id));
+      res.json(resources);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch task resources" });
+    }
+  });
+  
+  // Add a resource to a task
+  app.post("/api/tasks/:id/resources", requireAuth, async (req, res) => {
+    try {
+      const taskId = Number(req.params.id);
+      const task = await storage.getTask(taskId);
+      if (!task) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      const resourceData = {
+        taskId,
+        uploadedBy: req.user.id,
+        ...req.body
+      };
+      
+      const resource = await storage.createResource(resourceData);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.user.id,
+        entityType: "task",
+        entityId: taskId,
+        action: "update",
+        notes: `Added resource: ${resource.name}`
+      });
+      
+      res.status(201).json(resource);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to add resource to task" });
+    }
+  });
+  
+  // Delete a resource
+  app.delete("/api/resources/:id", requireAuth, async (req, res) => {
+    try {
+      const resourceId = Number(req.params.id);
+      const resource = await storage.getResource(resourceId);
+      
+      if (!resource) {
+        return res.status(404).json({ message: "Resource not found" });
+      }
+      
+      await storage.deleteResource(resourceId);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.user.id,
+        entityType: "task",
+        entityId: resource.taskId,
+        action: "update",
+        notes: `Deleted resource: ${resource.name}`
+      });
+      
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete resource" });
+    }
+  });
+  
+  // Get task comments
+  app.get("/api/tasks/:id/comments", requireAuth, async (req, res) => {
+    try {
+      const comments = await storage.getTaskComments(Number(req.params.id));
+      res.json(comments);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch task comments" });
+    }
+  });
+  
+  // Add a comment to a task
+  app.post("/api/tasks/:id/comments", requireAuth, async (req, res) => {
+    try {
+      const taskId = Number(req.params.id);
+      const task = await storage.getTask(taskId);
+      if (!task) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      
+      const commentData = {
+        taskId,
+        userId: req.user.id,
+        content: req.body.content
+      };
+      
+      const comment = await storage.createTaskComment(commentData);
+      
+      res.status(201).json(comment);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to add comment to task" });
+    }
+  });
+  
+  // Delete a comment
+  app.delete("/api/comments/:id", requireAuth, async (req, res) => {
+    try {
+      const commentId = Number(req.params.id);
+      const comment = await storage.getTaskComment(commentId);
+      
+      if (!comment) {
+        return res.status(404).json({ message: "Comment not found" });
+      }
+      
+      // Only the comment author or admins can delete comments
+      if (comment.userId !== req.user.id && req.user.role !== "admin") {
+        return res.status(403).json({ message: "Not authorized to delete this comment" });
+      }
+      
+      await storage.deleteTaskComment(commentId);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete comment" });
+    }
+  });
+  
+  // Get user mentions
+  app.get("/api/mentions", requireAuth, async (req, res) => {
+    try {
+      const isRead = req.query.read === "true";
+      const mentions = await storage.getUserMentions(req.user.id, isRead);
+      res.json(mentions);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch mentions" });
+    }
+  });
+  
+  // Mark mention as read
+  app.patch("/api/mentions/:id/read", requireAuth, async (req, res) => {
+    try {
+      const mentionId = Number(req.params.id);
+      const mention = await storage.markMentionAsRead(mentionId);
+      res.json(mention);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to mark mention as read" });
+    }
+  });
 
   // Create a new task
   app.post("/api/tasks", async (req, res) => {
