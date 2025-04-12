@@ -60,7 +60,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
     markAsRead, 
     markAllAsRead,
     isMarkingAsRead,
-    isMarkingAllAsRead
+    isMarkingAllAsRead,
+    createTestNotification,
+    refetch
   } = useNotifications();
 
   // Fetch all tasks for all editions to get upcoming tasks
@@ -316,7 +318,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
                         variant="outline" 
                         size="sm"
                         className="text-xs"
-                        onClick={() => refetch()}
+                        onClick={() => createTestNotification()}
                       >
                         Create Test Notification
                       </Button>
