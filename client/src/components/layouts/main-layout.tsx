@@ -156,9 +156,54 @@ export default function MainLayout({ children }: MainLayoutProps) {
             />
             <Search className="absolute left-2 top-2.5 w-4 h-4 text-neutral-500" />
           </div>
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <Bell className="h-5 w-5 text-neutral-500" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full relative">
+                <Bell className="h-5 w-5 text-neutral-500" />
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 flex items-center justify-center text-[10px] font-bold text-white">
+                  3
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80">
+              <div className="flex items-center justify-between px-4 py-2 border-b">
+                <h4 className="font-medium">Notifications</h4>
+                <Button variant="ghost" size="sm" className="text-xs h-7">Mark all as read</Button>
+              </div>
+              <div className="max-h-[400px] overflow-y-auto py-2">
+                <DropdownMenuItem className="p-3 focus:bg-neutral-100 cursor-default">
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-sm">Task Update</span>
+                      <span className="text-xs text-neutral-500">2h ago</span>
+                    </div>
+                    <p className="text-sm">Task "Verify mailing list" was marked as complete</p>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="p-3 focus:bg-neutral-100 cursor-default">
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-sm">Due Date Reminder</span>
+                      <span className="text-xs text-neutral-500">1d ago</span>
+                    </div>
+                    <p className="text-sm">Task "Send invites" is due tomorrow</p>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="p-3 focus:bg-neutral-100 cursor-default">
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-sm">New Assignment</span>
+                      <span className="text-xs text-neutral-500">2d ago</span>
+                    </div>
+                    <p className="text-sm">You were assigned a new task "Update edition status"</p>
+                  </div>
+                </DropdownMenuItem>
+              </div>
+              <div className="p-2 border-t text-center">
+                <Button variant="ghost" size="sm" className="w-full text-xs">View all notifications</Button>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
           
           {/* User Avatar - new component */}
           <div className="ml-2">

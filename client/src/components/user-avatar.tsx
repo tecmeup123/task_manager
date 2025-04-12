@@ -26,20 +26,11 @@ export function UserAvatar() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-            <Avatar 
-              className="h-10 w-10"
-              avatarColor={user.avatarColor}
-              avatarShape={user.avatarShape as "circle" | "square"}
-              avatarBackground={user.avatarBackground as "solid" | "gradient"}
-            >
+            <Avatar className="h-10 w-10">
               {user.avatarUrl ? (
                 <AvatarImage src={user.avatarUrl} alt={user.username} />
               ) : (
-                <AvatarFallback
-                  avatarColor={user.avatarColor}
-                  avatarIcon={user.avatarIcon as "user" | "circleUser" | "userCircle"}
-                  avatarBackground={user.avatarBackground as "solid" | "gradient"}
-                >
+                <AvatarFallback className="bg-primary">
                   {getInitials(user.fullName || user.username)}
                 </AvatarFallback>
               )}

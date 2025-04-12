@@ -6,14 +6,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { User, CircleUser, UserCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { getInitials } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -31,10 +27,6 @@ const profileFormSchema = z.object({
   fullName: z.string().optional(),
   email: z.string().email().optional(),
   avatarUrl: z.string().optional(),
-  avatarColor: z.string().optional(),
-  avatarShape: z.enum(["circle", "square"]).optional(),
-  avatarIcon: z.enum(["user", "circleUser", "userCircle"]).optional(),
-  avatarBackground: z.enum(["solid", "gradient"]).optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -47,7 +39,6 @@ export function UserProfile({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [activeTab, setActiveTab] = useState("photo");
 
   // Create form with default values from the user object
   const form = useForm<ProfileFormValues>({
@@ -56,23 +47,8 @@ export function UserProfile({ isOpen, onClose }: { isOpen: boolean; onClose: () 
       fullName: user?.fullName || "",
       email: user?.email || "",
       avatarUrl: user?.avatarUrl || "",
-      avatarColor: user?.avatarColor || "#6366F1",
-      avatarShape: user?.avatarShape as "circle" | "square" || "circle",
-      avatarIcon: user?.avatarIcon as "user" | "circleUser" | "userCircle" || "user",
-      avatarBackground: user?.avatarBackground as "solid" | "gradient" || "gradient",
     },
   });
-
-  // Avatar color options
-  const colorOptions = [
-    { value: "#6366F1", label: "Indigo" },
-    { value: "#10B981", label: "Emerald" },
-    { value: "#3B82F6", label: "Blue" },
-    { value: "#EF4444", label: "Red" },
-    { value: "#F59E0B", label: "Amber" },
-    { value: "#8B5CF6", label: "Violet" },
-    { value: "#EC4899", label: "Pink" },
-  ];
 
   // Mutation for updating profile
   const updateProfileMutation = useMutation({
@@ -130,7 +106,7 @@ export function UserProfile({ isOpen, onClose }: { isOpen: boolean; onClose: () 
       
       toast({
         title: "Avatar uploaded",
-        description: "Your avatar has been uploaded successfully.",
+        description: "Your profile photo has been updated successfully.",
       });
       
       // Clear the file selection and preview
@@ -140,7 +116,7 @@ export function UserProfile({ isOpen, onClose }: { isOpen: boolean; onClose: () 
     },
     onError: (error: Error) => {
       toast({
-        title: "Error uploading avatar",
+        title: "Error uploading photo",
         description: error.message,
         variant: "destructive",
       });
@@ -174,20 +150,6 @@ export function UserProfile({ isOpen, onClose }: { isOpen: boolean; onClose: () 
     }
   };
 
-  // Render the appropriate icon based on the selected icon type
-  const renderAvatarIcon = (iconType: string) => {
-    switch (iconType) {
-      case "user":
-        return <User className="h-6 w-6" />;
-      case "circleUser":
-        return <CircleUser className="h-6 w-6" />;
-      case "userCircle":
-        return <UserCircle className="h-6 w-6" />;
-      default:
-        return <User className="h-6 w-6" />;
-    }
-  };
-
   if (!user) return null;
 
   return (
@@ -196,18 +158,13 @@ export function UserProfile({ isOpen, onClose }: { isOpen: boolean; onClose: () 
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
           <DialogDescription>
-            Update your profile information and customize your avatar.
+            Update your profile information and upload a profile photo.
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="photo">Photo</TabsTrigger>
-            <TabsTrigger value="info">Info</TabsTrigger>
-          </TabsList>
-          
-          {/* Photo Tab */}
-          <TabsContent value="photo" className="space-y-4 py-4">
+        <div className="space-y-6">
+          {/* Photo Upload Section */}
+          <div className="pt-4">
             <div className="flex flex-col items-center justify-center space-y-4">
               <div className="relative group">
                 <Avatar className="h-24 w-24 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
@@ -216,7 +173,7 @@ export function UserProfile({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                   ) : user.avatarUrl ? (
                     <AvatarImage src={user.avatarUrl} alt={user.username} />
                   ) : (
-                    <AvatarFallback className="h-24 w-24">
+                    <AvatarFallback className="h-24 w-24 bg-primary">
                       {getInitials(user.fullName || user.username)}
                     </AvatarFallback>
                   )}
@@ -275,136 +232,13 @@ export function UserProfile({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                 </div>
               )}
             </div>
-            
+          </div>
+
+          {/* Profile Information Section */}
+          <div className="border-t pt-4">
+            <h3 className="text-sm font-medium mb-4">Profile Information</h3>
             <Form {...form}>
-              <form className="space-y-6">
-                <div className="space-y-4">
-                  <h3 className="text-sm font-medium">Avatar Customization</h3>
-                  
-                  <FormField
-                    control={form.control}
-                    name="avatarColor"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Color</FormLabel>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {colorOptions.map((color) => (
-                            <div
-                              key={color.value}
-                              className={`w-8 h-8 rounded-full cursor-pointer transition-all ${
-                                field.value === color.value 
-                                  ? 'ring-2 ring-offset-2 ring-primary scale-110' 
-                                  : 'hover:scale-110'
-                              }`}
-                              style={{ backgroundColor: color.value }}
-                              onClick={() => field.onChange(color.value)}
-                              title={color.label}
-                            />
-                          ))}
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="avatarShape"
-                    render={({ field }) => (
-                      <FormItem className="space-y-1">
-                        <FormLabel>Shape</FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            value={field.value}
-                            onValueChange={field.onChange}
-                            className="flex space-x-4"
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="circle" id="shape-circle" />
-                              <Label htmlFor="shape-circle">Circle</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="square" id="shape-square" />
-                              <Label htmlFor="shape-square">Square</Label>
-                            </div>
-                          </RadioGroup>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="avatarIcon"
-                    render={({ field }) => (
-                      <FormItem className="space-y-1">
-                        <FormLabel>Icon Style</FormLabel>
-                        <div className="flex justify-between space-x-4 mt-1">
-                          {["user", "circleUser", "userCircle"].map((iconType) => (
-                            <div
-                              key={iconType}
-                              className={`flex flex-col items-center p-2 border rounded-md cursor-pointer ${
-                                field.value === iconType 
-                                  ? 'border-primary bg-primary/5' 
-                                  : 'border-border hover:border-primary'
-                              }`}
-                              onClick={() => field.onChange(iconType)}
-                            >
-                              {renderAvatarIcon(iconType)}
-                              <span className="text-xs mt-1">{
-                                iconType === "user" ? "Default" : 
-                                iconType === "circleUser" ? "Circle" : "Round"
-                              }</span>
-                            </div>
-                          ))}
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="avatarBackground"
-                    render={({ field }) => (
-                      <FormItem className="space-y-1">
-                        <FormLabel>Background Style</FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            value={field.value}
-                            onValueChange={field.onChange}
-                            className="flex space-x-4"
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="solid" id="bg-solid" />
-                              <Label htmlFor="bg-solid">Solid</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="gradient" id="bg-gradient" />
-                              <Label htmlFor="bg-gradient">Gradient</Label>
-                            </div>
-                          </RadioGroup>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <div className="flex justify-end">
-                  <Button
-                    type="button"
-                    onClick={form.handleSubmit(onSubmit)}
-                    disabled={updateProfileMutation.isPending}
-                  >
-                    {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </TabsContent>
-          
-          {/* Info Tab */}
-          <TabsContent value="info" className="space-y-4 py-4">
-            <Form {...form}>
-              <form className="space-y-6">
+              <form className="space-y-4">
                 <FormField
                   control={form.control}
                   name="fullName"
@@ -450,8 +284,8 @@ export function UserProfile({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                 </div>
               </form>
             </Form>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

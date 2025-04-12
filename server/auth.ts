@@ -83,8 +83,7 @@ export function setupAuth(app: Express) {
 
       req.login(user, (err) => {
         if (err) return next(err);
-        const safeUser = { ...user };
-        delete safeUser.password;
+        const { password, ...safeUser } = user;
         res.status(201).json(safeUser);
       });
     } catch (error) {
