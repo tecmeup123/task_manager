@@ -51,6 +51,43 @@ export default function Settings() {
   const [reminderTime, setReminderTime] = useState("3");
   const [isNotificationSettingsChanged, setIsNotificationSettingsChanged] = useState(false);
   
+  // Avatar customization settings
+  const [avatarSettings, setAvatarSettings] = useState<{
+    avatarColor: string;
+    avatarShape: AvatarShape;
+    avatarIcon: string;
+    avatarBackground: AvatarBackground;
+  }>({
+    avatarColor: user?.avatarColor || "#6366F1",
+    avatarShape: (user?.avatarShape as AvatarShape) || "circle",
+    avatarIcon: user?.avatarIcon || "user",
+    avatarBackground: (user?.avatarBackground as AvatarBackground) || "gradient"
+  });
+  
+  // Avatar update mutation
+  const updateAvatarMutation = useMutation({
+    mutationFn: async (avatarData: typeof avatarSettings) => {
+      const res = await apiRequest("POST", "/api/user/avatar", avatarData);
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      // Update user data in the cache
+      queryClient.setQueryData(["/api/user"], data);
+      
+      toast({
+        title: "Avatar updated",
+        description: "Your profile avatar has been successfully updated",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
   // Security settings
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -75,10 +112,17 @@ export default function Settings() {
   };
   
   const handleSaveAccountSettings = () => {
+    // Save avatar settings if they have changed
+    if (avatarSettings) {
+      updateAvatarMutation.mutate(avatarSettings);
+    }
+    
+    // TODO: Update the rest of the account settings in a real implementation
     toast({
       title: "Account settings saved",
       description: "Your account information has been updated"
     });
+    
     setIsAccountSettingsChanged(false);
   };
   
@@ -917,6 +961,22 @@ export default function Settings() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              <div className="flex items-center gap-4 mb-4">
+                <UserAvatar
+                  username={user?.username}
+                  fullName={user?.fullName}
+                  size="lg"
+                  avatarColor={user?.avatarColor || "#6366F1"}
+                  avatarShape={(user?.avatarShape as AvatarShape) || "circle"}
+                  avatarIcon={user?.avatarIcon || "user"}
+                  avatarBackground={(user?.avatarBackground as AvatarBackground) || "gradient"}
+                />
+                <div>
+                  <h3 className="font-medium">{user?.fullName || user?.username}</h3>
+                  <p className="text-sm text-muted-foreground">{user?.role}</p>
+                </div>
+              </div>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="username">Username</Label>
@@ -966,6 +1026,23 @@ export default function Settings() {
                 </div>
               </div>
               
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="text-lg font-medium">Avatar Customization</h3>
+                <div className="space-y-4">
+                  {/* Avatar customization component */}
+                  <AvatarCustomizer 
+                    user={user}
+                    onChange={(avatarSettings) => {
+                      // Set state that account settings have changed
+                      setIsAccountSettingsChanged(true);
+                      
+                      // Store avatar settings to be sent on save
+                      setAvatarSettings(avatarSettings);
+                    }}
+                  />
+                </div>
+              </div>
+
               <div className="space-y-4 pt-4 border-t">
                 <h3 className="text-lg font-medium">Account Preferences</h3>
                 
