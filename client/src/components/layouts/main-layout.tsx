@@ -335,44 +335,44 @@ export default function MainLayout({ children }: MainLayoutProps) {
               <Link to="/">
                 <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <LayoutDashboard className="w-5 h-5 mr-3" />
-                  <span>Dashboard</span>
+                  <span>{t('navigation.dashboard')}</span>
                 </div>
               </Link>
               <Link to="/tasks">
                 <div className={`flex items-center px-4 py-3 text-base rounded-md ${location.startsWith("/tasks") ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <ListTodo className="w-5 h-5 mr-3" />
-                  <span>Tasks</span>
+                  <span>{t('navigation.tasks')}</span>
                 </div>
               </Link>
               <Link to="/editions">
                 <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/editions" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <GraduationCap className="w-5 h-5 mr-3" />
-                  <span>Editions</span>
+                  <span>{t('navigation.editions')}</span>
                 </div>
               </Link>
               <Link to="/trainers">
                 <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/trainers" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <Users className="w-5 h-5 mr-3" />
-                  <span>Trainers</span>
+                  <span>{t('navigation.trainers')}</span>
                 </div>
               </Link>
               <Link to="/reports">
                 <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/reports" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <BarChart className="w-5 h-5 mr-3" />
-                  <span>Reports</span>
+                  <span>{t('navigation.reports')}</span>
                 </div>
               </Link>
               <Link to="/settings">
                 <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/settings" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <Settings className="w-5 h-5 mr-3" />
-                  <span>Settings</span>
+                  <span>{t('navigation.settings')}</span>
                 </div>
               </Link>
               {user && user.role === "admin" && (
                 <Link to="/users">
                   <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/users" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
                     <Users className="w-5 h-5 mr-3" />
-                    <span>Users</span>
+                    <span>{t('navigation.users')}</span>
                   </div>
                 </Link>
               )}
@@ -397,7 +397,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
                   </Link>
                 ))
               ) : (
-                <div className="px-4 py-3 text-neutral-500">No editions available</div>
+                <div className="px-4 py-3 text-neutral-500">{t('navigation.noEditions')}</div>
               )}
             </div>
           </div>
@@ -415,13 +415,13 @@ export default function MainLayout({ children }: MainLayoutProps) {
       <div className="flex flex-1 pt-16">
         {/* Desktop Sidebar */}
         <aside className="w-48 hidden md:block bg-white border-r border-neutral-200 fixed h-full pt-4">
-          <div className="px-4 py-2 text-sm font-medium text-neutral-500 uppercase">Navigation</div>
+          <div className="px-4 py-2 text-sm font-medium text-neutral-500 uppercase">{t('navigation.title')}</div>
           <nav>
             <div>
               <Link to="/">
                 <div className={`flex items-center px-4 py-2 text-sm ${location === "/" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <LayoutDashboard className="w-5 h-5 mr-2" />
-                  <span>Dashboard</span>
+                  <span>{t('navigation.dashboard')}</span>
                 </div>
               </Link>
             </div>
@@ -429,7 +429,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
               <Link to="/tasks">
                 <div className={`flex items-center px-4 py-2 text-sm ${location.startsWith("/tasks") ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <ListTodo className="w-5 h-5 mr-2" />
-                  <span>Tasks</span>
+                  <span>{t('navigation.tasks')}</span>
                 </div>
               </Link>
             </div>
@@ -437,40 +437,39 @@ export default function MainLayout({ children }: MainLayoutProps) {
               <Link to="/editions">
                 <div className={`flex items-center px-4 py-2 text-sm ${location === "/editions" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <GraduationCap className="w-5 h-5 mr-2" />
-                  <span>Editions</span>
+                  <span>{t('navigation.editions')}</span>
                 </div>
               </Link>
             </div>
             <Link to="/trainers">
               <div className={`flex items-center px-4 py-2 text-sm ${location === "/trainers" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                 <Users className="w-5 h-5 mr-2" />
-                <span>Trainers</span>
+                <span>{t('navigation.trainers')}</span>
               </div>
             </Link>
             <Link to="/reports">
               <div className={`flex items-center px-4 py-2 text-sm ${location === "/reports" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                 <BarChart className="w-5 h-5 mr-2" />
-                <span>Reports</span>
+                <span>{t('navigation.reports')}</span>
               </div>
             </Link>
             <Link to="/settings">
               <div className={`flex items-center px-4 py-2 text-sm ${location === "/settings" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                 <Settings className="w-5 h-5 mr-2" />
-                <span>Settings</span>
+                <span>{t('navigation.settings')}</span>
               </div>
             </Link>
-            {/* Debug information removed */}
             {user && user.role === "admin" && (
               <Link to="/users">
                 <div className={`flex items-center px-4 py-2 text-sm ${location === "/users" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                   <Users className="w-5 h-5 mr-2" />
-                  <span>Users</span>
+                  <span>{t('navigation.users')}</span>
                 </div>
               </Link>
             )}
           </nav>
           
-          <div className="px-4 py-2 mt-6 text-sm font-medium text-neutral-500 uppercase">Current Editions</div>
+          <div className="px-4 py-2 mt-6 text-sm font-medium text-neutral-500 uppercase">{t('navigation.currentEditions')}</div>
           <div className="px-4 py-2">
             {isLoading ? (
               <>
@@ -490,8 +489,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 </div>
               ))
             ) : (
-              <div className="text-sm text-neutral-500">No editions available</div>
+              <div className="text-sm text-neutral-500">{t('navigation.noEditions')}</div>
             )}
+          </div>
+
+          {/* Language switcher in desktop sidebar */}
+          <div className="mt-6 px-4">
+            <div className="text-sm font-medium text-neutral-500 uppercase mb-2">{t('settings.language')}</div>
+            <LanguageSwitcher />
           </div>
         </aside>
 
@@ -506,19 +511,19 @@ export default function MainLayout({ children }: MainLayoutProps) {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 flex justify-around items-center py-2 px-4 z-10">
           <Link to="/" className={`flex flex-col items-center ${location === '/' ? 'text-primary' : 'text-neutral-500'}`}>
             <LayoutDashboard className="h-6 w-6" />
-            <span className="text-xs mt-1">Home</span>
+            <span className="text-xs mt-1">{t('navigation.home')}</span>
           </Link>
           <Link to="/tasks" className={`flex flex-col items-center ${location.startsWith('/tasks') ? 'text-primary' : 'text-neutral-500'}`}>
             <ListTodo className="h-6 w-6" />
-            <span className="text-xs mt-1">Tasks</span>
+            <span className="text-xs mt-1">{t('navigation.tasks')}</span>
           </Link>
           <Link to="/editions" className={`flex flex-col items-center ${location === '/editions' ? 'text-primary' : 'text-neutral-500'}`}>
             <GraduationCap className="h-6 w-6" />
-            <span className="text-xs mt-1">Editions</span>
+            <span className="text-xs mt-1">{t('navigation.editions')}</span>
           </Link>
           <Link to="/settings" className={`flex flex-col items-center ${location === '/settings' ? 'text-primary' : 'text-neutral-500'}`}>
             <Settings className="h-6 w-6" />
-            <span className="text-xs mt-1">Settings</span>
+            <span className="text-xs mt-1">{t('navigation.settings')}</span>
           </Link>
         </div>
       )}
