@@ -240,7 +240,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80">
               <div className="flex items-center justify-between px-4 py-2 border-b">
-                <h4 className="font-medium">Notifications</h4>
+                <h4 className="font-medium">{t('notifications.title')}</h4>
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -248,13 +248,13 @@ export default function MainLayout({ children }: MainLayoutProps) {
                   onClick={() => markAllAsRead()}
                   disabled={isMarkingAllAsRead || notifications.length === 0 || !notifications.some(n => !n.isRead)}
                 >
-                  Mark all as read
+                  {t('notifications.markAllAsRead')}
                 </Button>
               </div>
               <div className="max-h-[400px] overflow-y-auto py-2">
                 {isNotificationsLoading ? (
                   <div className="p-4 text-center text-sm text-neutral-500">
-                    Loading notifications...
+                    {t('notifications.loading')}
                   </div>
                 ) : notifications && notifications.length > 0 ? (
                   notifications.map((notification) => (
@@ -266,13 +266,13 @@ export default function MainLayout({ children }: MainLayoutProps) {
                         <div className="flex items-center justify-between">
                           <span className="font-medium text-sm flex items-center">
                             {notification.type === 'task_assigned' && (
-                              <Badge variant="success" className="mr-1 py-0 px-1 text-[10px]">Assigned to you</Badge>
+                              <Badge variant="success" className="mr-1 py-0 px-1 text-[10px]">{t('notifications.assigned')}</Badge>
                             )}
                             {notification.type === 'task_updated' && (
-                              <Badge variant="outline" className="mr-1 py-0 px-1 text-[10px]">Updated</Badge>
+                              <Badge variant="outline" className="mr-1 py-0 px-1 text-[10px]">{t('notifications.updated')}</Badge>
                             )}
                             {notification.type === 'due_date' && (
-                              <Badge variant="destructive" className="mr-1 py-0 px-1 text-[10px]">Due Soon</Badge>
+                              <Badge variant="destructive" className="mr-1 py-0 px-1 text-[10px]">{t('notifications.dueSoon')}</Badge>
                             )}
                             <span className="text-neutral-600">{notification.title}</span>
                           </span>
@@ -289,20 +289,20 @@ export default function MainLayout({ children }: MainLayoutProps) {
                               className="h-7 text-xs"
                               onClick={() => markAsRead(notification.id)}
                             >
-                              Mark as read
+                              {t('notifications.markAsRead')}
                             </Button>
                           )}
                           {notification.entityType === 'task' && notification.entityId && (
                             <Link to={`/tasks/${notification.entityId}`}>
                               <Button size="sm" variant="outline" className="h-7 text-xs">
-                                Go to task
+                                {t('notifications.goToTask')}
                               </Button>
                             </Link>
                           )}
                           {notification.entityType === 'edition' && notification.entityId && (
                             <Link to={`/editions?id=${notification.entityId}`}>
                               <Button size="sm" variant="outline" className="h-7 text-xs">
-                                View edition
+                                {t('notifications.viewEdition')}
                               </Button>
                             </Link>
                           )}
@@ -312,7 +312,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
                   ))
                 ) : (
                   <div className="p-4 text-center space-y-2">
-                    <p className="text-sm text-neutral-500">No notifications.</p>
+                    <p className="text-sm text-neutral-500">{t('notifications.empty')}</p>
                     {user?.role === 'admin' && (
                       <Button 
                         variant="outline" 
@@ -327,7 +327,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 )}
               </div>
               <div className="p-2 border-t text-center">
-                <Button variant="ghost" size="sm" className="w-full text-xs">View all notifications</Button>
+                <Button variant="ghost" size="sm" className="w-full text-xs">{t('notifications.viewAll')}</Button>
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
