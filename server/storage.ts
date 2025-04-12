@@ -9,11 +9,14 @@ import {
   InsertTrainer,
   AuditLog,
   InsertAuditLog,
+  Notification,
+  InsertNotification,
   users,
   trainers,
   editions,
   tasks,
-  auditLogs
+  auditLogs,
+  notifications
 } from "@shared/schema";
 import { add, format, parseISO, isBefore, subWeeks } from "date-fns";
 import { and, eq, count } from "drizzle-orm";
