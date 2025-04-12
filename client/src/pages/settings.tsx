@@ -352,7 +352,11 @@ export default function Settings() {
                   <Input 
                     id="fullName" 
                     placeholder="Your full name" 
-                    value={user?.fullName || ''} 
+                    value={fullName} 
+                    onChange={(e) => {
+                      setFullName(e.target.value);
+                      setIsAccountSettingsChanged(true);
+                    }}
                   />
                 </div>
                 
@@ -362,7 +366,11 @@ export default function Settings() {
                     id="email" 
                     type="email" 
                     placeholder="email@example.com" 
-                    value={user?.email || ''} 
+                    value={email} 
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setIsAccountSettingsChanged(true);
+                    }}
                   />
                 </div>
                 
@@ -382,7 +390,13 @@ export default function Settings() {
                 
                 <div className="space-y-2">
                   <Label htmlFor="language">Interface Language</Label>
-                  <Select defaultValue="en">
+                  <Select 
+                    value={language} 
+                    onValueChange={(value) => {
+                      setLanguage(value);
+                      setIsAccountSettingsChanged(true);
+                    }}
+                  >
                     <SelectTrigger id="language">
                       <SelectValue placeholder="Select language" />
                     </SelectTrigger>
@@ -398,7 +412,13 @@ export default function Settings() {
                 
                 <div className="space-y-2">
                   <Label htmlFor="timezone">Time Zone</Label>
-                  <Select defaultValue="utc">
+                  <Select 
+                    value={timezone} 
+                    onValueChange={(value) => {
+                      setTimezone(value);
+                      setIsAccountSettingsChanged(true);
+                    }}
+                  >
                     <SelectTrigger id="timezone">
                       <SelectValue placeholder="Select time zone" />
                     </SelectTrigger>
@@ -415,7 +435,14 @@ export default function Settings() {
                 </div>
                 
                 <div className="flex items-center space-x-2">
-                  <Switch id="theme-switch" />
+                  <Switch 
+                    id="theme-switch" 
+                    checked={useDarkTheme}
+                    onCheckedChange={(value) => {
+                      setUseDarkTheme(value);
+                      setIsAccountSettingsChanged(true);
+                    }}
+                  />
                   <Label htmlFor="theme-switch">Use Dark Theme</Label>
                 </div>
               </div>
@@ -541,7 +568,9 @@ export default function Settings() {
               </div>
               
               <div className="pt-4 border-t flex justify-end">
-                <Button>Save Notification Settings</Button>
+                <Button onClick={handleSaveNotificationSettings}>
+                  Save Notification Settings
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -565,25 +594,54 @@ export default function Settings() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="currentPassword">Current Password</Label>
-                    <Input id="currentPassword" type="password" />
+                    <Input 
+                      id="currentPassword" 
+                      type="password" 
+                      value={currentPassword}
+                      onChange={(e) => {
+                        setCurrentPassword(e.target.value);
+                        setIsSecuritySettingsChanged(true);
+                      }}
+                    />
                   </div>
                   
                   <div className="hidden md:block" />
                   
                   <div className="space-y-2">
                     <Label htmlFor="newPassword">New Password</Label>
-                    <Input id="newPassword" type="password" />
+                    <Input 
+                      id="newPassword" 
+                      type="password" 
+                      value={newPassword}
+                      onChange={(e) => {
+                        setNewPassword(e.target.value);
+                        setIsSecuritySettingsChanged(true);
+                      }}
+                    />
                     <p className="text-xs text-muted-foreground">Password must be at least 8 characters and include letters, numbers, and special characters</p>
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                    <Input id="confirmPassword" type="password" />
+                    <Input 
+                      id="confirmPassword" 
+                      type="password" 
+                      value={confirmPassword}
+                      onChange={(e) => {
+                        setConfirmPassword(e.target.value);
+                        setIsSecuritySettingsChanged(true);
+                      }}
+                    />
                   </div>
                 </div>
                 
                 <div className="pt-4 flex justify-end">
-                  <Button>Change Password</Button>
+                  <Button 
+                    onClick={handleChangePassword}
+                    disabled={!currentPassword || !newPassword || !confirmPassword}
+                  >
+                    Change Password
+                  </Button>
                 </div>
               </div>
               
@@ -596,7 +654,13 @@ export default function Settings() {
                       <Label>Session Timeout</Label>
                       <p className="text-sm text-muted-foreground">Automatically log out after period of inactivity</p>
                     </div>
-                    <Select defaultValue="120">
+                    <Select 
+                      value={sessionTimeout}
+                      onValueChange={(value) => {
+                        setSessionTimeout(value);
+                        setIsSecuritySettingsChanged(true);
+                      }}
+                    >
                       <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Select timeout" />
                       </SelectTrigger>
@@ -615,7 +679,13 @@ export default function Settings() {
                       <Label>Remember Me</Label>
                       <p className="text-sm text-muted-foreground">Stay logged in on this device</p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch 
+                      checked={rememberMe}
+                      onCheckedChange={(value) => {
+                        setRememberMe(value);
+                        setIsSecuritySettingsChanged(true);
+                      }}
+                    />
                   </div>
                 </div>
               </div>
@@ -649,8 +719,14 @@ export default function Settings() {
                   </div>
                 </div>
                 
-                <div className="flex justify-end">
+                <div className="flex justify-between">
                   <Button variant="outline">View Full Activity Log</Button>
+                  <Button 
+                    onClick={handleSaveSecuritySettings}
+                    disabled={!isSecuritySettingsChanged}
+                  >
+                    Save Security Settings
+                  </Button>
                 </div>
               </div>
               
