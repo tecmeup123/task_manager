@@ -78,7 +78,7 @@ export default function OnboardingWizard() {
           </Button>
 
           {/* Content area */}
-          <div className="p-4 sm:p-6">
+          <div className="p-3 sm:p-6 max-h-[70vh] overflow-y-auto">
             <AnimatePresence mode="wait">
               {currentStep === "welcome" && <WelcomeStep key="welcome" />}
               {currentStep === "dashboard" && <DashboardStep key="dashboard" />}
@@ -131,13 +131,13 @@ function WelcomeStep() {
       className="text-center"
     >
       <motion.div variants={itemVariants}>
-        <div className="flex justify-center mb-4">
+        <div className="flex justify-center mb-3 sm:mb-4">
           <motion.div
             initial={{ rotate: 0 }}
             animate={{ rotate: 360 }}
             transition={{ duration: 1.5, ease: "easeInOut" }}
           >
-            <Calendar className="h-20 w-20 text-primary" />
+            <Calendar className="h-16 w-16 sm:h-20 sm:w-20 text-primary" />
           </motion.div>
         </div>
       </motion.div>
@@ -305,8 +305,8 @@ function EditionsStep() {
       exit="exit"
     >
       <motion.div variants={itemVariants}>
-        <div className="flex justify-center mb-4">
-          <Layers className="h-16 w-16 text-primary" />
+        <div className="flex justify-center mb-3 sm:mb-4">
+          <Layers className="h-12 w-12 sm:h-16 sm:w-16 text-primary" />
         </div>
       </motion.div>
       
@@ -360,8 +360,8 @@ function SettingsStep() {
       exit="exit"
     >
       <motion.div variants={itemVariants}>
-        <div className="flex justify-center mb-4">
-          <Settings className="h-16 w-16 text-primary" />
+        <div className="flex justify-center mb-3 sm:mb-4">
+          <Settings className="h-12 w-12 sm:h-16 sm:w-16 text-primary" />
         </div>
       </motion.div>
       
@@ -420,7 +420,7 @@ function CompleteStep() {
     >
       <motion.div 
         variants={confettiVariants} 
-        className="relative h-40 mb-6"
+        className="relative h-32 sm:h-40 mb-4 sm:mb-6"
       >
         <div className="absolute inset-0 flex items-center justify-center">
           <motion.div
@@ -436,7 +436,7 @@ function CompleteStep() {
               }
             }}
           >
-            <div className="text-7xl">🎉</div>
+            <div className="text-5xl sm:text-7xl">🎉</div>
           </motion.div>
         </div>
         
