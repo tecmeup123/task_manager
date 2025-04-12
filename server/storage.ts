@@ -568,6 +568,10 @@ export class MemStorage implements IStorage {
       .filter(comment => comment.taskId === taskId)
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
+  
+  async getTaskComment(id: number): Promise<TaskComment | undefined> {
+    return this.taskComments.get(id);
+  }
 
   async createTaskComment(comment: InsertTaskComment): Promise<TaskComment> {
     const id = this.currentTaskCommentId++;
@@ -886,6 +890,182 @@ export class DatabaseStorage implements IStorage {
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000 // 24 hours
     });
+  }
+  
+  // Resource methods
+  async getTaskResources(taskId: number): Promise<Resource[]> {
+    const { db, eq, desc } = await import("./db");
+    return db.select()
+      .from(resources)
+      .where(eq(resources.taskId, taskId))
+      .orderBy(desc(resources.createdAt));
+  }
+
+  async getResource(id: number): Promise<Resource | undefined> {
+    const { db, eq } = await import("./db");
+    const [resource] = await db.select().from(resources).where(eq(resources.id, id));
+    return resource || undefined;
+  }
+
+  async createResource(resource: InsertResource): Promise<Resource> {
+    const { db } = await import("./db");
+    const [newResource] = await db.insert(resources).values(resource).returning();
+    return newResource;
+  }
+
+  async updateResource(id: number, resourceData: Partial<Resource>): Promise<Resource> {
+    const { db } = await import("./db");
+    const [updatedResource] = await db
+      .update(resources)
+      .set(resourceData)
+      .where(eq(resources.id, id))
+      .returning();
+    
+    if (!updatedResource) {
+      throw new Error(`Resource with id ${id} not found`);
+    }
+    
+    return updatedResource;
+  }
+
+  async deleteResource(id: number): Promise<boolean> {
+    const { db } = await import("./db");
+    const result = await db.delete(resources).where(eq(resources.id, id)).returning();
+    return result.length > 0;
+  }
+  
+  // Mention methods
+  async createMention(mention: InsertMention): Promise<Mention> {
+    const { db } = await import("./db");
+    const [newMention] = await db.insert(mentions).values({
+      ...mention,
+      isRead: false
+    }).returning();
+    
+    // Create a notification for the mentioned user
+    await this.createNotification({
+      userId: mention.userId,
+      type: "task_assigned",
+      title: "You were mentioned in a task",
+      message: `You were mentioned in task`,
+      entityType: "task",
+      entityId: mention.taskId,
+      actionUrl: `/tasks/${mention.taskId}`
+    });
+    
+    return newMention;
+  }
+
+  async getTaskMentions(taskId: number): Promise<Mention[]> {
+    const { db, eq, desc } = await import("./db");
+    return db.select()
+      .from(mentions)
+      .where(eq(mentions.taskId, taskId))
+      .orderBy(desc(mentions.createdAt));
+  }
+
+  async getUserMentions(userId: number, isRead?: boolean): Promise<Mention[]> {
+    const { db, eq, and, desc } = await import("./db");
+    
+    if (isRead !== undefined) {
+      return db.select().from(mentions)
+        .where(and(
+          eq(mentions.userId, userId),
+          eq(mentions.isRead, isRead)
+        ))
+        .orderBy(desc(mentions.createdAt));
+    } else {
+      return db.select().from(mentions)
+        .where(eq(mentions.userId, userId))
+        .orderBy(desc(mentions.createdAt));
+    }
+  }
+
+  async markMentionAsRead(id: number): Promise<Mention> {
+    const { db } = await import("./db");
+    const [updatedMention] = await db
+      .update(mentions)
+      .set({ isRead: true })
+      .where(eq(mentions.id, id))
+      .returning();
+    
+    if (!updatedMention) {
+      throw new Error(`Mention with id ${id} not found`);
+    }
+    
+    return updatedMention;
+  }
+  
+  // Task comment methods
+  async getTaskComments(taskId: number): Promise<TaskComment[]> {
+    const { db, eq, desc } = await import("./db");
+    return db.select()
+      .from(taskComments)
+      .where(eq(taskComments.taskId, taskId))
+      .orderBy(desc(taskComments.createdAt));
+  }
+  
+  async getTaskComment(id: number): Promise<TaskComment | undefined> {
+    const { db, eq } = await import("./db");
+    const [comment] = await db.select().from(taskComments).where(eq(taskComments.id, id));
+    return comment || undefined;
+  }
+
+  async createTaskComment(comment: InsertTaskComment): Promise<TaskComment> {
+    const { db, eq } = await import("./db");
+    const [newComment] = await db.insert(taskComments).values({
+      ...comment,
+      createdAt: new Date(),
+      updatedAt: null
+    }).returning();
+    
+    // Process mentions in the comment content
+    const mentionRegex = /@(\w+)/g;
+    const mentionedUsers = new Set();
+    let match;
+    
+    while ((match = mentionRegex.exec(comment.content)) !== null) {
+      const username = match[1];
+      const user = await this.getUserByUsername(username);
+      
+      if (user && !mentionedUsers.has(user.id)) {
+        mentionedUsers.add(user.id);
+        
+        // Create a mention
+        await this.createMention({
+          taskId: comment.taskId,
+          userId: user.id,
+          commentId: newComment.id,
+          createdBy: comment.userId
+        });
+      }
+    }
+    
+    return newComment;
+  }
+
+  async updateTaskComment(id: number, commentData: Partial<TaskComment>): Promise<TaskComment> {
+    const { db } = await import("./db");
+    const [updatedComment] = await db
+      .update(taskComments)
+      .set({
+        ...commentData,
+        updatedAt: new Date()
+      })
+      .where(eq(taskComments.id, id))
+      .returning();
+    
+    if (!updatedComment) {
+      throw new Error(`Comment with id ${id} not found`);
+    }
+    
+    return updatedComment;
+  }
+
+  async deleteTaskComment(id: number): Promise<boolean> {
+    const { db } = await import("./db");
+    const result = await db.delete(taskComments).where(eq(taskComments.id, id)).returning();
+    return result.length > 0;
   }
   
   async getUser(id: number): Promise<User | undefined> {
