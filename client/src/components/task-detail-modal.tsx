@@ -392,7 +392,7 @@ export default function TaskDetailModal({
                         {isLoadingUsers ? (
                           <div className="flex items-center justify-center p-2">
                             <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                            <span>Loading users...</span>
+                            <span>{t('common.loadingUsers')}</span>
                           </div>
                         ) : users && users.length > 0 ? (
                           users.map(user => (
@@ -401,7 +401,7 @@ export default function TaskDetailModal({
                             </SelectItem>
                           ))
                         ) : (
-                          <SelectItem value="no-users" disabled>No users available</SelectItem>
+                          <SelectItem value="no-users" disabled>{t('common.noUsersAvailable')}</SelectItem>
                         )}
                       </SelectContent>
                     </Select>
@@ -458,7 +458,7 @@ export default function TaskDetailModal({
                         {isLoadingUsers ? (
                           <div className="flex items-center justify-center p-2">
                             <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                            <span>Loading users...</span>
+                            <span>{t('common.loadingUsers')}</span>
                           </div>
                         ) : users && users.length > 0 ? (
                           users.map(user => (
@@ -467,7 +467,7 @@ export default function TaskDetailModal({
                             </SelectItem>
                           ))
                         ) : (
-                          <SelectItem value="no-users" disabled>No users available</SelectItem>
+                          <SelectItem value="no-users" disabled>{t('common.noUsersAvailable')}</SelectItem>
                         )}
                       </SelectContent>
                     </Select>
