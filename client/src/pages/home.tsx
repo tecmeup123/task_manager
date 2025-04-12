@@ -671,7 +671,8 @@ export default function Home() {
         </Card>
       </div>
 
-
+      {/* Add invisible spacing div at the bottom for mobile */}
+      <div className="h-12 md:hidden" />
     </div>
   );
 }

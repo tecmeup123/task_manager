@@ -482,7 +482,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 md:ml-48 p-4 md:p-6">
+        <main className="flex-1 md:ml-48 p-4 pb-20 md:p-6">
           {children}
         </main>
       </div>
