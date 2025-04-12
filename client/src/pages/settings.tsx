@@ -1059,6 +1059,11 @@ export default function Settings() {
                     onValueChange={(value) => {
                       setLanguage(value);
                       setIsAccountSettingsChanged(true);
+                      
+                      // Also change the active language immediately
+                      import('i18next').then(i18n => {
+                        i18n.default.changeLanguage(value);
+                      });
                     }}
                   >
                     <SelectTrigger id="language">
@@ -1066,10 +1071,10 @@ export default function Settings() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="es">Spanish</SelectItem>
-                      <SelectItem value="fr">French</SelectItem>
-                      <SelectItem value="de">German</SelectItem>
-                      <SelectItem value="pt">Portuguese</SelectItem>
+                      <SelectItem value="es">Spanish (Español)</SelectItem>
+                      <SelectItem value="fr">French (Français)</SelectItem>
+                      <SelectItem value="de">German (Deutsch)</SelectItem>
+                      <SelectItem value="pt">Portuguese (Português)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

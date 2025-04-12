@@ -14,6 +14,8 @@ import AuthPage from "@/pages/auth-page";
 import MainLayout from "@/components/layouts/main-layout";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
+// i18n
+import { useTranslation } from 'react-i18next';
 
 function Router() {
   return (
