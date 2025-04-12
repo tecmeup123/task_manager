@@ -11,7 +11,7 @@ import fs from "fs";
 
 // Configure multer for avatar uploads
 const avatarStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination: function (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) {
     const uploadDir = path.join(process.cwd(), "public/uploads/avatars");
     // Ensure the directory exists
     if (!fs.existsSync(uploadDir)) {
@@ -19,9 +19,9 @@ const avatarStorage = multer.diskStorage({
     }
     cb(null, uploadDir);
   },
-  filename: function (req, file, cb) {
+  filename: function (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) {
     // Generate a unique filename with timestamp and user ID
-    const userId = req.user?.id || "unknown";
+    const userId = (req as any).user?.id || "unknown";
     const timestamp = Date.now();
     const fileExt = path.extname(file.originalname).toLowerCase();
     cb(null, `avatar-${userId}-${timestamp}${fileExt}`);
@@ -34,7 +34,7 @@ const avatarUpload = multer({
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB max file size
   },
-  fileFilter: (req, file, cb) => {
+  fileFilter: (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
     // Accept only image files
     const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (allowedMimeTypes.includes(file.mimetype)) {
@@ -223,7 +223,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Upload avatar
-  app.post("/api/user/avatar", avatarUpload.single('avatar'), async (req, res) => {
+  app.post("/api/user/avatar", avatarUpload.single('avatar'), async (req: Request & { file?: Express.Multer.File }, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Authentication required" });
     }
@@ -246,7 +246,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         entityType: "user",
         entityId: req.user.id,
         action: "update",
-        previousState: { avatarUrl: req.user.avatarUrl || null },
+        previousState: { avatarUrl: (req.user as any).avatarUrl || null },
         newState: { avatarUrl },
         notes: "User avatar updated"
       });
