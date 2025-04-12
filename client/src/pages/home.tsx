@@ -343,7 +343,7 @@ export default function Home() {
             </div>
             <CardDescription>Tasks that are past their due date</CardDescription>
           </CardHeader>
-          <CardContent className={`transition-all duration-300 ease-in-out ${overdueCollapsed ? 'max-h-0 overflow-hidden p-0' : ''}`}>
+          <CardContent className={`transition-all duration-300 ease-in-out ${overdueCollapsed ? 'hidden' : ''}`}>
             {isLoading ? (
               <>
                 <Skeleton className="h-12 w-full mb-2" />
@@ -419,7 +419,7 @@ export default function Home() {
             </div>
             <CardDescription>Tasks due in the next 7 days</CardDescription>
           </CardHeader>
-          <CardContent className={`transition-all duration-300 ease-in-out ${upcomingCollapsed ? 'max-h-0 overflow-hidden p-0' : ''}`}>
+          <CardContent className={`transition-all duration-300 ease-in-out ${upcomingCollapsed ? 'hidden' : ''}`}>
             {isLoading ? (
               <>
                 <Skeleton className="h-12 w-full mb-2" />
