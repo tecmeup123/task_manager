@@ -309,7 +309,7 @@ export default function TaskDetailModal({
                             {field.value ? (
                               format(field.value, "PPP")
                             ) : (
-                              <span>Pick a date</span>
+                              <span>{t('tasks.pickDate')}</span>
                             )}
                           </Button>
                         </FormControl>
@@ -385,7 +385,7 @@ export default function TaskDetailModal({
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select owner" />
+                          <SelectValue placeholder={t('tasks.selectOwner')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -422,7 +422,7 @@ export default function TaskDetailModal({
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select assignment" />
+                          <SelectValue placeholder={t('tasks.selectAssignment')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -450,7 +450,7 @@ export default function TaskDetailModal({
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Assign to specific user" />
+                          <SelectValue placeholder={t('tasks.assignToSpecificUser')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -491,7 +491,7 @@ export default function TaskDetailModal({
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
+                          <SelectValue placeholder={t('tasks.selectStatus')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -518,7 +518,7 @@ export default function TaskDetailModal({
                     <Textarea 
                       {...field} 
                       value={field.value || ''}
-                      placeholder="Add notes about this task..."
+                      placeholder={t('tasks.addNotesPlaceholder')}
                       className="min-h-[100px]"
                     />
                   </FormControl>
