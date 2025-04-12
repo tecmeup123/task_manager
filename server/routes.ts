@@ -175,12 +175,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate edition data
       const editionData = insertEditionSchema.parse(formattedData);
       
-      // Create the edition
+      // Create the edition (set a temporary current week which we'll update later)
       const edition = await storage.createEdition(editionData);
       
       // Add template tasks to the new edition
       const { TASK_TEMPLATE } = await import("../client/src/lib/constants");
-      const { calculateTaskDueDate } = await import("../client/src/lib/utils");
+      const { calculateTaskDueDate, getCurrentWeekFromDate } = await import("../client/src/lib/utils");
       
       // Loop through all weeks and tasks in the template
       for (const [week, weekTasks] of Object.entries(TASK_TEMPLATE)) {
@@ -208,6 +208,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.createTask(task);
         }
       }
+      
+      // Calculate current week based on today's date relative to the start date
+      const today = new Date();
+      const currentWeek = getCurrentWeekFromDate(today, edition.startDate);
+      
+      // Update the edition with the correct current week
+      const updatedEdition = await storage.updateEdition(edition.id, { currentWeek });
+      
       
       res.status(201).json(edition);
     } catch (error) {

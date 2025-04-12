@@ -790,7 +790,7 @@ export class DatabaseStorage implements IStorage {
 
   async duplicateEdition(editionId: number, newEditionData: InsertEdition): Promise<Edition> {
     const { db } = await import("./db");
-    const { calculateTaskDueDate } = await import("../client/src/lib/utils");
+    const { calculateTaskDueDate, getCurrentWeekFromDate } = await import("../client/src/lib/utils");
     
     // First, get the source edition
     const sourceEdition = await this.getEdition(editionId);
@@ -798,11 +798,16 @@ export class DatabaseStorage implements IStorage {
       throw new Error(`Edition with id ${editionId} not found`);
     }
     
+    // Calculate the current week based on today's date relative to the start date
+    const today = new Date();
+    const newStartDate = new Date(newEditionData.startDate);
+    const currentWeek = getCurrentWeekFromDate(today, newStartDate);
+    
     // Create the new edition with default values
     const editionWithDefaults = {
       ...newEditionData,
       status: "active",
-      currentWeek: 1
+      currentWeek
     };
     
     // Use a transaction to ensure all operations succeed or fail together

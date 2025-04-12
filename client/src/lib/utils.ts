@@ -258,6 +258,35 @@ export function getCurrentWeek(edition: any): number {
 }
 
 /**
+ * Calculate the current week number based on today's date relative to the training start date
+ * @param currentDate The current date to use for calculation
+ * @param startDate The training start date
+ * @returns The current week number (-5 to 8)
+ */
+export function getCurrentWeekFromDate(currentDate: Date, startDate: Date): number {
+  const start = new Date(startDate);
+  const current = new Date(currentDate);
+  
+  // Calculate the difference in days
+  const diffTime = current.getTime() - start.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  
+  // Calculate the difference in weeks
+  const diffWeeks = Math.floor(diffDays / 7);
+  
+  // Before the start date: weeks -5 to -1
+  if (diffDays < 0) {
+    // If more than 5 weeks before start, default to week -5
+    const negativeWeek = Math.max(-5, Math.ceil(diffDays / 7));
+    return negativeWeek;
+  }
+  
+  // After the start date: weeks 1 to 8
+  const positiveWeek = Math.min(8, diffWeeks + 1);
+  return positiveWeek;
+}
+
+/**
  * Add business days to a date (skipping weekends)
  * @param date The starting date
  * @param days Number of business days to add
