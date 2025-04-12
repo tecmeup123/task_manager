@@ -3,12 +3,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useEffect } from 'react';
 
 export function LanguageSwitcher() {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   
   const changeLanguage = (value: string) => {
+    // Update i18n instance language
     i18n.changeLanguage(value);
     // Save the language preference to localStorage
     localStorage.setItem('i18nextLng', value);
+    // Force a reload to ensure all components update with the new language
+    // This is more reliable than trying to update every component manually
+    window.location.reload();
   };
   
   useEffect(() => {

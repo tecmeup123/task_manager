@@ -1071,6 +1071,8 @@ export default function Settings() {
                       i18n.changeLanguage(value);
                       // Store in localStorage
                       localStorage.setItem('i18nextLng', value);
+                      // Force a reload to ensure all components update with the new language
+                      window.location.reload();
                     }}
                   >
                     <SelectTrigger id="language">
