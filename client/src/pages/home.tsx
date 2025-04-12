@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,6 +33,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
+  const { t } = useTranslation();
   const { data: allEditions, isLoading: loadingEditions } = useQuery({
     queryKey: ["/api/editions"],
   });
@@ -214,19 +216,19 @@ export default function Home() {
   return (
     <div>
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-        <h2 className="text-2xl font-semibold mb-2 md:mb-0">Dashboard</h2>
+        <h2 className="text-2xl font-semibold mb-2 md:mb-0">{t('dashboard.title')}</h2>
 
         <div className="flex gap-2">
           <Link to="/tasks">
             <Button variant="default">
               <ListTodo className="mr-2 h-4 w-4" />
-              View Tasks
+              {t('tasks.title')}
             </Button>
           </Link>
           <Link to="/editions">
             <Button variant="outline">
               <Layers className="mr-2 h-4 w-4" />
-              Manage Editions
+              {t('editions.title')}
             </Button>
           </Link>
         </div>
@@ -240,7 +242,7 @@ export default function Home() {
               <Layers className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Ongoing Training Sessions</p>
+              <p className="text-sm font-medium text-muted-foreground">{t('dashboard.ongoingTrainingSessions')}</p>
               {isLoading ? (
                 <Skeleton className="h-7 w-16 mt-1" />
               ) : (
