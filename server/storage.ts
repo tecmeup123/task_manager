@@ -98,6 +98,18 @@ export interface IStorage {
   updateTaskComment(id: number, comment: Partial<TaskComment>): Promise<TaskComment>;
   deleteTaskComment(id: number): Promise<boolean>;
   
+  // Task reaction methods
+  addTaskReaction(reaction: InsertTaskReaction): Promise<TaskReaction>;
+  getTaskReactions(taskId: number): Promise<TaskReaction[]>;
+  getUserTaskReaction(taskId: number, userId: number, emoji: string): Promise<TaskReaction | undefined>;
+  removeTaskReaction(id: number): Promise<boolean>;
+  
+  // Comment reaction methods
+  addCommentReaction(reaction: InsertCommentReaction): Promise<CommentReaction>;
+  getCommentReactions(commentId: number): Promise<CommentReaction[]>;
+  getUserCommentReaction(commentId: number, userId: number, emoji: string): Promise<CommentReaction | undefined>;
+  removeCommentReaction(id: number): Promise<boolean>;
+  
   // Helper method to duplicate edition with tasks
   duplicateEdition(editionId: number, newEditionData: InsertEdition): Promise<Edition>;
 }
@@ -625,6 +637,72 @@ export class MemStorage implements IStorage {
 
   async deleteTaskComment(id: number): Promise<boolean> {
     return this.taskComments.delete(id);
+  }
+  
+  // Task Reaction Properties
+  private taskReactions: Map<number, TaskReaction>;
+  private currentTaskReactionId: number;
+  private commentReactions: Map<number, CommentReaction>;
+  private currentCommentReactionId: number;
+  
+  // Task Reaction methods
+  async addTaskReaction(reaction: InsertTaskReaction): Promise<TaskReaction> {
+    const id = this.currentTaskReactionId++;
+    const newReaction: TaskReaction = {
+      ...reaction,
+      id,
+      createdAt: new Date()
+    };
+    this.taskReactions.set(id, newReaction);
+    return newReaction;
+  }
+  
+  async getTaskReactions(taskId: number): Promise<TaskReaction[]> {
+    return Array.from(this.taskReactions.values())
+      .filter(reaction => reaction.taskId === taskId);
+  }
+  
+  async getUserTaskReaction(taskId: number, userId: number, emoji: string): Promise<TaskReaction | undefined> {
+    return Array.from(this.taskReactions.values())
+      .find(reaction => 
+        reaction.taskId === taskId && 
+        reaction.userId === userId &&
+        reaction.emoji === emoji
+      );
+  }
+  
+  async removeTaskReaction(id: number): Promise<boolean> {
+    return this.taskReactions.delete(id);
+  }
+  
+  // Comment Reaction methods
+  async addCommentReaction(reaction: InsertCommentReaction): Promise<CommentReaction> {
+    const id = this.currentCommentReactionId++;
+    const newReaction: CommentReaction = {
+      ...reaction,
+      id,
+      createdAt: new Date()
+    };
+    this.commentReactions.set(id, newReaction);
+    return newReaction;
+  }
+  
+  async getCommentReactions(commentId: number): Promise<CommentReaction[]> {
+    return Array.from(this.commentReactions.values())
+      .filter(reaction => reaction.commentId === commentId);
+  }
+  
+  async getUserCommentReaction(commentId: number, userId: number, emoji: string): Promise<CommentReaction | undefined> {
+    return Array.from(this.commentReactions.values())
+      .find(reaction => 
+        reaction.commentId === commentId && 
+        reaction.userId === userId &&
+        reaction.emoji === emoji
+      );
+  }
+  
+  async removeCommentReaction(id: number): Promise<boolean> {
+    return this.commentReactions.delete(id);
   }
 
   // Seed some initial data
