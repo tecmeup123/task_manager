@@ -9,7 +9,8 @@ import {
   Users,
   BarChart, 
   Settings,
-  BookOpen
+  BookOpen,
+  KeyRound
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/hooks/use-auth";
+import ChangePasswordForm from "@/components/change-password-form";
 import { 
   DropdownMenu,
   DropdownMenuContent,

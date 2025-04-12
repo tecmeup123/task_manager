@@ -5,6 +5,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { Redirect } from "wouter";
 import MainLayout from "@/components/layouts/main-layout";
+import CreateUserForm from "@/components/create-user-form";
 import { 
   Dialog, 
   DialogContent, 
@@ -39,7 +40,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, UserCog } from "lucide-react";
+import { Pencil, UserCog, UserPlus } from "lucide-react";
 import { Loader2 } from "lucide-react";
 
 // Types for users
@@ -56,6 +57,7 @@ export default function UsersPage() {
   const { toast } = useToast();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isCreateUserDialogOpen, setIsCreateUserDialogOpen] = useState(false);
   const [newRole, setNewRole] = useState<string>("");
 
   // Fetch all users
@@ -142,6 +144,15 @@ export default function UsersPage() {
                 <CardDescription>
                   Manage user roles and permissions
                 </CardDescription>
+              </div>
+              <div>
+                <Button 
+                  onClick={() => setIsCreateUserDialogOpen(true)}
+                  className="flex items-center"
+                >
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Create User
+                </Button>
               </div>
             </div>
           </CardHeader>
@@ -249,6 +260,12 @@ export default function UsersPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        
+        {/* Create User dialog */}
+        <CreateUserForm 
+          isOpen={isCreateUserDialogOpen} 
+          onClose={() => setIsCreateUserDialogOpen(false)} 
+        />
       </div>
     </MainLayout>
   );
