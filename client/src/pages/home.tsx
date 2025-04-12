@@ -32,13 +32,16 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
-  const { data: editions, isLoading: loadingEditions } = useQuery({
+  const { data: allEditions, isLoading: loadingEditions } = useQuery({
     queryKey: ["/api/editions"],
   });
 
+  // Filter out archived editions for the dashboard
+  const editions = allEditions ? allEditions.filter((edition: any) => !edition.archived) : [];
+  
   const currentEdition = editions?.[0];
   
-  // Set up an array to hold all edition IDs
+  // Set up an array to hold all active edition IDs (exclude archived)
   const editionIds = editions?.map((edition: any) => edition.id) || [];
   
   // Track the loading state of all task queries
