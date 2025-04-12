@@ -9,6 +9,7 @@ import Editions from "@/pages/editions";
 import Trainers from "@/pages/trainers";
 import Reports from "@/pages/reports";
 import Settings from "@/pages/settings";
+import Users from "@/pages/users";
 import AuthPage from "@/pages/auth-page";
 import MainLayout from "@/components/layouts/main-layout";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -75,6 +76,10 @@ function Router() {
             <Settings />
           </MainLayout>
         )} 
+      />
+      <ProtectedRoute 
+        path="/users" 
+        component={Users} 
       />
       
       {/* Fallback to 404 */}

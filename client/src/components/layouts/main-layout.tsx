@@ -214,6 +214,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
                   <span>Settings</span>
                 </div>
               </Link>
+              {user && user.role === "admin" && (
+                <Link to="/users">
+                  <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/users" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
+                    <Users className="w-5 h-5 mr-3" />
+                    <span>Users</span>
+                  </div>
+                </Link>
+              )}
             </div>
           </nav>
           
@@ -289,6 +297,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 <span>Settings</span>
               </div>
             </Link>
+            {user && user.role === "admin" && (
+              <Link to="/users">
+                <div className={`flex items-center px-4 py-2 text-sm ${location === "/users" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
+                  <Users className="w-5 h-5 mr-2" />
+                  <span>Users</span>
+                </div>
+              </Link>
+            )}
           </nav>
           
           <div className="px-4 py-2 mt-6 text-sm font-medium text-neutral-500 uppercase">Current Editions</div>
