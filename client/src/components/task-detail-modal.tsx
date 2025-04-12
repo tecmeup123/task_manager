@@ -147,18 +147,20 @@ export default function TaskDetailModal({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md md:max-w-2xl">
-        <DialogHeader className="flex flex-row items-center">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="mr-2 h-8 w-8 rounded-full p-0"
-          >
-            <span className="sr-only">Back</span>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <DialogTitle>Task Detail: {task?.taskCode || ""}</DialogTitle>
+        <DialogHeader className="flex flex-row items-center justify-start">
+          <div className="flex items-center">
+            <Button
+              type="button" 
+              variant="ghost" 
+              size="icon"
+              onClick={() => onClose()}
+              className="mr-2 h-8 w-8 p-0"
+              aria-label="Back"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <DialogTitle>Task Detail: {task?.taskCode || ""}</DialogTitle>
+          </div>
         </DialogHeader>
 
         <Form {...form}>
@@ -543,9 +545,15 @@ export default function TaskDetailModal({
               </div>
             </div>
 
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
+            <DialogFooter className="flex justify-between sm:justify-end space-x-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => onClose()}
+                className="flex items-center"
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Back
               </Button>
               <Button type="submit">Update Task</Button>
             </DialogFooter>
