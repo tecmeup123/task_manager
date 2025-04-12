@@ -684,13 +684,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Edition not found" });
       }
       
+      // Create audit log if user is authenticated
+      if (req.isAuthenticated()) {
+        await storage.createAuditLog({
+          userId: req.user.id,
+          entityType: "task",
+          entityId: 0, // Will be updated after task creation
+          action: "create",
+          previousState: null,
+          newState: taskData,
+          notes: `New task "${taskData.name}" created for edition ${edition.code}`
+        });
+      }
+      
       const task = await storage.createTask(taskData);
+      
+      // Create notification if task is assigned to a user
+      if (req.isAuthenticated() && task.assignedUserId) {
+        const editionCode = edition ? edition.code : "Unknown";
+        
+        // Create notification for the assigned user
+        await storage.createNotification({
+          userId: task.assignedUserId,
+          type: "task_assigned",
+          title: "New Task Assigned",
+          message: `You have been assigned to a new task "${task.name}" (${editionCode})`,
+          entityType: "task",
+          entityId: task.id,
+          actionUrl: `/tasks/${task.id}`,
+          metadata: { taskId: task.id, editionId: task.editionId }
+        });
+      }
+      
       res.status(201).json(task);
     } catch (error) {
       if (error instanceof ZodError) {
         const validationError = fromZodError(error);
         return res.status(400).json({ message: validationError.message });
       }
+      console.error("Error creating task:", error);
       res.status(500).json({ message: "Failed to create task" });
     }
   });
