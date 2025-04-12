@@ -139,6 +139,12 @@ export class MemStorage implements IStorage {
       role: insertUser.role || "viewer",
       forcePasswordChange: insertUser.forcePasswordChange !== undefined ? insertUser.forcePasswordChange : false,
       passwordChangeRequired: insertUser.passwordChangeRequired !== undefined ? insertUser.passwordChangeRequired : false,
+      approved: insertUser.approved !== undefined ? insertUser.approved : false,
+      avatarUrl: insertUser.avatarUrl || null,
+      avatarColor: insertUser.avatarColor || null,
+      avatarShape: insertUser.avatarShape || null,
+      avatarIcon: insertUser.avatarIcon || null,
+      avatarBackground: insertUser.avatarBackground || null,
       createdAt: new Date()  
     };
     this.users.set(id, user);
@@ -161,7 +167,10 @@ export class MemStorage implements IStorage {
     const auditLog: AuditLog = {
       ...log,
       id,
-      timestamp: new Date()
+      timestamp: new Date(),
+      previousState: log.previousState || null,
+      newState: log.newState || null,
+      notes: log.notes || null
     };
     this.auditLogs.set(id, auditLog);
     return auditLog;
@@ -195,8 +204,12 @@ export class MemStorage implements IStorage {
     const newTrainer: Trainer = { 
       ...trainer, 
       id, 
+      name: trainer.name,
+      email: trainer.email || null,
+      role: trainer.role || null,
+      department: trainer.department || null,
       status: trainer.status || "active",
-      createdAt: new Date()
+      createdAt: new Date() || null
     };
     this.trainers.set(id, newTrainer);
     return newTrainer;
@@ -287,7 +300,20 @@ export class MemStorage implements IStorage {
 
   async createTask(task: InsertTask): Promise<Task> {
     const id = this.currentTaskId++;
-    const newTask: Task = { ...task, id };
+    const newTask: Task = { 
+      ...task, 
+      id,
+      status: task.status || null,
+      notes: task.notes || null,
+      assignedUserId: task.assignedUserId || null,
+      duration: task.duration || null,
+      dueDate: task.dueDate || null,
+      links: task.links || null,
+      assignedTo: task.assignedTo || null,
+      owner: task.owner || null,
+      inflexible: task.inflexible || false,
+      completionDate: task.completionDate || null
+    };
     this.tasks.set(id, newTask);
     return newTask;
   }
@@ -341,6 +367,8 @@ export class MemStorage implements IStorage {
       ...notification,
       id,
       isRead: false,
+      actionUrl: notification.actionUrl || null,
+      metadata: notification.metadata || null,
       createdAt: new Date()
     };
     this.notifications.set(id, notificationRecord);
