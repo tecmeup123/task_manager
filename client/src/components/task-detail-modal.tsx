@@ -283,7 +283,7 @@ export default function TaskDetailModal({
                   <FormItem className="md:col-span-1">
                     <FormLabel>{t('tasks.duration')}</FormLabel>
                     <FormControl>
-                      <Input {...field} value={field.value || ''} placeholder="e.g. 0:15:00" />
+                      <Input {...field} value={field.value || ''} placeholder={t('tasks.durationPlaceholder')} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -454,7 +454,7 @@ export default function TaskDetailModal({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="none">None</SelectItem>
+                        <SelectItem value="none">{t('common.none')}</SelectItem>
                         {isLoadingUsers ? (
                           <div className="flex items-center justify-center p-2">
                             <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -546,7 +546,7 @@ export default function TaskDetailModal({
                       </span>
                     </div>
                     <div className="text-neutral-600 text-xs mt-1">
-                      By {activity.user}
+                      {t('tasks.by')} {activity.user}
                     </div>
                   </div>
                 ))}
