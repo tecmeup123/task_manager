@@ -297,6 +297,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 <span>Settings</span>
               </div>
             </Link>
+            {/* Debug information */}
+            {console.log("User data:", user)}
             {user && user.role === "admin" && (
               <Link to="/users">
                 <div className={`flex items-center px-4 py-2 text-sm ${location === "/users" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
