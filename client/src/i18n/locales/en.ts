@@ -22,6 +22,10 @@ const en = {
     'app.actions': 'Actions',
     'app.all': 'All',
     'app.details': 'Details',
+    'previous': 'Previous',
+    'next': 'Next',
+    'skip': 'Skip Onboarding',
+    'finish': 'Finish',
     
     // Navigation
     'nav.home': 'Home',
@@ -192,6 +196,58 @@ const en = {
     'role.editor': 'Editor',
     'role.viewer': 'Viewer',
     'role.trainer': 'Trainer',
+    
+    // Menu Items
+    'menu_dashboard': 'Dashboard',
+    'menu_tasks': 'Tasks',
+    'menu_editions': 'Editions',
+    'menu_settings': 'Settings',
+    
+    // Onboarding
+    'welcome_to_training_app': 'Welcome to Training Task Manager!',
+    'onboarding_welcome_description': 'Get ready to manage your training sessions more efficiently. Let\'s take a quick tour of the key features to help you get started.',
+    
+    'dashboard_overview': 'Dashboard Overview',
+    'dashboard_description': 'Your dashboard gives you a quick snapshot of your training status with overdue and upcoming tasks.',
+    'key_features': 'Key Features',
+    'dashboard_feature_1': 'See overdue tasks that need attention',
+    'dashboard_feature_2': 'Preview upcoming tasks to plan your work',
+    'dashboard_feature_3': 'Get a snapshot of active editions',
+    'dashboard_tip': 'Tip: Check your dashboard daily to stay on top of time-sensitive training tasks!',
+    
+    'tasks_management': 'Tasks Management',
+    'tasks_description': 'Manage all training tasks efficiently with our week-based organization system.',
+    'task_statuses': 'Task Statuses',
+    'not_started': 'Not Started',
+    'in_progress': 'In Progress',
+    'done': 'Done',
+    'task_types': 'Training Types',
+    'guided_learning_route': 'Guided Learning Route',
+    'self_learning_route': 'Self Learning Route',
+    'tasks_pro_tip': 'Pro Tip: Focus on tasks in the current week first, then tackle upcoming ones.',
+    
+    'editions_management': 'Editions Management',
+    'editions_description': 'Training editions follow the YYMM-[A/B] format and can be easily created, managed and duplicated.',
+    'edition_format': 'Edition Format',
+    'edition_format_description': 'We use a standardized format for all training editions:',
+    'for_customers': 'For Customers',
+    'for_partners': 'For Partners',
+    'edition_cloning': 'Edition Cloning',
+    'edition_cloning_description': 'You can quickly duplicate any edition to create a new one with all its tasks.',
+    
+    'customize_your_experience': 'Customize Your Experience',
+    'settings_description': 'Personalize your training management experience with these settings.',
+    'language': 'Language',
+    'language_setting_description': 'Change the application language to suit your preference',
+    'profile': 'Profile',
+    'profile_setting_description': 'Update your personal information and avatar',
+    'settings_security_tip': 'Remember to change your password regularly for better security!',
+    
+    'youre_all_set': 'You\'re All Set',
+    'onboarding_complete_description': 'You\'ve completed the onboarding tour and are ready to start managing your training sessions like a pro!',
+    'whats_next': 'What\'s Next?',
+    'onboarding_next_steps': 'Start by creating a new edition or explore tasks in existing editions.',
+    'onboarding_restart_hint': 'You can restart this tour anytime from the help menu if needed.'
   }
 };
 

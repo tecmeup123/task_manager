@@ -14,6 +14,8 @@ import AuthPage from "@/pages/auth-page";
 import MainLayout from "@/components/layouts/main-layout";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
+import { OnboardingProvider } from "@/hooks/use-onboarding";
+import OnboardingWizard from "@/components/onboarding/onboarding-wizard";
 // i18n
 import { useTranslation } from 'react-i18next';
 
@@ -94,8 +96,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Router />
-        <Toaster />
+        <OnboardingProvider>
+          <Router />
+          <OnboardingWizard />
+          <Toaster />
+        </OnboardingProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
