@@ -553,6 +553,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // TEMPORARY ENDPOINT: Make Telmo an admin (will be removed after use)
+  app.get("/api/make-telmo-admin", async (req, res) => {
+    try {
+      // Find Telmo's user account
+      const telmo = await storage.getUserByUsername("Telmo");
+      if (!telmo) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Update to admin role
+      const updatedUser = await storage.updateUser(telmo.id, { role: "admin" });
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: telmo.id,
+        entityType: "user",
+        entityId: telmo.id,
+        action: "update",
+        previousState: telmo,
+        newState: updatedUser,
+        notes: "Automatic role update to admin via temporary endpoint"
+      });
+      
+      // Force refresh the session data
+      if (req.user && req.user.id === telmo.id) {
+        req.logout((err) => {
+          if (err) {
+            console.error("Error during logout", err);
+            return res.status(500).json({ message: "Error refreshing session" });
+          }
+          
+          req.login(updatedUser, (err) => {
+            if (err) {
+              console.error("Error during re-login", err);
+              return res.status(500).json({ message: "Error refreshing session" });
+            }
+            
+            res.json({ message: "User role updated to admin", user: { ...updatedUser, password: undefined } });
+          });
+        });
+      } else {
+        res.json({ message: "User role updated to admin", user: { ...updatedUser, password: undefined } });
+      }
+    } catch (error) {
+      console.error("Error updating user role:", error);
+      res.status(500).json({ message: "Failed to update user role" });
+    }
+  });
+  
   // Get audit logs for a specific entity
   app.get("/api/audit-logs/:type/:id", requireEditor, async (req, res) => {
     try {
