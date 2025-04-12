@@ -979,14 +979,22 @@ export class DatabaseStorage implements IStorage {
     const { db } = await import("./db");
     const { and, eq, desc } = await import("drizzle-orm");
     
-    let query = db.select().from(notifications)
-      .where(eq(notifications.userId, userId));
-    
-    if (!includeRead) {
-      query = query.where(eq(notifications.isRead, false));
+    if (includeRead) {
+      // All notifications for the user
+      return db.select().from(notifications)
+        .where(eq(notifications.userId, userId))
+        .orderBy(desc(notifications.createdAt))
+        .limit(limit);
+    } else {
+      // Only unread notifications
+      return db.select().from(notifications)
+        .where(and(
+          eq(notifications.userId, userId),
+          eq(notifications.isRead, false)
+        ))
+        .orderBy(desc(notifications.createdAt))
+        .limit(limit);
     }
-    
-    return query.orderBy(desc(notifications.createdAt)).limit(limit);
   }
 
   async getNotification(id: number): Promise<Notification | undefined> {
@@ -1040,12 +1048,14 @@ export class DatabaseStorage implements IStorage {
 
   async getUnreadNotificationCount(userId: number): Promise<number> {
     const { db } = await import("./db");
-    const { eq, count } = await import("drizzle-orm");
+    const { eq, and, count } = await import("drizzle-orm");
     
     const [result] = await db.select({ count: count() })
       .from(notifications)
-      .where(eq(notifications.userId, userId))
-      .where(eq(notifications.isRead, false));
+      .where(and(
+        eq(notifications.userId, userId),
+        eq(notifications.isRead, false)
+      ));
     
     return result ? result.count : 0;
   }
