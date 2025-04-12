@@ -10,10 +10,12 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/use-auth";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useTranslation } from "react-i18next";
 
 export default function Settings() {
   const { toast } = useToast();
   const { user } = useAuth();
+  const { t, i18n } = useTranslation();
   const [isDashboardSettingsChanged, setIsDashboardSettingsChanged] = useState(false);
   const [isTaskSettingsChanged, setIsTaskSettingsChanged] = useState(false);
   const [isAccountSettingsChanged, setIsAccountSettingsChanged] = useState(false);
@@ -37,7 +39,10 @@ export default function Settings() {
   // Account settings
   const [fullName, setFullName] = useState(user?.fullName || '');
   const [email, setEmail] = useState(user?.email || '');
-  const [language, setLanguage] = useState("en");
+  const [language, setLanguage] = useState(() => {
+    // Initialize from localStorage if available
+    return localStorage.getItem('i18nextLng')?.split('-')[0] || "en";
+  });
   const [timezone, setTimezone] = useState("utc");
   
   // Notification settings
@@ -1062,9 +1067,10 @@ export default function Settings() {
                       setLanguage(value);
                       setIsAccountSettingsChanged(true);
                       
-                      // Also change the active language immediately
+                      // Also change the active language immediately and store in localStorage
                       import('i18next').then(i18n => {
                         i18n.default.changeLanguage(value);
+                        localStorage.setItem('i18nextLng', value);
                       });
                     }}
                   >
