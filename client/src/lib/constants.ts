@@ -85,7 +85,7 @@ export const TASK_TEMPLATE = {
   "Week -4": [
     {
       taskCode: "WM4T01",
-      name: "Send welcome to e-learning email",
+      name: "Update cohort and training tracking system",
       duration: "0:10:00",
       assignedTo: "Organizer",
       owner: "Miguel",
@@ -95,7 +95,7 @@ export const TASK_TEMPLATE = {
   "Week -3": [
     {
       taskCode: "WM3T01",
-      name: "Send welcome to e-learning email",
+      name: "Prepare welcome resources for participants",
       duration: "0:10:00",
       assignedTo: "Organizer",
       owner: "Miguel",
@@ -121,7 +121,7 @@ export const TASK_TEMPLATE = {
     },
     {
       taskCode: "WM2T02",
-      name: "Send mail announcing start of the e-learning stage with Q&A sessions",
+      name: "Announce start of the e-learning stage with Q&A sessions",
       duration: "0:10:00",
       assignedTo: "Organizer",
       owner: "Miguel",
@@ -129,7 +129,7 @@ export const TASK_TEMPLATE = {
     },
     {
       taskCode: "WM2T03",
-      name: "Send Elearning Q&A Session invites",
+      name: "Schedule Elearning Q&A Sessions",
       duration: "0:10:00",
       assignedTo: "Organizer",
       owner: "Miguel",
@@ -139,7 +139,7 @@ export const TASK_TEMPLATE = {
   "Week -1": [
     {
       taskCode: "WM1T01",
-      name: "Update mailing list (names; groups information; schedule; edition)",
+      name: "Update participant list (names; groups information; schedule; edition)",
       duration: "0:10:00",
       assignedTo: "Organizer",
       owner: "Miguel",
@@ -183,7 +183,7 @@ export const TASK_TEMPLATE = {
     },
     {
       taskCode: "W2T02",
-      name: "Send reminder about assignments due",
+      name: "Post reminder about assignments due",
       duration: "0:10:00",
       assignedTo: "Organizer",
       owner: "Miguel",
