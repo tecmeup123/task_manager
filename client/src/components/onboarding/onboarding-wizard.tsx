@@ -65,7 +65,7 @@ export default function OnboardingWizard() {
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           transition={{ type: "spring", damping: 25 }}
-          className="relative w-full max-w-3xl bg-white rounded-xl shadow-xl"
+          className="relative w-[95%] sm:w-full max-w-3xl bg-white rounded-xl shadow-xl overflow-hidden"
         >
           {/* Close button */}
           <Button 
@@ -78,7 +78,7 @@ export default function OnboardingWizard() {
           </Button>
 
           {/* Content area */}
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <AnimatePresence mode="wait">
               {currentStep === "welcome" && <WelcomeStep key="welcome" />}
               {currentStep === "dashboard" && <DashboardStep key="dashboard" />}
@@ -89,25 +89,25 @@ export default function OnboardingWizard() {
             </AnimatePresence>
           </div>
 
-          {/* Navigation buttons */}
-          <div className="p-4 border-t border-gray-200 flex justify-between items-center">
-            <div>
+          {/* Navigation buttons - mobile optimized */}
+          <div className="p-3 sm:p-4 border-t border-gray-200 flex flex-wrap sm:flex-nowrap justify-between items-center">
+            <div className="mb-2 sm:mb-0">
               {currentStep !== "welcome" && currentStep !== "complete" && (
-                <Button variant="outline" onClick={prevStep}>
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  {t("previous")}
+                <Button variant="outline" size="sm" className="sm:size-default" onClick={prevStep}>
+                  <ArrowLeft className="mr-1 h-4 w-4" />
+                  <span className="sm:inline">{t("previous")}</span>
                 </Button>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 ml-auto">
               {currentStep !== "complete" && (
-                <Button variant="ghost" onClick={skipOnboarding}>
-                  {t("skip")}
+                <Button variant="ghost" size="sm" className="sm:size-default" onClick={skipOnboarding}>
+                  <span className="sm:inline">{t("skip")}</span>
                 </Button>
               )}
-              <Button onClick={nextStep}>
-                {currentStep === "complete" ? t("finish") : t("next")}
-                <ArrowRight className="ml-2 h-4 w-4" />
+              <Button size="sm" className="sm:size-default" onClick={nextStep}>
+                <span className="mr-1 sm:mr-2">{currentStep === "complete" ? t("finish") : t("next")}</span>
+                <ArrowRight className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -150,19 +150,19 @@ function WelcomeStep() {
         {t("onboarding_welcome_description")}
       </motion.p>
       
-      <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
         {['dashboard', 'tasks', 'editions', 'settings'].map((step, i) => (
-          <Card key={step} className="p-4 text-center hover:shadow-md transition-shadow">
+          <Card key={step} className="p-2 sm:p-4 text-center hover:shadow-md transition-shadow">
             <motion.div 
               whileHover={{ y: -5 }}
-              className="flex justify-center mb-2"
+              className="flex justify-center mb-1 sm:mb-2"
             >
-              {step === 'dashboard' && <Zap className="h-8 w-8 text-primary" />}
-              {step === 'tasks' && <ListChecks className="h-8 w-8 text-primary" />}
-              {step === 'editions' && <Layers className="h-8 w-8 text-primary" />}
-              {step === 'settings' && <Settings className="h-8 w-8 text-primary" />}
+              {step === 'dashboard' && <Zap className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />}
+              {step === 'tasks' && <ListChecks className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />}
+              {step === 'editions' && <Layers className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />}
+              {step === 'settings' && <Settings className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />}
             </motion.div>
-            <div className="font-medium">{t(`menu_${step}`)}</div>
+            <div className="font-medium text-sm sm:text-base">{t(`menu_${step}`)}</div>
           </Card>
         ))}
       </motion.div>
@@ -208,11 +208,11 @@ function DashboardStep() {
       
       <motion.div 
         variants={itemVariants}
-        className="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg"
+        className="bg-blue-50 border border-blue-200 text-blue-800 p-3 sm:p-4 rounded-lg text-sm sm:text-base"
       >
         <p className="flex items-center">
-          <span className="mr-2">💡</span>
-          {t("dashboard_tip")}
+          <span className="mr-2 flex-shrink-0">💡</span>
+          <span>{t("dashboard_tip")}</span>
         </p>
       </motion.div>
     </motion.div>
@@ -246,35 +246,35 @@ function TasksStep() {
         </p>
       </motion.div>
       
-      <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <Card className="p-4 border-l-4 border-blue-500">
-          <h3 className="font-semibold mb-2">{t("task_statuses")}</h3>
-          <ul className="space-y-2">
+      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
+        <Card className="p-3 sm:p-4 border-l-4 border-blue-500">
+          <h3 className="font-semibold text-sm sm:text-base mb-2">{t("task_statuses")}</h3>
+          <ul className="space-y-1 sm:space-y-2 text-sm sm:text-base">
             <li className="flex items-center">
-              <span className="h-3 w-3 rounded-full bg-gray-300 mr-2"></span>
+              <span className="h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-gray-300 mr-2"></span>
               <span>{t("not_started")}</span>
             </li>
             <li className="flex items-center">
-              <span className="h-3 w-3 rounded-full bg-yellow-400 mr-2"></span>
+              <span className="h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-yellow-400 mr-2"></span>
               <span>{t("in_progress")}</span>
             </li>
             <li className="flex items-center">
-              <span className="h-3 w-3 rounded-full bg-green-500 mr-2"></span>
+              <span className="h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-green-500 mr-2"></span>
               <span>{t("done")}</span>
             </li>
           </ul>
         </Card>
         
-        <Card className="p-4 border-l-4 border-purple-500">
-          <h3 className="font-semibold mb-2">{t("task_types")}</h3>
-          <ul className="space-y-2">
+        <Card className="p-3 sm:p-4 border-l-4 border-purple-500">
+          <h3 className="font-semibold text-sm sm:text-base mb-2">{t("task_types")}</h3>
+          <ul className="space-y-1 sm:space-y-2 text-sm sm:text-base">
             <li className="flex items-center">
-              <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded mr-2">GLR</span>
-              <span>{t("guided_learning_route")}</span>
+              <span className="text-xs px-1 py-0.5 sm:px-2 sm:py-1 bg-blue-100 text-blue-800 rounded mr-2">GLR</span>
+              <span className="text-xs sm:text-sm">{t("guided_learning_route")}</span>
             </li>
             <li className="flex items-center">
-              <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded mr-2">SLR</span>
-              <span>{t("self_learning_route")}</span>
+              <span className="text-xs px-1 py-0.5 sm:px-2 sm:py-1 bg-green-100 text-green-800 rounded mr-2">SLR</span>
+              <span className="text-xs sm:text-sm">{t("self_learning_route")}</span>
             </li>
           </ul>
         </Card>
@@ -282,11 +282,11 @@ function TasksStep() {
       
       <motion.div 
         variants={itemVariants}
-        className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-lg"
+        className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-3 sm:p-4 rounded-lg text-sm sm:text-base"
       >
         <p className="flex items-center">
-          <span className="mr-2">⚡</span>
-          {t("tasks_pro_tip")}
+          <span className="mr-2 flex-shrink-0">⚡</span>
+          <span>{t("tasks_pro_tip")}</span>
         </p>
       </motion.div>
     </motion.div>
@@ -320,18 +320,18 @@ function EditionsStep() {
         </p>
       </motion.div>
       
-      <motion.div variants={itemVariants} className="mb-6">
-        <Card className="p-4 mb-4">
-          <h3 className="font-semibold mb-2">{t("edition_format")}</h3>
-          <p className="text-sm text-gray-600 mb-2">{t("edition_format_description")}</p>
+      <motion.div variants={itemVariants} className="mb-4 sm:mb-6">
+        <Card className="p-3 sm:p-4 mb-3 sm:mb-4">
+          <h3 className="font-semibold text-sm sm:text-base mb-1 sm:mb-2">{t("edition_format")}</h3>
+          <p className="text-xs sm:text-sm text-gray-600 mb-2">{t("edition_format_description")}</p>
           
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-100 p-3 rounded text-center">
-              <div className="font-mono text-lg">YYMM-A</div>
+          <div className="grid grid-cols-2 gap-2 sm:gap-4">
+            <div className="bg-gray-100 p-2 sm:p-3 rounded text-center">
+              <div className="font-mono text-base sm:text-lg">YYMM-A</div>
               <div className="text-xs text-gray-500">{t("for_customers")}</div>
             </div>
-            <div className="bg-gray-100 p-3 rounded text-center">
-              <div className="font-mono text-lg">YYMM-B</div>
+            <div className="bg-gray-100 p-2 sm:p-3 rounded text-center">
+              <div className="font-mono text-base sm:text-lg">YYMM-B</div>
               <div className="text-xs text-gray-500">{t("for_partners")}</div>
             </div>
           </div>
@@ -339,9 +339,9 @@ function EditionsStep() {
       </motion.div>
       
       <motion.div variants={itemVariants}>
-        <div className="bg-green-50 border border-green-200 text-green-800 p-4 rounded-lg">
-          <h3 className="font-semibold mb-2">{t("edition_cloning")}</h3>
-          <p>{t("edition_cloning_description")}</p>
+        <div className="bg-green-50 border border-green-200 text-green-800 p-3 sm:p-4 rounded-lg">
+          <h3 className="font-semibold text-sm sm:text-base mb-1 sm:mb-2">{t("edition_cloning")}</h3>
+          <p className="text-sm sm:text-base">{t("edition_cloning_description")}</p>
         </div>
       </motion.div>
     </motion.div>
@@ -375,19 +375,19 @@ function SettingsStep() {
         </p>
       </motion.div>
       
-      <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <Card className="p-4 flex flex-col items-center">
-          <div className="mb-2 text-xl">🌐</div>
-          <h3 className="font-semibold mb-1">{t("language")}</h3>
-          <p className="text-sm text-center text-gray-600">
+      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
+        <Card className="p-3 sm:p-4 flex flex-col items-center">
+          <div className="mb-1 sm:mb-2 text-lg sm:text-xl">🌐</div>
+          <h3 className="font-semibold text-sm sm:text-base mb-1">{t("language")}</h3>
+          <p className="text-xs sm:text-sm text-center text-gray-600">
             {t("language_setting_description")}
           </p>
         </Card>
         
-        <Card className="p-4 flex flex-col items-center">
-          <div className="mb-2 text-xl">👤</div>
-          <h3 className="font-semibold mb-1">{t("profile")}</h3>
-          <p className="text-sm text-center text-gray-600">
+        <Card className="p-3 sm:p-4 flex flex-col items-center">
+          <div className="mb-1 sm:mb-2 text-lg sm:text-xl">👤</div>
+          <h3 className="font-semibold text-sm sm:text-base mb-1">{t("profile")}</h3>
+          <p className="text-xs sm:text-sm text-center text-gray-600">
             {t("profile_setting_description")}
           </p>
         </Card>
