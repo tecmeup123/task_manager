@@ -12,7 +12,17 @@ import {
   isDateUpcoming,
   getRelativeDateDescription
 } from "@/lib/utils";
-import { ListTodo, Calendar, Layers, CheckCircle, Clock, AlertTriangle, ChevronRight } from "lucide-react";
+import { 
+  ListTodo, 
+  Calendar, 
+  Layers, 
+  CheckCircle, 
+  Clock, 
+  AlertTriangle, 
+  ChevronRight,
+  ChevronDown,
+  ChevronUp
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
@@ -124,6 +134,10 @@ export default function Home() {
   
   // Loading states
   const isLoading = loadingEditions || tasksLoading;
+  
+  // State for collapsible sections
+  const [overdueCollapsed, setOverdueCollapsed] = useState(false);
+  const [upcomingCollapsed, setUpcomingCollapsed] = useState(false);
 
   return (
     <div>
@@ -313,13 +327,23 @@ export default function Home() {
                 <AlertTriangle className="mr-2 h-5 w-5 text-red-500" />
                 Overdue Tasks
               </CardTitle>
-              {!isLoading && overdueTasks.length > 0 && (
-                <Badge variant="destructive">{overdueTasks.length}</Badge>
-              )}
+              <div className="flex items-center gap-2">
+                {!isLoading && overdueTasks.length > 0 && (
+                  <Badge variant="destructive">{overdueTasks.length}</Badge>
+                )}
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  onClick={() => setOverdueCollapsed(!overdueCollapsed)}
+                >
+                  {overdueCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                </Button>
+              </div>
             </div>
             <CardDescription>Tasks that are past their due date</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className={`transition-all duration-300 ease-in-out ${overdueCollapsed ? 'max-h-0 overflow-hidden p-0' : ''}`}>
             {isLoading ? (
               <>
                 <Skeleton className="h-12 w-full mb-2" />
@@ -379,13 +403,23 @@ export default function Home() {
                 <Clock className="mr-2 h-5 w-5 text-amber-500" />
                 Upcoming Tasks
               </CardTitle>
-              {!isLoading && upcomingTasks.length > 0 && (
-                <Badge variant="secondary">{upcomingTasks.length}</Badge>
-              )}
+              <div className="flex items-center gap-2">
+                {!isLoading && upcomingTasks.length > 0 && (
+                  <Badge variant="secondary">{upcomingTasks.length}</Badge>
+                )}
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  onClick={() => setUpcomingCollapsed(!upcomingCollapsed)}
+                >
+                  {upcomingCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                </Button>
+              </div>
             </div>
             <CardDescription>Tasks due in the next 7 days</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className={`transition-all duration-300 ease-in-out ${upcomingCollapsed ? 'max-h-0 overflow-hidden p-0' : ''}`}>
             {isLoading ? (
               <>
                 <Skeleton className="h-12 w-full mb-2" />
