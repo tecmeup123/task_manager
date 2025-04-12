@@ -135,9 +135,9 @@ export default function Home() {
   // Loading states
   const isLoading = loadingEditions || tasksLoading;
   
-  // State for collapsible sections
-  const [overdueCollapsed, setOverdueCollapsed] = useState(false);
-  const [upcomingCollapsed, setUpcomingCollapsed] = useState(false);
+  // State for collapsible sections - collapsed by default
+  const [overdueCollapsed, setOverdueCollapsed] = useState(true);
+  const [upcomingCollapsed, setUpcomingCollapsed] = useState(true);
 
   return (
     <div>
