@@ -144,11 +144,11 @@ export default function TaskDetailModal({
                     variant={
                       task?.status === "Done" ? "success" : 
                       task?.status === "In Progress" ? "default" : 
-                      "outline"
+                      task?.status === "Not Started" ? "outline" :
+                      task?.status === "Blocked" ? "destructive" :
+                      "secondary"
                     }
-                    className={
-                      task?.status === "In Progress" ? "bg-yellow-100 hover:bg-yellow-200 text-yellow-800 border-yellow-200" : ""
-                    }
+                    className="text-white"
                   >
                     {task?.status || "Not Started"}
                   </Badge>
