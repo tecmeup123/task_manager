@@ -164,11 +164,16 @@ export default function TaskDetailModal({
       <DialogContent className="sm:max-w-md md:max-w-2xl">
         <DialogHeader className="flex flex-row items-center justify-start">
           <button 
-            onClick={() => {
-              onClose();
-              setLocation(redirectPath);
-            }} 
             className="mr-3 hover:bg-neutral-100 p-1 rounded-full transition-colors"
+            onClick={() => {
+              console.log("Back button clicked, redirecting to:", redirectPath);
+              onClose();
+              // Use a slight delay to ensure modal closes before navigation
+              setTimeout(() => {
+                window.history.pushState({}, '', redirectPath);
+                setLocation(redirectPath);
+              }, 50);
+            }}
             aria-label="Back to dashboard"
           >
             <ChevronLeft className="h-6 w-6" />
@@ -572,8 +577,13 @@ export default function TaskDetailModal({
                 type="button" 
                 variant="outline" 
                 onClick={() => {
+                  console.log("Back to list button clicked, redirecting to:", redirectPath);
                   onClose();
-                  setLocation(redirectPath);
+                  // Use a slight delay to ensure modal closes before navigation
+                  setTimeout(() => {
+                    window.history.pushState({}, '', redirectPath);
+                    setLocation(redirectPath);
+                  }, 50);
                 }}
                 className="flex items-center"
               >
