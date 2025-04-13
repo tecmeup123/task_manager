@@ -426,6 +426,7 @@ export default function Tasks() {
           setSelectedTask(null);
         }}
         onSave={handleTaskSave}
+        redirectPath="/"
       />
       
       {/* Add invisible spacing div at the bottom for mobile */}
