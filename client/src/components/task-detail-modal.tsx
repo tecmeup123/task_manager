@@ -156,8 +156,10 @@ export default function TaskDetailModal({
       open={isOpen} 
       onOpenChange={(open) => {
         if (!open) {
-          console.log("Dialog close triggered");
           onClose();
+          if (redirectPath) {
+            setLocation(redirectPath);
+          }
         }
       }}
     >
@@ -166,13 +168,8 @@ export default function TaskDetailModal({
           <button 
             className="mr-3 hover:bg-neutral-100 p-1 rounded-full transition-colors"
             onClick={() => {
-              console.log("Back button clicked, redirecting to:", redirectPath);
               onClose();
-              // Use a slight delay to ensure modal closes before navigation
-              setTimeout(() => {
-                window.history.pushState({}, '', redirectPath);
-                setLocation(redirectPath);
-              }, 50);
+              setLocation(redirectPath || '/');
             }}
             aria-label="Back to dashboard"
           >
@@ -577,13 +574,8 @@ export default function TaskDetailModal({
                 type="button" 
                 variant="outline" 
                 onClick={() => {
-                  console.log("Back to list button clicked, redirecting to:", redirectPath);
                   onClose();
-                  // Use a slight delay to ensure modal closes before navigation
-                  setTimeout(() => {
-                    window.history.pushState({}, '', redirectPath);
-                    setLocation(redirectPath);
-                  }, 50);
+                  setLocation(redirectPath || '/');
                 }}
                 className="flex items-center"
               >
