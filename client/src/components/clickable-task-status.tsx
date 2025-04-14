@@ -19,12 +19,17 @@ export default function ClickableTaskStatus({ task, className }: ClickableTaskSt
   const statusColors = getStatusColor(task.status);
 
   // Function to get the next status in the cycle
-  const getNextStatus = (currentStatus: string): string => {
+  const getNextStatus = (currentStatus: string): string | null => {
     const statuses = ["Not Started", "In Progress", "Done"];
     const currentIndex = statuses.indexOf(currentStatus);
     
-    // If the current status is not in our cycle list or it's the last one, go back to the beginning
-    if (currentIndex === -1 || currentIndex === statuses.length - 1) {
+    // If current status is "Done", return null to indicate we can't go further
+    if (currentStatus === "Done") {
+      return null;
+    }
+    
+    // If the current status is not in our cycle list, start with "Not Started"
+    if (currentIndex === -1) {
       return statuses[0];
     }
     
@@ -38,11 +43,21 @@ export default function ClickableTaskStatus({ task, className }: ClickableTaskSt
     
     if (isUpdating) return; // Prevent double-clicking
 
+    // Check if the task is already completed
+    if (task.status === "Done") {
+      toast({
+        title: "Task already completed",
+        description: "This task is already marked as done. If needed, please create a new task.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Get the next status in the cycle
     const nextStatus = getNextStatus(task.status);
     
-    // If the status is the same, do nothing
-    if (nextStatus === task.status) return;
+    // If no next status, do nothing (this should not happen with our new logic)
+    if (!nextStatus) return;
     
     try {
       setIsUpdating(true);
@@ -88,10 +103,22 @@ export default function ClickableTaskStatus({ task, className }: ClickableTaskSt
     return false;
   };
 
+  // Determine if task is completed
+  const isCompleted = task.status === "Done";
+  
   return (
     <div className="inline-block" onClick={handleBadgeClick}>
       <Badge
-        className={`${statusColors.bg} ${statusColors.text} font-normal cursor-pointer transition-all duration-200 hover:scale-105 ${className}`}
+        className={`
+          ${statusColors.bg} 
+          ${statusColors.text} 
+          font-normal 
+          ${isCompleted ? 'cursor-not-allowed opacity-90' : 'cursor-pointer hover:scale-105'} 
+          transition-all 
+          duration-200 
+          ${className}
+        `}
+        title={isCompleted ? "This task is already completed" : "Click to change status"}
       >
         {isUpdating ? "Updating..." : task.status}
       </Badge>
