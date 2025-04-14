@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "wouter";
 import { User } from "@shared/schema";
+import { ActivityHistoryItem, AuditLogResponse, parseTimestamp } from "@/lib/types";
 import {
   Dialog,
   DialogContent,
@@ -76,11 +77,11 @@ export default function TaskDetailModal({
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
   // Use a ref to store activity history for the Task Activity section
-  const [activityHistory, setActivityHistory] = useState<any[]>([
+  const [activityHistory, setActivityHistory] = useState<ActivityHistoryItem[]>([
     {
       action: "Task created",
-      timestamp: task?.createdAt ? new Date(task.createdAt) : new Date(),
-      user: "System"
+      timestamp: parseTimestamp(task?.createdAt) || new Date(),
+      username: "System"
     }
   ]);
   
@@ -97,8 +98,8 @@ export default function TaskDetailModal({
       // Reset to default state when task changes
       setActivityHistory([{
         action: "Task created",
-        timestamp: task?.createdAt ? new Date(task.createdAt) : new Date(),
-        user: "System"
+        timestamp: parseTimestamp(task?.createdAt) || new Date(),
+        username: "System"
       }]);
     }
   }, [task?.id, task?.createdAt]);
