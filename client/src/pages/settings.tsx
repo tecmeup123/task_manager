@@ -1022,9 +1022,10 @@ export default function Settings() {
             <TabsTrigger value="notifications" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.notifications')}</TabsTrigger>
             <TabsTrigger value="security" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.security')}</TabsTrigger>
             <TabsTrigger value="data" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.data')}</TabsTrigger>
-            {user?.role === 'admin' && (
-              <TabsTrigger value="users" className="text-xs px-1 py-1 md:text-sm md:px-3">User Management</TabsTrigger>
-            )}
+            <TabsTrigger value="users" className="text-xs px-1 py-1 md:text-sm md:px-3">
+              <Users className="h-3 w-3 mr-1 md:h-4 md:w-4" />
+              User Management
+            </TabsTrigger>
           </TabsList>
         </div>
         
@@ -1793,7 +1794,6 @@ export default function Settings() {
           </Card>
         </TabsContent>
 
-        {user?.role === 'admin' && (
         <TabsContent value="users" className="space-y-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -1904,7 +1904,6 @@ export default function Settings() {
             </CardContent>
           </Card>
         </TabsContent>
-        )}
       </Tabs>
       
       {/* Edit User Dialog */}
