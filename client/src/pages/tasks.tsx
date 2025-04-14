@@ -512,8 +512,13 @@ export default function Tasks() {
           // Clean up the URL to avoid reopening modal on page refresh,
           // but keep the editionId param to preserve context
           if (editionId) {
-            // Use setLocation with replace to avoid adding history entries
-            setLocation(`/tasks?editionId=${editionId}`);
+            // Use setLocation to update the URL without the taskId
+            // This preserves the editionId for context
+            window.history.replaceState(
+              { state: { fromModal: true } }, 
+              '', 
+              `/tasks?editionId=${editionId}`
+            );
           }
         }}
         onSave={handleTaskSave}
