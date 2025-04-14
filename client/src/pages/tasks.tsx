@@ -28,11 +28,23 @@ import CreateEditionForm from "@/components/create-edition-form";
 import { formatDate, getTasksByWeek, getWeekStatus, sortWeeks, getAllWeeks } from "@/lib/utils";
 import { WEEK_OPTIONS, TRAINING_TYPE_OPTIONS, TASK_STATUS_OPTIONS } from "@/lib/constants";
 
+// Helper function to parse query parameters
+function useQueryParams() {
+  const [location] = useLocation();
+  return new URLSearchParams(location.split('?')[1] || '');
+}
+
 export default function Tasks() {
   const params = useParams();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const editionId = params.editionId ? parseInt(params.editionId) : null;
+  const queryParams = useQueryParams();
+  const urlEditionId = queryParams.get('editionId');
+  const urlTaskId = queryParams.get('taskId');
+  
+  // Priority: URL editionId parameter > route editionId parameter
+  const editionId = urlEditionId ? parseInt(urlEditionId) : 
+                    params.editionId ? parseInt(params.editionId) : null;
 
   const [selectedTask, setSelectedTask] = useState<any | null>(null);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -59,6 +71,9 @@ export default function Tasks() {
       setLocation(`/tasks/${editions[0].id}`);
     }
   }, [editions, editionId, setLocation]);
+  
+  // Current location to handle task URL parameters
+  const [currentLocation] = useLocation();
 
   // Fetch tasks for the current edition
   const { data: tasks = [], isLoading: tasksLoading, refetch: refetchTasks } = useQuery<any[]>({
@@ -67,6 +82,22 @@ export default function Tasks() {
     staleTime: 60000, // Consider data fresh for 1 minute to reduce API calls
     refetchOnWindowFocus: false, // Disable refetching on window focus
   });
+
+  // Open task detail modal when task ID is in URL (from notification)
+  useEffect(() => {
+    if (urlTaskId && tasks?.length > 0) {
+      const taskId = parseInt(urlTaskId);
+      const taskToOpen = tasks.find((task: any) => task.id === taskId);
+      if (taskToOpen) {
+        setSelectedTask(taskToOpen);
+        setIsTaskModalOpen(true);
+        
+        // Clean up the URL to avoid reopening the modal if the page refreshes
+        const cleanLocation = currentLocation.split('?')[0] || '/tasks';
+        window.history.replaceState({}, '', cleanLocation);
+      }
+    }
+  }, [urlTaskId, tasks, currentLocation]);
 
   // Initialize expanded state for all weeks
   useEffect(() => {
