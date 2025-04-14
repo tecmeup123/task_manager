@@ -4,7 +4,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings as SettingsIcon, User, Bell, Lock, Database, Calendar, Clock, Eye, Columns, EyeOff, AlertCircle } from "lucide-react";
+import { 
+  Settings as SettingsIcon, 
+  User, 
+  Bell, 
+  Lock, 
+  Database, 
+  Calendar, 
+  Clock, 
+  Eye, 
+  Columns, 
+  EyeOff, 
+  AlertCircle,
+  Users,
+  UserPlus,
+  UserCog,
+  Pencil,
+  CheckCircle,
+  XCircle
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -12,6 +30,26 @@ import { useAuth } from "@/hooks/use-auth";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useTranslation } from "react-i18next";
 import { LoginActivityList } from "@/components/login-activity-list";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose
+} from "@/components/ui/dialog";
 
 export default function Settings() {
   const { toast } = useToast();
@@ -59,6 +97,24 @@ export default function Settings() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [sessionTimeout, setSessionTimeout] = useState("120");
   const [rememberMe, setRememberMe] = useState(true);
+  
+  // User management settings
+  const [selectedUser, setSelectedUser] = useState<any | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isCreateUserDialogOpen, setIsCreateUserDialogOpen] = useState(false);
+  const [newRole, setNewRole] = useState<string>("");
+  const [newUsername, setNewUsername] = useState("");
+  const [newUserFullName, setNewUserFullName] = useState("");
+  const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserRole, setNewUserRole] = useState("viewer");
+  const [newUserPassword, setNewUserPassword] = useState("ChangeMe123!");
+  
+  // Fetch all users for the admin panel
+  const { data: users, isLoading: isUsersLoading } = useQuery<any[]>({
+    queryKey: ["/api/users"],
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    enabled: user?.role === 'admin'
+  });
   
   const handleSaveDashboardSettings = () => {
     toast({
@@ -382,6 +438,145 @@ export default function Settings() {
       });
     } finally {
       setIsUpdatingTerminology(false);
+    }
+  };
+  
+  // User management functions
+  const handleEditUser = (user: any) => {
+    setSelectedUser(user);
+    setNewRole(user.role);
+    setIsEditDialogOpen(true);
+  };
+  
+  const updateUserMutation = useMutation({
+    mutationFn: async (userData: any) => {
+      const res = await apiRequest("PATCH", `/api/users/${userData.id}`, userData);
+      return await res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "User updated",
+        description: "The user details have been successfully updated."
+      });
+      setIsEditDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  });
+  
+  const createUserMutation = useMutation({
+    mutationFn: async (userData: any) => {
+      const res = await apiRequest("POST", "/api/users", userData);
+      return await res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "User created",
+        description: "New user has been successfully created."
+      });
+      setIsCreateUserDialogOpen(false);
+      setNewUsername("");
+      setNewUserFullName("");
+      setNewUserEmail("");
+      setNewUserRole("viewer");
+      setNewUserPassword("ChangeMe123!");
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Creation failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  });
+  
+  const toggleUserApprovalMutation = useMutation({
+    mutationFn: async ({ userId, approved }: { userId: number, approved: boolean }) => {
+      const res = await apiRequest("PATCH", `/api/users/${userId}`, { approved });
+      return await res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "User status updated",
+        description: "The user's approval status has been updated."
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  });
+  
+  const resetPasswordMutation = useMutation({
+    mutationFn: async (userId: number) => {
+      const res = await apiRequest("POST", `/api/users/${userId}/reset-password`, {});
+      return await res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Password reset",
+        description: "The user's password has been reset to the default."
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Reset failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  });
+  
+  const handleSaveUserEdit = () => {
+    if (!selectedUser) return;
+    
+    updateUserMutation.mutate({
+      id: selectedUser.id,
+      role: newRole
+    });
+  };
+  
+  const handleCreateUser = () => {
+    if (!newUsername || !newUserFullName) {
+      toast({
+        title: "Missing information",
+        description: "Username and full name are required.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    createUserMutation.mutate({
+      username: newUsername,
+      fullName: newUserFullName,
+      email: newUserEmail,
+      role: newUserRole,
+      password: newUserPassword,
+      approved: newUserRole === "admin" // Auto-approve admins
+    });
+  };
+  
+  const handleToggleApproval = (userId: number, currentApproval: boolean) => {
+    toggleUserApprovalMutation.mutate({
+      userId,
+      approved: !currentApproval
+    });
+  };
+  
+  const handleResetPassword = (userId: number) => {
+    if (confirm("Are you sure you want to reset this user's password to the default?")) {
+      resetPasswordMutation.mutate(userId);
     }
   };
   
@@ -827,6 +1022,9 @@ export default function Settings() {
             <TabsTrigger value="notifications" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.notifications')}</TabsTrigger>
             <TabsTrigger value="security" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.security')}</TabsTrigger>
             <TabsTrigger value="data" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.data')}</TabsTrigger>
+            {user?.role === 'admin' && (
+              <TabsTrigger value="users" className="text-xs px-1 py-1 md:text-sm md:px-3">User Management</TabsTrigger>
+            )}
           </TabsList>
         </div>
         
