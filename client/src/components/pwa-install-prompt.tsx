@@ -18,38 +18,55 @@ export function PWAInstallPrompt() {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
 
-  // Verificar status de instalação
+  // Check installation status
   useEffect(() => {
     const isStandalone = PWA.detectStandaloneMode();
     setIsInstallable(!isStandalone);
 
-    // Monitorar evento de instalação
+    // Monitor installation event
     const handleBeforeInstallPrompt = (e: Event) => {
+      console.log('Before install prompt event fired');
       e.preventDefault();
-      // @ts-ignore - Tipo personalizado não está disponível no TypeScript padrão
-      const promptFn = PWA.setupInstallPrompt()(e);
-      setInstallPromptFn(() => promptFn);
+      
+      // Store the event for later use
+      // @ts-ignore - Custom type not available in standard TypeScript
+      setInstallPromptFn(() => {
+        return () => {
+          // @ts-ignore
+          e.prompt();
+          // @ts-ignore
+          return e.userChoice.then((choiceResult: {outcome: string}) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log('User accepted the install prompt');
+              setIsInstallable(false);
+            } else {
+              console.log('User dismissed the install prompt');
+            }
+          });
+        };
+      });
+      
       setIsInstallable(true);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-    // Monitorar status online/offline
+    // Monitor online/offline status
     const handleConnectionChange = (e: Event) => {
-      // @ts-ignore - Acessando detalhe personalizado do evento
+      // @ts-ignore - Accessing custom event detail
       const online = (e as CustomEvent)?.detail?.online ?? navigator.onLine;
       setIsOnline(online);
       
       if (!online) {
         toast({
-          title: "Você está offline",
-          description: "Algumas funcionalidades podem estar limitadas",
+          title: "You are offline",
+          description: "Some features may be limited",
           variant: "destructive"
         });
       } else {
         toast({
-          title: "Conexão restaurada",
-          description: "Todas as funcionalidades estão disponíveis",
+          title: "Connection restored",
+          description: "All features are available",
           variant: "default"
         });
       }

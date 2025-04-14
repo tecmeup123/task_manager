@@ -1,29 +1,23 @@
-// Registrar o service worker
+// Register the service worker
 export function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
-    // Em desenvolvimento, o service worker pode ter conflitos com o HMR do Vite
-    // Em produção, isso funcionará normalmente
-    const isProduction = import.meta.env.PROD;
+    // In development, service worker might conflict with Vite's HMR
+    // But we'll force it to register for testing purposes
     
-    // Só registramos o service worker em produção ou se forçado
-    if (isProduction || localStorage.getItem('forcePWA') === 'true') {
-      window.addEventListener('load', async () => {
-        try {
-          // Tentar registrar o service worker
-          const registration = await navigator.serviceWorker.register('/service-worker.js', {
-            scope: '/'
-          });
-          console.log('Service Worker registrado com sucesso:', registration.scope);
-        } catch (error) {
-          console.error('Falha ao registrar Service Worker:', error);
-        }
-      });
-    } else {
-      console.log('Service Worker desativado em desenvolvimento');
-      
-      // Para testar em desenvolvimento, você pode habilitar com:
-      // localStorage.setItem('forcePWA', 'true')
-    }
+    // Force PWA features in development mode to test installation
+    localStorage.setItem('forcePWA', 'true');
+    
+    window.addEventListener('load', async () => {
+      try {
+        // Try to register the service worker
+        const registration = await navigator.serviceWorker.register('/service-worker.js', {
+          scope: '/'
+        });
+        console.log('Service Worker registered successfully:', registration.scope);
+      } catch (error) {
+        console.error('Failed to register Service Worker:', error);
+      }
+    });
   }
 }
 
