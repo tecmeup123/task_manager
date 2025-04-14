@@ -236,6 +236,7 @@ export const mentions = pgTable("mentions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   createdBy: integer("created_by").references(() => users.id),
   isRead: boolean("is_read").default(false).notNull(),
+  editionId: integer("edition_id").references(() => editions.id), // Added for task context
 });
 
 export const insertMentionSchema = createInsertSchema(mentions).omit({

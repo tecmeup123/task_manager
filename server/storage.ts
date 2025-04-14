@@ -201,6 +201,9 @@ export class MemStorage implements IStorage {
       avatarShape: insertUser.avatarShape || null,
       avatarIcon: insertUser.avatarIcon || null,
       avatarBackground: insertUser.avatarBackground || null,
+      rememberMe: insertUser.rememberMe || null,
+      sessionTimeoutMinutes: insertUser.sessionTimeoutMinutes || 120,
+      lastActive: null,
       createdAt: new Date()  
     };
     this.users.set(id, user);
@@ -542,7 +545,12 @@ export class MemStorage implements IStorage {
     const loginActivity: LoginActivity = {
       ...activity,
       id,
-      timestamp: new Date()
+      timestamp: new Date(),
+      success: activity.success ?? true,
+      location: activity.location || null,
+      ipAddress: activity.ipAddress || null,
+      userAgent: activity.userAgent || null,
+      deviceInfo: activity.deviceInfo || null
     };
     this.loginActivities.set(id, loginActivity);
     return loginActivity;
