@@ -54,6 +54,7 @@ export default function Tasks() {
   const [selectedTrainingType, setSelectedTrainingType] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [expandedWeeks, setExpandedWeeks] = useState<Record<string, boolean>>({});
+  const [editionHasChanged, setEditionHasChanged] = useState(false);
 
   // Fetch all editions
   const { data: editions = [], isLoading: editionsLoading } = useQuery<any[]>({
@@ -64,6 +65,13 @@ export default function Tasks() {
   const currentEdition = editionId 
     ? editions?.find((edition: any) => edition.id === editionId) 
     : editions?.[0];
+  
+  // Track edition changes to reset expanded weeks
+  useEffect(() => {
+    if (editionId) {
+      setEditionHasChanged(true);
+    }
+  }, [editionId]);
   
   useEffect(() => {
     // If editions are loaded and no edition is selected, redirect to the first one
@@ -189,9 +197,9 @@ export default function Tasks() {
     openTaskFromUrl();
   }, [urlTaskId, stateTaskId, fromNotification, editionId, tasks]);
 
-  // Initialize expanded state for all weeks
+  // Initialize expanded state for all weeks - but only on first load or edition change
   useEffect(() => {
-    if (tasks) {
+    if (tasks && (!expandedWeeks || Object.keys(expandedWeeks).length === 0 || editionHasChanged)) {
       // Create a unique array of weeks without using Set (to avoid TypeScript downlevelIteration issues)
       const uniqueWeeks: string[] = [];
       tasks.forEach((task: any) => {
@@ -211,8 +219,13 @@ export default function Tasks() {
       });
       
       setExpandedWeeks(initialExpandedState);
+      
+      // Reset the editionHasChanged flag
+      if (editionHasChanged) {
+        setEditionHasChanged(false);
+      }
     }
-  }, [tasks, currentEdition]);
+  }, [currentEdition?.id, editionHasChanged]);
 
   // Handle week expansion toggle
   const toggleWeekExpanded = (week: string) => {
