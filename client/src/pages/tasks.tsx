@@ -85,22 +85,43 @@ export default function Tasks() {
 
   // Open task detail modal when task ID is in URL (from notification)
   useEffect(() => {
-    // Only execute if tasks are loaded and there's a taskId in the URL
-    if (urlTaskId && tasks?.length > 0) {
-      const taskId = parseInt(urlTaskId);
-      const taskToOpen = tasks.find((task: any) => task.id === taskId);
-      
-      // If task found, select it and open the modal
-      if (taskToOpen) {
-        console.log(`Opening task from URL: ${taskId}`, taskToOpen);
-        setSelectedTask(taskToOpen);
-        setIsTaskModalOpen(true);
+    const openTaskFromUrl = async () => {
+      // Only execute if tasks are loaded, there's a taskId in the URL, and we have an editionId
+      if (urlTaskId && editionId) {
+        console.log(`Attempting to open task ID: ${urlTaskId} for edition: ${editionId}`);
         
-        // We'll clean up the URL when the modal is closed, not here
-        // This ensures the modal has time to open before we remove the taskId
+        // If tasks aren't loaded yet or the specific task isn't found, fetch it directly
+        if (!tasks || tasks.length === 0 || !tasks.find((task: any) => task.id === parseInt(urlTaskId))) {
+          try {
+            // Fetch the specific task directly if needed
+            console.log("Fetching specific task");
+            const taskResponse = await apiRequest('GET', `/api/tasks/${urlTaskId}`);
+            const specificTask = await taskResponse.json();
+            
+            if (specificTask) {
+              console.log("Found specific task:", specificTask);
+              setSelectedTask(specificTask);
+              setIsTaskModalOpen(true);
+            }
+          } catch (error) {
+            console.error("Error fetching specific task:", error);
+          }
+        } else {
+          // Task is in the loaded tasks array
+          const taskId = parseInt(urlTaskId);
+          const taskToOpen = tasks.find((task: any) => task.id === taskId);
+          
+          if (taskToOpen) {
+            console.log(`Opening task from loaded tasks: ${taskId}`, taskToOpen);
+            setSelectedTask(taskToOpen);
+            setIsTaskModalOpen(true);
+          }
+        }
       }
-    }
-  }, [urlTaskId, tasks]);
+    };
+    
+    openTaskFromUrl();
+  }, [urlTaskId, editionId, tasks]);
 
   // Initialize expanded state for all weeks
   useEffect(() => {
