@@ -1150,6 +1150,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Debug cleaning process
+      console.log("Cleaning task data for update:", id, {
+        before: task,
+        after: updatedData
+      });
+      
       const updatedTask = await storage.updateTask(id, updatedData);
       console.log(`Task ${id} updated successfully:`, updatedTask);
       
