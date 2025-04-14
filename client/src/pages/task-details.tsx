@@ -115,13 +115,18 @@ export default function TaskDetails() {
   const { 
     data: auditLogs = [], 
     isLoading: isAuditLogsLoading 
-  } = useQuery<any[]>({
+  } = useQuery<AuditLogResponse[]>({
     queryKey: [`/api/audit-logs/task/${taskId}`],
     enabled: !!taskId,
     select: (data) => {
       // Sort logs by timestamp (newest first)
       return [...data].sort((a, b) => {
-        return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+        const dateA = parseTimestamp(b.timestamp);
+        const dateB = parseTimestamp(a.timestamp);
+        if (dateA && dateB) {
+          return dateA.getTime() - dateB.getTime();
+        }
+        return 0;
       });
     }
   });
@@ -258,21 +263,21 @@ export default function TaskDetails() {
   // Format date helper
   const formatDate = (dateString: string) => {
     if (!dateString) return "";
-    try {
-      return format(parseISO(dateString), "MMM d, yyyy");
-    } catch (e) {
-      return "Invalid date";
+    const parsedDate = parseTimestamp(dateString);
+    if (parsedDate) {
+      return format(parsedDate, "MMM d, yyyy");
     }
+    return "Unknown date";
   };
   
   // Format date with time for history entries
   const formatDateTime = (dateString: string) => {
     if (!dateString) return "";
-    try {
-      return format(parseISO(dateString), "MMM d, yyyy HH:mm");
-    } catch (e) {
-      return "Invalid date";
+    const parsedDate = parseTimestamp(dateString);
+    if (parsedDate) {
+      return format(parsedDate, "MMM d, yyyy HH:mm");
     }
+    return "Unknown time";
   };
   
   const handleGoBack = () => {
