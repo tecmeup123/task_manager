@@ -79,55 +79,71 @@ export default function TaskDetailModal({
   
   // Fetch task's audit logs
   const { data: auditLogs = [] } = useQuery<any[]>({
-    queryKey: ['/api/entity-audit-logs', 'task', task?.id],
+    queryKey: ['/api/entity-audit-logs'],
+    queryFn: async () => {
+      if (!task?.id) return [];
+      const res = await fetch(`/api/entity-audit-logs?entityType=task&entityId=${task.id}`);
+      if (!res.ok) throw new Error('Failed to fetch audit logs');
+      return res.json();
+    },
     enabled: !!task?.id && isOpen
   });
   
   // Transform audit logs into activity history format when logs change
   useEffect(() => {
-    if (auditLogs && auditLogs.length > 0) {
-      // Transform audit logs into activity history format
-      const history = auditLogs.map((log: any) => {
-        // Determine the action text based on log data
-        let actionText = log.notes;
-        
-        // Special handling for specific actions
-        if (log.action === 'update') {
-          const oldState = log.previousState;
-          const newState = log.newState;
+    // Log for debugging
+    console.log("Raw history state:", auditLogs);
+    if (task) console.log("Task data example:", task);
+    
+    // Function to transform logs to history
+    const transformLogsToHistory = () => {
+      if (auditLogs && auditLogs.length > 0) {
+        // Transform audit logs into activity history format
+        const history = auditLogs.map((log: any) => {
+          // Determine the action text based on log data
+          let actionText = log.notes;
           
-          if (oldState && newState) {
-            if (oldState.status !== newState.status) {
-              actionText = `Status changed from "${oldState.status}" to "${newState.status}"`;
-            } else if (oldState.owner !== newState.owner) {
-              actionText = `Task ownership changed from "${oldState.owner || 'Unassigned'}" to "${newState.owner || 'Unassigned'}"`;
-            } else if (oldState.assignedUserId !== newState.assignedUserId) {
-              actionText = `Task assignment changed`;
+          // Special handling for specific actions
+          if (log.action === 'update') {
+            const oldState = log.previousState;
+            const newState = log.newState;
+            
+            if (oldState && newState) {
+              if (oldState.status !== newState.status) {
+                actionText = `Status changed from "${oldState.status}" to "${newState.status}"`;
+              } else if (oldState.owner !== newState.owner) {
+                actionText = `Task ownership changed from "${oldState.owner || 'Unassigned'}" to "${newState.owner || 'Unassigned'}"`;
+              } else if (oldState.assignedUserId !== newState.assignedUserId) {
+                actionText = `Task assignment changed`;
+              }
             }
+          } else if (log.action === 'create') {
+            actionText = 'Task created';
           }
-        } else if (log.action === 'create') {
-          actionText = 'Task created';
-        }
+          
+          return {
+            action: actionText,
+            timestamp: new Date(log.createdAt),
+            user: log.username || 'System'
+          };
+        });
         
-        return {
-          action: actionText,
-          timestamp: new Date(log.createdAt),
-          user: log.username || 'System'
-        };
-      });
+        return history;
+      }
       
-      setActivityHistory(history);
-    } else {
-      // Set default history if no logs found
-      setActivityHistory([
-        {
-          action: "Task created",
-          timestamp: task?.createdAt ? new Date(task.createdAt) : new Date(),
-          user: "System"
-        }
-      ]);
-    }
-  }, [auditLogs, task]);
+      // Default history if no logs found
+      return [{
+        action: "Task created",
+        timestamp: task?.createdAt ? new Date(task.createdAt) : new Date(),
+        user: "System"
+      }];
+    };
+    
+    // Set history only once based on current auditLogs and task
+    const history = transformLogsToHistory();
+    setActivityHistory(history);
+    
+  }, [auditLogs, task?.id]); // Only depend on task.id, not the entire task object
 
   // Fetch users for task assignment
   const { data: users = [], isLoading: isLoadingUsers } = useQuery<User[]>({
