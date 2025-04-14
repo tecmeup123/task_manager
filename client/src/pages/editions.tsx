@@ -287,7 +287,7 @@ export default function Editions() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => setLocation(`/tasks/${edition.id}`)}>
+                          <DropdownMenuItem onClick={() => setLocation(`/tasks?editionId=${edition.id}`)}>
                             <Layers className="mr-2 h-4 w-4" />
                             View Tasks
                           </DropdownMenuItem>
@@ -363,7 +363,7 @@ export default function Editions() {
                   <div 
                     key={edition.id} 
                     className="border rounded-lg p-4 shadow-sm hover:shadow transition-all"
-                    onClick={() => setLocation(`/tasks/${edition.id}`)}
+                    onClick={() => setLocation(`/tasks?editionId=${edition.id}`)}
                   >
                     <div className="flex justify-between items-start mb-2">
                       <div>
@@ -405,7 +405,7 @@ export default function Editions() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={(e) => {
                             e.stopPropagation();
-                            setLocation(`/tasks/${edition.id}`);
+                            setLocation(`/tasks?editionId=${edition.id}`);
                           }}>
                             <Layers className="mr-2 h-4 w-4" />
                             View Tasks
@@ -536,7 +536,7 @@ export default function Editions() {
                           </p>
                         </div>
                       </div>
-                      <Link to={`/tasks/${edition.id}`}>
+                      <Link to={`/tasks?editionId=${edition.id}`}>
                         <Button variant="ghost" size="sm" className="hidden sm:flex">
                           View <ArrowRight className="ml-1 h-4 w-4" />
                         </Button>
