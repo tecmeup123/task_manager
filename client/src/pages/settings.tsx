@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/hooks/use-auth";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useTranslation } from "react-i18next";
+import { LoginActivityList } from "@/components/login-activity-list";
 
 export default function Settings() {
   const { toast } = useToast();
@@ -1404,31 +1405,7 @@ export default function Settings() {
               <div className="space-y-4 pt-4 border-t">
                 <h3 className="text-lg font-medium">Account Activity</h3>
                 
-                <div className="border rounded-md">
-                  <div className="bg-muted px-4 py-2 border-b">
-                    <div className="grid grid-cols-3 font-medium">
-                      <div>Date & Time</div>
-                      <div>IP Address</div>
-                      <div>Device</div>
-                    </div>
-                  </div>
-                  
-                  <div className="px-4 py-2 border-b">
-                    <div className="grid grid-cols-3">
-                      <div className="text-sm">Apr 12, 2025 02:15 AM</div>
-                      <div className="text-sm">127.0.0.1</div>
-                      <div className="text-sm">Chrome - Windows</div>
-                    </div>
-                  </div>
-                  
-                  <div className="px-4 py-2">
-                    <div className="grid grid-cols-3">
-                      <div className="text-sm">Apr 11, 2025 10:24 PM</div>
-                      <div className="text-sm">127.0.0.1</div>
-                      <div className="text-sm">Firefox - MacOS</div>
-                    </div>
-                  </div>
-                </div>
+                <LoginActivityList limit={5} />
                 
                 <div className="flex justify-between">
                   <Button variant="outline">View Full Activity Log</Button>
