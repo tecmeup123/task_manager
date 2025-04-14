@@ -105,6 +105,8 @@ export default function Settings() {
   const [selectedUser, setSelectedUser] = useState<any | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isCreateUserDialogOpen, setIsCreateUserDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<any | null>(null);
   const [newRole, setNewRole] = useState<string>("");
   const [newUsername, setNewUsername] = useState("");
   const [newUserFullName, setNewUserFullName] = useState("");
@@ -604,10 +606,27 @@ export default function Settings() {
     }
   };
   
-  const handleDeleteUser = (userId: number, username: string) => {
-    if (confirm(`Are you sure you want to delete the user "${username}"? This action cannot be undone.`)) {
-      deleteUserMutation.mutate(userId);
+  const handleDeleteUser = (user: any) => {
+    // Don't allow admins to be deleted
+    if (user.role === "admin") {
+      toast({
+        title: "Cannot delete admin",
+        description: "Administrator accounts cannot be deleted from the system.",
+        variant: "destructive"
+      });
+      return;
     }
+    
+    setUserToDelete(user);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  const confirmDeleteUser = () => {
+    if (!userToDelete) return;
+    
+    deleteUserMutation.mutate(userToDelete.id);
+    setIsDeleteDialogOpen(false);
+    setUserToDelete(null);
   };
   
   // Helper function to generate comprehensive template data for all weeks
@@ -1948,7 +1967,7 @@ export default function Settings() {
                               <Button
                                 variant="outline"
                                 size="icon"
-                                onClick={() => handleDeleteUser(user.id, user.username)}
+                                onClick={() => handleDeleteUser(user)}
                                 className="h-8 w-8 p-0 inline-flex text-red-500 hover:text-red-700 hover:bg-red-100"
                                 title="Delete user"
                               >
@@ -2104,6 +2123,31 @@ export default function Settings() {
         </DialogContent>
       </Dialog>
       
+      {/* Delete User Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm User Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete the user "{userToDelete?.username}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteUser} disabled={deleteUserMutation.isPending}>
+              {deleteUserMutation.isPending ? (
+                <>
+                  <div className="animate-spin h-4 w-4 mr-2 border-2 border-background border-t-transparent rounded-full" />
+                  Deleting...
+                </>
+              ) : "Delete User"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Add invisible spacing div at the bottom for mobile */}
       <div className="h-12 md:hidden" />
     </div>
