@@ -51,7 +51,6 @@ const formSchema = z.object({
   trainingType: z.string().min(1, "Training type is required"),
   inflexible: z.boolean().default(false),
   owner: z.string().optional().nullable(),
-  assignedTo: z.string().optional().nullable(),
   assignedUserId: z.number().optional().nullable(),
   status: z.string(),
   notes: z.string().optional().nullable(),
@@ -112,7 +111,6 @@ export default function TaskDetailModal({
       trainingType: task?.trainingType || "GLR",
       inflexible: task?.inflexible || false,
       owner: task?.owner || "",
-      assignedTo: task?.assignedTo || "",
       assignedUserId: task?.assignedUserId || null,
       status: task?.status || "Not Started",
       notes: task?.notes || "",
@@ -132,7 +130,6 @@ export default function TaskDetailModal({
         trainingType: task.trainingType,
         inflexible: task.inflexible,
         owner: task.owner,
-        assignedTo: task.assignedTo,
         assignedUserId: task.assignedUserId || null,
         status: task.status,
         notes: task.notes,
@@ -434,33 +431,7 @@ export default function TaskDetailModal({
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="assignedTo"
-                render={({ field }) => (
-                  <FormItem className="md:col-span-1">
-                    <FormLabel>{t('tasks.assignedToRole')}</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value || ""}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('tasks.selectAssignment')} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {ASSIGNED_TO_OPTIONS.map(option => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+{/* Removed assignedTo role field as requested */}
               
               <FormField
                 control={form.control}
