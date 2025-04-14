@@ -1069,7 +1069,55 @@ export default function Settings() {
   useEffect(() => {
     // In a real app, these would be loaded from a user preferences API
     // and the changes would be saved to that API
+    
+    // Check if app is in standalone mode (installed PWA)
+    setIsStandaloneMode(PWA.detectStandaloneMode());
+    
+    // Initialize other PWA settings from localStorage
+    setAutoCheckForUpdates(localStorage.getItem('pwa_autoCheckForUpdates') !== 'false');
+    setShowUpdateNotifications(localStorage.getItem('pwa_showUpdateNotifications') !== 'false');
+    setWelcomeScreenEnabled(localStorage.getItem('pwa_welcomeScreenEnabled') !== 'false');
   }, []);
+  
+  const handleSavePWASettings = () => {
+    // Save PWA settings to localStorage
+    localStorage.setItem('pwa_autoCheckForUpdates', autoCheckForUpdates.toString());
+    localStorage.setItem('pwa_showUpdateNotifications', showUpdateNotifications.toString());
+    localStorage.setItem('pwa_welcomeScreenEnabled', welcomeScreenEnabled.toString());
+    
+    // Apply settings
+    if (!welcomeScreenEnabled) {
+      localStorage.setItem('pwa_welcomeShown', 'true');
+    }
+    
+    toast({
+      title: "App settings saved",
+      description: "Your application preferences have been updated"
+    });
+    setIsPWASettingsChanged(false);
+    
+    // If welcome screen was enabled again, reset it so it shows on next app launch
+    if (welcomeScreenEnabled) {
+      PWA.resetWelcomeScreen();
+    }
+    
+    // Force check for updates if enabled
+    if (autoCheckForUpdates) {
+      PWA.checkForUpdates();
+    }
+  };
+  
+  const handleChangeLanguage = (newLanguage: string) => {
+    if (newLanguage === language) return;
+    
+    setLanguage(newLanguage);
+    i18n.changeLanguage(newLanguage);
+    
+    toast({
+      title: "Language updated",
+      description: `Interface language set to ${newLanguage.toUpperCase()}`
+    });
+  };
   
   return (
     <div className="max-w-full overflow-x-hidden">
@@ -1107,6 +1155,10 @@ export default function Settings() {
             <TabsTrigger value="users" className="text-xs px-1 py-1 md:text-sm md:px-3">
               <Users className="h-3 w-3 mr-1 md:h-4 md:w-4" />
               User Management
+            </TabsTrigger>
+            <TabsTrigger value="pwa" className="text-xs px-1 py-1 md:text-sm md:px-3">
+              <Smartphone className="h-3 w-3 mr-1 md:h-4 md:w-4" />
+              App Settings
             </TabsTrigger>
           </TabsList>
         </div>
