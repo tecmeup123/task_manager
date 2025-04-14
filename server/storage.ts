@@ -65,7 +65,7 @@ export interface IStorage {
   deleteTrainer(id: number): Promise<boolean>;
 
   // Edition methods
-  getAllEditions(): Promise<Edition[]>;
+  getAllEditions(includeArchived?: boolean): Promise<Edition[]>;
   getEdition(id: number): Promise<Edition | undefined>;
   getEditionByCode(code: string): Promise<Edition | undefined>;
   createEdition(edition: InsertEdition): Promise<Edition>;
@@ -286,8 +286,16 @@ export class MemStorage implements IStorage {
   }
 
   // Edition methods
-  async getAllEditions(): Promise<Edition[]> {
-    return Array.from(this.editions.values());
+  async getAllEditions(includeArchived: boolean = false): Promise<Edition[]> {
+    const editions = Array.from(this.editions.values());
+    
+    // Se includeArchived for falso, filtra as edições arquivadas
+    if (!includeArchived) {
+      return editions.filter(edition => !edition.archived);
+    }
+    
+    // Caso contrário, retorna todas as edições
+    return editions;
   }
 
   async getEdition(id: number): Promise<Edition | undefined> {
@@ -1221,8 +1229,16 @@ export class DatabaseStorage implements IStorage {
     return result.length > 0;
   }
   
-  async getAllEditions(): Promise<Edition[]> {
+  async getAllEditions(includeArchived: boolean = false): Promise<Edition[]> {
     const { db } = await import("./db");
+    const { eq, not } = await import("drizzle-orm");
+
+    // Se includeArchived for falso, filtra as edições arquivadas
+    if (!includeArchived) {
+      return db.select().from(editions).where(eq(editions.archived, false));
+    }
+    
+    // Caso contrário, retorna todas as edições
     return db.select().from(editions);
   }
 

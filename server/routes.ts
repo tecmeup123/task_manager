@@ -378,7 +378,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all editions
   app.get("/api/editions", async (req, res) => {
     try {
-      const editions = await storage.getAllEditions();
+      // Converte o parâmetro includeArchived de string para booleano
+      const includeArchived = req.query.includeArchived === 'true';
+      const editions = await storage.getAllEditions(includeArchived);
       res.json(editions);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch editions" });
