@@ -85,21 +85,22 @@ export default function Tasks() {
 
   // Open task detail modal when task ID is in URL (from notification)
   useEffect(() => {
+    // Only execute if tasks are loaded and there's a taskId in the URL
     if (urlTaskId && tasks?.length > 0) {
       const taskId = parseInt(urlTaskId);
       const taskToOpen = tasks.find((task: any) => task.id === taskId);
+      
+      // If task found, select it and open the modal
       if (taskToOpen) {
+        console.log(`Opening task from URL: ${taskId}`, taskToOpen);
         setSelectedTask(taskToOpen);
         setIsTaskModalOpen(true);
         
-        // Keep the editionId in the URL but remove taskId to avoid reopening the modal if the page refreshes
-        // This ensures we preserve the selected edition when closing the task modal
-        if (editionId) {
-          window.history.replaceState({}, '', `/tasks?editionId=${editionId}`);
-        }
+        // We'll clean up the URL when the modal is closed, not here
+        // This ensures the modal has time to open before we remove the taskId
       }
     }
-  }, [urlTaskId, tasks, currentLocation]);
+  }, [urlTaskId, tasks]);
 
   // Initialize expanded state for all weeks
   useEffect(() => {
@@ -457,6 +458,12 @@ export default function Tasks() {
           console.log("Task modal onClose called from tasks page");
           setIsTaskModalOpen(false);
           setSelectedTask(null);
+          
+          // Clean up the URL to avoid reopening modal on page refresh,
+          // but keep the editionId param to preserve context
+          if (editionId) {
+            window.history.replaceState({}, '', `/tasks?editionId=${editionId}`);
+          }
         }}
         onSave={handleTaskSave}
         redirectPath={editionId ? `/tasks?editionId=${editionId}` : '/tasks'}
