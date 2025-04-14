@@ -28,7 +28,7 @@ import {
   taskComments
 } from "@shared/schema";
 import { add, format, parseISO, isBefore, subWeeks } from "date-fns";
-import { and, eq, count } from "drizzle-orm";
+import { and, eq, count, inArray } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -1219,13 +1219,63 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteEdition(id: number): Promise<boolean> {
-    const { db } = await import("./db");
-    // First delete all tasks associated with this edition
-    await db.delete(tasks).where(eq(tasks.editionId, id));
-    
-    // Then delete the edition
-    const result = await db.delete(editions).where(eq(editions.id, id)).returning();
-    return result.length > 0;
+    const { db, eq, and, inArray } = await import("./db");
+
+    try {
+      // First get all tasks associated with this edition
+      const editionTasks = await db.select({ id: tasks.id }).from(tasks).where(eq(tasks.editionId, id));
+      const taskIds = editionTasks.map(task => task.id);
+      
+      // If there are tasks, delete all related records
+      if (taskIds.length > 0) {
+        // Delete resources related to the tasks
+        await db.delete(resources).where(inArray(resources.taskId, taskIds));
+        
+        // Delete mentions related to the tasks
+        await db.delete(mentions).where(inArray(mentions.taskId, taskIds));
+        
+        // Delete task comments related to the tasks
+        await db.delete(taskComments).where(inArray(taskComments.taskId, taskIds));
+        
+        // Delete notifications related to tasks (where entityType is 'task' and entityId is one of the task IDs)
+        await db.delete(notifications)
+          .where(and(
+            eq(notifications.entityType, 'task'),
+            inArray(notifications.entityId, taskIds)
+          ));
+
+        // Delete audit logs related to tasks (where entityType is 'task' and entityId is one of the task IDs)
+        await db.delete(auditLogs)
+          .where(and(
+            eq(auditLogs.entityType, 'task'),
+            inArray(auditLogs.entityId, taskIds)
+          ));
+      }
+      
+      // Delete notifications related to the edition
+      await db.delete(notifications)
+        .where(and(
+          eq(notifications.entityType, 'edition'),
+          eq(notifications.entityId, id)
+        ));
+      
+      // Delete audit logs related to the edition
+      await db.delete(auditLogs)
+        .where(and(
+          eq(auditLogs.entityType, 'edition'),
+          eq(auditLogs.entityId, id)
+        ));
+      
+      // Now delete all tasks associated with this edition
+      await db.delete(tasks).where(eq(tasks.editionId, id));
+      
+      // Finally delete the edition
+      const result = await db.delete(editions).where(eq(editions.id, id)).returning();
+      return result.length > 0;
+    } catch (error) {
+      console.error('Error deleting edition:', error);
+      throw error;
+    }
   }
 
   async getAllTasks(): Promise<Task[]> {
