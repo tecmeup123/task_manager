@@ -128,6 +128,7 @@ export class MemStorage implements IStorage {
   private resources: Map<number, Resource>;
   private mentions: Map<number, Mention>;
   private taskComments: Map<number, TaskComment>;
+  private loginActivities: Map<number, LoginActivity>;
   private currentUserId: number;
   private currentTrainerId: number;
   private currentEditionId: number;
@@ -137,6 +138,7 @@ export class MemStorage implements IStorage {
   private currentResourceId: number;
   private currentMentionId: number;
   private currentTaskCommentId: number;
+  private currentLoginActivityId: number;
   sessionStore: session.Store;
 
   constructor() {
@@ -149,6 +151,7 @@ export class MemStorage implements IStorage {
     this.resources = new Map();
     this.mentions = new Map();
     this.taskComments = new Map();
+    this.loginActivities = new Map();
     this.currentUserId = 1;
     this.currentTrainerId = 1;
     this.currentEditionId = 1;
@@ -158,6 +161,7 @@ export class MemStorage implements IStorage {
     this.currentResourceId = 1;
     this.currentMentionId = 1;
     this.currentTaskCommentId = 1;
+    this.currentLoginActivityId = 1;
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000 // 24 hours
     });
@@ -475,6 +479,39 @@ export class MemStorage implements IStorage {
     return Array.from(this.notifications.values())
       .filter(notification => notification.userId === userId && !notification.isRead)
       .length;
+  }
+  
+  // Login activity methods
+  async createLoginActivity(activity: InsertLoginActivity): Promise<LoginActivity> {
+    const id = this.currentLoginActivityId++;
+    const loginActivity: LoginActivity = {
+      ...activity,
+      id,
+      timestamp: new Date()
+    };
+    this.loginActivities.set(id, loginActivity);
+    return loginActivity;
+  }
+  
+  async getUserLoginActivities(userId: number, limit: number = 10): Promise<LoginActivity[]> {
+    return Array.from(this.loginActivities.values())
+      .filter(activity => activity.userId === userId)
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      .slice(0, limit);
+  }
+  
+  async updateUserSecuritySettings(userId: number, settings: { 
+    rememberMe?: boolean; 
+    sessionTimeoutMinutes?: number;
+  }): Promise<User> {
+    const user = this.users.get(userId);
+    if (!user) {
+      throw new Error(`User with id ${userId} not found`);
+    }
+    
+    const updatedUser = { ...user, ...settings };
+    this.users.set(userId, updatedUser);
+    return updatedUser;
   }
 
   // Resource methods

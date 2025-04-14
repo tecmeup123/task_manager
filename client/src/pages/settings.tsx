@@ -114,12 +114,37 @@ export default function Settings() {
     setIsSecuritySettingsChanged(false);
   };
   
-  const handleSaveSecuritySettings = () => {
-    toast({
-      title: "Security settings saved",
-      description: "Your security preferences have been updated"
-    });
-    setIsSecuritySettingsChanged(false);
+  const handleSaveSecuritySettings = async () => {
+    try {
+      const response = await fetch('/api/security-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          rememberMe,
+          sessionTimeoutMinutes: parseInt(sessionTimeout)
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to update security settings: ${response.statusText}`);
+      }
+      
+      toast({
+        title: "Security settings saved",
+        description: "Your security preferences have been updated"
+      });
+      setIsSecuritySettingsChanged(false);
+    } catch (error) {
+      console.error('Error updating security settings:', error);
+      toast({
+        title: "Update failed",
+        description: error instanceof Error ? error.message : "Failed to update security settings",
+        variant: "destructive"
+      });
+    }
   };
   
   const handleSaveNotificationSettings = () => {

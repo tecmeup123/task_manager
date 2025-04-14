@@ -275,4 +275,67 @@ export function setupAuth(app: Express) {
       next(error);
     }
   });
+  
+  // Security settings endpoint
+  app.post("/api/security-settings", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const { rememberMe, sessionTimeoutMinutes } = req.body;
+      
+      // Update security settings
+      const updatedUser = await storage.updateUserSecuritySettings(req.user.id, {
+        rememberMe,
+        sessionTimeoutMinutes
+      });
+      
+      // Create audit log
+      await storage.createAuditLog({
+        userId: req.user.id,
+        entityType: "user",
+        entityId: req.user.id,
+        action: "update",
+        previousState: { ...req.user, password: "[REDACTED]" },
+        newState: { ...updatedUser, password: "[REDACTED]" },
+        notes: "Security settings updated"
+      });
+      
+      // If session timeout was updated, update the current session
+      if (sessionTimeoutMinutes && !rememberMe) {
+        req.session.cookie.maxAge = sessionTimeoutMinutes * 60 * 1000;
+      } else if (rememberMe) {
+        // If "Remember Me" was enabled, set long session
+        req.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+      }
+      
+      // Return updated user (without password)
+      const safeUser = { ...updatedUser } as Record<string, any>;
+      delete safeUser.password;
+      
+      res.json(safeUser);
+    } catch (error) {
+      console.error("Error updating security settings:", error);
+      next(error);
+    }
+  });
+  
+  // Get login activity history
+  app.get("/api/login-activities", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+      
+      const activities = await storage.getUserLoginActivities(req.user.id, limit);
+      
+      res.json(activities);
+    } catch (error) {
+      console.error("Error fetching login activities:", error);
+      next(error);
+    }
+  });
 }
