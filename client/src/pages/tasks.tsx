@@ -249,7 +249,15 @@ export default function Tasks() {
 
   const handleTaskSave = async (updatedTask: any) => {
     try {
-      console.log("Sending task update for:", updatedTask);
+      // Enhanced logging for debugging assignment
+      console.log("Sending task update with data:", {
+        id: updatedTask.id,
+        assignedUserId: updatedTask.assignedUserId,
+        owner: updatedTask.owner,
+        fullTask: updatedTask
+      });
+      
+      // Make the API request with the complete task data
       await apiRequest('PATCH', `/api/tasks/${updatedTask.id}`, updatedTask);
       
       // Salvar a posição de rolagem antes de refetch

@@ -144,6 +144,10 @@ export default function TaskDetailModal({
       formData.assignedUserId = null;
     }
     
+    // Debug log for task form submission
+    console.log("Task form submitted with values:", values);
+    console.log("Processed form data (with assignedUserId):", formData);
+    
     onSave(formData);
   };
 
