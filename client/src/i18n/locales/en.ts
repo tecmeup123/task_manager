@@ -172,6 +172,10 @@ const en = {
     'tasks.selectAssignee': 'Select assignee',
     'tasks.noAssignee': 'No assignee',
     'tasks.notesPlaceholder': 'Add notes about this task...',
+    'tasks.statusNotStarted': 'Not Started',
+    'tasks.statusInProgress': 'In Progress',
+    'tasks.statusDone': 'Done',
+    'tasks.statusBlocked': 'Blocked',
     
     // Trainers
     'trainers.title': 'Trainers',
