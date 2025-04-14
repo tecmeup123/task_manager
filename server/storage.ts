@@ -41,6 +41,7 @@ export interface IStorage {
   getAllUsers(): Promise<User[]>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, userData: Partial<User>): Promise<User>;
+  deleteUser(id: number): Promise<boolean>;
   
   // Audit logs methods
   createAuditLog(log: InsertAuditLog): Promise<AuditLog>;
@@ -215,6 +216,52 @@ export class MemStorage implements IStorage {
     const updatedUser = { ...user, ...userData };
     this.users.set(id, updatedUser);
     return updatedUser;
+  }
+  
+  async deleteUser(id: number): Promise<boolean> {
+    // Verificar se o usuário existe
+    if (!this.users.has(id)) {
+      return false;
+    }
+    
+    // Remover notificações do usuário
+    Array.from(this.notifications.entries()).forEach(([notifId, notification]) => {
+      if (notification.userId === id) {
+        this.notifications.delete(notifId);
+      }
+    });
+    
+    // Remover login activities do usuário
+    Array.from(this.loginActivities.entries()).forEach(([activityId, activity]) => {
+      if (activity.userId === id) {
+        this.loginActivities.delete(activityId);
+      }
+    });
+    
+    // Remover menções do usuário
+    Array.from(this.mentions.entries()).forEach(([mentionId, mention]) => {
+      if (mention.userId === id) {
+        this.mentions.delete(mentionId);
+      }
+    });
+    
+    // Remover comentários do usuário
+    Array.from(this.taskComments.entries()).forEach(([commentId, comment]) => {
+      if (comment.userId === id) {
+        this.taskComments.delete(commentId);
+      }
+    });
+    
+    // Desassociar o usuário de tarefas (definir assignedUserId como null)
+    Array.from(this.tasks.entries()).forEach(([taskId, task]) => {
+      if (task.assignedUserId === id) {
+        task.assignedUserId = null;
+        this.tasks.set(taskId, task);
+      }
+    });
+    
+    // Remover o usuário
+    return this.users.delete(id);
   }
   
   async createAuditLog(log: InsertAuditLog): Promise<AuditLog> {

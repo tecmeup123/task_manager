@@ -1532,6 +1532,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Delete a user (admin only)
+  app.delete("/api/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      
+      // Não permitir que o usuário delete a si mesmo
+      if (id === req.user?.id) {
+        return res.status(400).json({ message: "You cannot delete your own account" });
+      }
+      
+      const user = await storage.getUser(id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Não permitir deletar administradores
+      if (user.role === 'admin') {
+        return res.status(403).json({ message: "Administrator accounts cannot be deleted" });
+      }
+      
+      // Verificar se o usuário tem tarefas atribuídas
+      const tasks = await storage.getAllTasks();
+      const userTasks = tasks.filter(task => task.assignedUserId === id);
+      
+      if (userTasks.length > 0) {
+        return res.status(409).json({ 
+          message: "Cannot delete user with assigned tasks. Please reassign or complete all tasks first.", 
+          affectedTasks: userTasks 
+        });
+      }
+      
+      // Create audit log before deleting
+      if (req.user) {
+        await storage.createAuditLog({
+          userId: req.user.id,
+          entityType: "user",
+          entityId: id,
+          action: "delete",
+          previousState: { ...user, password: "[REDACTED]" },
+          newState: null,
+          notes: `User ${user.username} deleted by ${req.user.username}`
+        });
+      }
+      
+      // Deletar o usuário
+      const result = await storage.deleteUser(id);
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "Failed to delete user" });
+    }
+  });
+  
   // Audit logs routes
   // Get all audit logs endpoint is already defined above
   
