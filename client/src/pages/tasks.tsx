@@ -83,45 +83,62 @@ export default function Tasks() {
     refetchOnWindowFocus: false, // Disable refetching on window focus
   });
 
-  // Open task detail modal when task ID is in URL (from notification)
+  // Check if we have state passed from notification click
+  const historyState = typeof window !== 'undefined' ? window.history.state : {};
+  const fromNotification = historyState?.fromNotification || false;
+  const stateTaskId = historyState?.openTaskId;
+
+  // Open task detail modal when task ID is in URL (from notification) or in history state
   useEffect(() => {
     const openTaskFromUrl = async () => {
-      // Only execute if tasks are loaded, there's a taskId in the URL, and we have an editionId
-      if (urlTaskId && editionId) {
-        console.log(`Attempting to open task ID: ${urlTaskId} for edition: ${editionId}`);
+      // Determine which task ID to use (prefer state taskId over URL taskId)
+      const taskIdToUse = stateTaskId || (urlTaskId ? parseInt(urlTaskId) : null);
+      
+      // Only execute if we have a taskId and editionId
+      if (taskIdToUse && editionId) {
+        console.log(`Attempting to open task ID: ${taskIdToUse} for edition: ${editionId}`, { fromState: !!stateTaskId, fromUrl: !!urlTaskId });
         
         // If tasks aren't loaded yet or the specific task isn't found, fetch it directly
-        if (!tasks || tasks.length === 0 || !tasks.find((task: any) => task.id === parseInt(urlTaskId))) {
+        if (!tasks || tasks.length === 0 || !tasks.find((task: any) => task.id === taskIdToUse)) {
           try {
             // Fetch the specific task directly if needed
-            console.log("Fetching specific task");
-            const taskResponse = await apiRequest('GET', `/api/tasks/${urlTaskId}`);
+            console.log(`Fetching specific task: ${taskIdToUse}`);
+            const taskResponse = await apiRequest('GET', `/api/tasks/${taskIdToUse}`);
             const specificTask = await taskResponse.json();
             
             if (specificTask) {
               console.log("Found specific task:", specificTask);
               setSelectedTask(specificTask);
               setIsTaskModalOpen(true);
+              
+              // Clear the history state to avoid reopening on refresh
+              if (fromNotification) {
+                window.history.replaceState({}, '', window.location.pathname + window.location.search);
+              }
             }
           } catch (error) {
             console.error("Error fetching specific task:", error);
           }
         } else {
           // Task is in the loaded tasks array
-          const taskId = parseInt(urlTaskId);
-          const taskToOpen = tasks.find((task: any) => task.id === taskId);
+          const taskToOpen = tasks.find((task: any) => task.id === taskIdToUse);
           
           if (taskToOpen) {
-            console.log(`Opening task from loaded tasks: ${taskId}`, taskToOpen);
+            console.log(`Opening task from loaded tasks: ${taskIdToUse}`, taskToOpen);
             setSelectedTask(taskToOpen);
             setIsTaskModalOpen(true);
+            
+            // Clear the history state to avoid reopening on refresh
+            if (fromNotification) {
+              window.history.replaceState({}, '', window.location.pathname + window.location.search);
+            }
           }
         }
       }
     };
     
     openTaskFromUrl();
-  }, [urlTaskId, editionId, tasks]);
+  }, [urlTaskId, stateTaskId, fromNotification, editionId, tasks]);
 
   // Initialize expanded state for all weeks
   useEffect(() => {

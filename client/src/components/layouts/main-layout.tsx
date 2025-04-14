@@ -297,11 +297,30 @@ export default function MainLayout({ children }: MainLayoutProps) {
                             </Button>
                           )}
                           {notification.entityType === 'task' && notification.entityId && (
-                            <Link to={`/tasks?editionId=${notification.metadata?.editionId || ''}&taskId=${notification.entityId}`}>
-                              <Button size="sm" variant="outline" className="h-7 text-xs">
-                                {t('notifications.goToTask')}
-                              </Button>
-                            </Link>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="h-7 text-xs"
+                              onClick={async () => {
+                                // First, mark notification as read
+                                if (!notification.isRead) {
+                                  await markAsRead(notification.id);
+                                }
+                                
+                                // Navigate to tasks page with the correct edition ID
+                                const editionId = notification.metadata?.editionId || '';
+                                const taskId = notification.entityId;
+                                
+                                // Add state to indicate modal should be opened
+                                const taskDetailState = { openTaskId: taskId, fromNotification: true };
+                                
+                                // Navigate with state and then close notification popup
+                                navigate(`/tasks?editionId=${editionId}&taskId=${taskId}`, { state: taskDetailState });
+                                setIsNotificationsOpen(false);
+                              }}
+                            >
+                              {t('notifications.goToTask')}
+                            </Button>
                           )}
                           {notification.entityType === 'edition' && notification.entityId && (
                             <Link to={`/editions?id=${notification.entityId}`}>
