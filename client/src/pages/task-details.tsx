@@ -109,6 +109,15 @@ export default function TaskDetails() {
     enabled: !!taskId,
   });
   
+  // Fetch task audit logs/history
+  const { 
+    data: auditLogs = [], 
+    isLoading: isAuditLogsLoading 
+  } = useQuery<any[]>({
+    queryKey: [`/api/audit-logs/task/${taskId}`],
+    enabled: !!taskId,
+  });
+  
   // Update task mutation
   const updateTaskMutation = useMutation({
     mutationFn: async (updatedTask: any) => {
@@ -336,6 +345,7 @@ export default function TaskDetails() {
           <TabsTrigger value="details">{t('tasks.tabDetails')}</TabsTrigger>
           <TabsTrigger value="comments">{t('tasks.tabComments')}</TabsTrigger>
           <TabsTrigger value="resources">{t('tasks.tabResources')}</TabsTrigger>
+          <TabsTrigger value="history">{t('tasks.tabHistory')}</TabsTrigger>
         </TabsList>
         
         <TabsContent value="details">
@@ -686,6 +696,118 @@ export default function TaskDetails() {
                       </Button>
                     </form>
                   </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="history">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <History className="mr-2 h-5 w-5" /> {t('tasks.history')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isAuditLogsLoading ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="space-y-2">
+                      <Skeleton className="h-5 w-40" />
+                      <Skeleton className="h-16 w-full" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  {auditLogs.length > 0 ? (
+                    <div className="space-y-4">
+                      {auditLogs.map((log, index) => {
+                        // Find the user who made the change
+                        const user = users.find(u => u.id === log.userId);
+                        
+                        // Determine which fields were changed
+                        const changes = [];
+                        if (log.previousState && log.newState) {
+                          // Check for status change
+                          if (log.previousState.status !== log.newState.status) {
+                            changes.push({
+                              field: t('tasks.status'),
+                              from: log.previousState.status || t('common.none'),
+                              to: log.newState.status || t('common.none')
+                            });
+                          }
+                          
+                          // Check for assigned user change
+                          if (log.previousState.assignedUserId !== log.newState.assignedUserId) {
+                            const previousUser = users.find(u => u.id === log.previousState.assignedUserId);
+                            const newUser = users.find(u => u.id === log.newState.assignedUserId);
+                            
+                            changes.push({
+                              field: t('tasks.assignedTo'),
+                              from: previousUser ? (previousUser.fullName || previousUser.username) : t('common.none'),
+                              to: newUser ? (newUser.fullName || newUser.username) : t('common.none')
+                            });
+                          }
+                          
+                          // Check for notes change
+                          if (log.previousState.notes !== log.newState.notes) {
+                            changes.push({
+                              field: t('tasks.notes'),
+                              from: log.previousState.notes || t('common.none'),
+                              to: log.newState.notes || t('common.none')
+                            });
+                          }
+                          
+                          // Check for completion date change
+                          if (log.previousState.completionDate !== log.newState.completionDate) {
+                            changes.push({
+                              field: t('tasks.completionDate'),
+                              from: log.previousState.completionDate ? formatDate(log.previousState.completionDate) : t('common.none'),
+                              to: log.newState.completionDate ? formatDate(log.newState.completionDate) : t('common.none')
+                            });
+                          }
+                        }
+                        
+                        return (
+                          <div key={log.id} className="border rounded-md p-4">
+                            <div className="flex justify-between mb-3">
+                              <span className="font-medium">
+                                {user ? (user.fullName || user.username) : t('common.unknownUser')}
+                              </span>
+                              <span className="text-sm text-muted-foreground">
+                                {formatDate(log.timestamp)}
+                              </span>
+                            </div>
+                            
+                            <div className="text-sm">
+                              <p className="mb-2">
+                                <span className="font-medium">{t(`tasks.action.${log.action}`)}</span>
+                                {log.action === 'update' && changes.length > 0 && (
+                                  <>
+                                    <span>: {t('tasks.changedFields')}</span>
+                                    <ul className="mt-2 space-y-2 pl-6">
+                                      {changes.map((change, i) => (
+                                        <li key={i} className="list-disc">
+                                          <span className="font-medium">{change.field}:</span> {change.from} → {change.to}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </>
+                                )}
+                              </p>
+                              {log.notes && <p className="italic text-muted-foreground">{log.notes}</p>}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">
+                      {t('tasks.noHistory')}
+                    </p>
+                  )}
                 </>
               )}
             </CardContent>
