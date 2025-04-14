@@ -11,6 +11,7 @@ import Trainers from "@/pages/trainers";
 import Reports from "@/pages/reports";
 import Settings from "@/pages/settings";
 import Users from "@/pages/users";
+import Calendar from "@/pages/calendar";
 import AuthPage from "@/pages/auth-page";
 import MainLayout from "@/components/layouts/main-layout";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -94,6 +95,11 @@ function Router() {
       <ProtectedRoute 
         path="/users" 
         component={Users} 
+      />
+
+      <ProtectedRoute 
+        path="/calendar" 
+        component={Calendar} 
       />
       
       {/* Fallback to 404 */}
