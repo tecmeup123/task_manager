@@ -1,6 +1,10 @@
-const fs = require('fs');
-const path = require('path');
-const { createCanvas, loadImage } = require('canvas');
+import fs from 'fs';
+import path from 'path';
+import { createCanvas, loadImage } from 'canvas';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function generateIcons() {
   try {
