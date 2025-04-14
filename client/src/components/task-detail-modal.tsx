@@ -107,12 +107,20 @@ export default function TaskDetailModal({
   useEffect(() => {
     // Only fetch if we have a task, the modal is open, and we haven't processed logs yet
     if (task?.id && isOpen && !processedLogsRef.current) {
-      fetch(`/api/entity-audit-logs?entityType=task&entityId=${task.id}`)
+      // Use the API request function with proper error handling
+      console.log('Fetching audit logs for task:', task.id);
+      fetch(`/api/entity-audit-logs?entityType=task&entityId=${task.id}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      })
         .then(res => {
           if (!res.ok) throw new Error('Failed to fetch audit logs');
           return res.json();
         })
         .then(logs => {
+          console.log('Received audit logs:', logs);
           if (logs && logs.length > 0) {
             // Transform logs to activity history
             const history = logs.map((log: any) => {
