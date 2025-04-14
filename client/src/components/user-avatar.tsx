@@ -44,6 +44,7 @@ export function UserAvatar() {
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-medium leading-none">{user.fullName || user.username}</p>
               <p className="text-xs leading-none text-muted-foreground">{user.email || user.username}</p>
+              <p className="text-xs leading-none text-primary font-bold mt-1">Role: {user.role}</p>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
@@ -56,6 +57,12 @@ export function UserAvatar() {
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
             </DropdownMenuItem>
+            {user.role === 'admin' && (
+              <DropdownMenuItem onClick={() => window.location.href = "/users"}>
+                <User className="mr-2 h-4 w-4" />
+                <span>User Management</span>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onClick={() => startOnboarding()}>
               <HelpCircle className="mr-2 h-4 w-4" />
               <span>Start Onboarding</span>
