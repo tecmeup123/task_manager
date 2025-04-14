@@ -150,6 +150,10 @@ export default function TaskDetailModal({
     onSave(formData);
   };
 
+  // Check if we're already on the tasks page
+  const [currentLocation] = useLocation();
+  const isOnTasksPage = currentLocation.startsWith('/tasks');
+
   // Simplified closing approach
   return (
     <Dialog 
@@ -157,7 +161,8 @@ export default function TaskDetailModal({
       onOpenChange={(open) => {
         if (!open) {
           onClose();
-          if (redirectPath) {
+          // Only redirect if we're not already on the tasks page
+          if (redirectPath && !isOnTasksPage) {
             setLocation(redirectPath);
           }
         }

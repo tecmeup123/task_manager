@@ -92,9 +92,11 @@ export default function Tasks() {
         setSelectedTask(taskToOpen);
         setIsTaskModalOpen(true);
         
-        // Clean up the URL to avoid reopening the modal if the page refreshes
-        const cleanLocation = currentLocation.split('?')[0] || '/tasks';
-        window.history.replaceState({}, '', cleanLocation);
+        // Keep the editionId in the URL but remove taskId to avoid reopening the modal if the page refreshes
+        // This ensures we preserve the selected edition when closing the task modal
+        if (editionId) {
+          window.history.replaceState({}, '', `/tasks?editionId=${editionId}`);
+        }
       }
     }
   }, [urlTaskId, tasks, currentLocation]);
@@ -457,7 +459,7 @@ export default function Tasks() {
           setSelectedTask(null);
         }}
         onSave={handleTaskSave}
-        redirectPath="/"
+        redirectPath={editionId ? `/tasks?editionId=${editionId}` : '/tasks'}
       />
       
       {/* Add invisible spacing div at the bottom for mobile */}
