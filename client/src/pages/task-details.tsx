@@ -508,22 +508,60 @@ export default function TaskDetails() {
                     </div>
                   ))}
                 </div>
-              ) : comments.length > 0 ? (
-                <div className="space-y-4">
-                  {comments.map(comment => (
-                    <div key={comment.id} className="p-4 border rounded-md">
-                      <div className="flex justify-between mb-2">
-                        <span className="font-medium">{comment.user?.fullName || comment.user?.username || t('common.unknownUser')}</span>
-                        <span className="text-sm text-muted-foreground">{formatDate(comment.createdAt)}</span>
-                      </div>
-                      <p className="text-sm">{comment.content}</p>
-                    </div>
-                  ))}
-                </div>
               ) : (
-                <p className="text-center text-muted-foreground py-8">
-                  {t('tasks.noComments')}
-                </p>
+                <>
+                  {comments.length > 0 ? (
+                    <div className="space-y-4 mb-6">
+                      {comments.map(comment => (
+                        <div key={comment.id} className="p-4 border rounded-md">
+                          <div className="flex justify-between mb-2">
+                            <span className="font-medium">{comment.user?.fullName || comment.user?.username || t('common.unknownUser')}</span>
+                            <span className="text-sm text-muted-foreground">{formatDate(comment.createdAt)}</span>
+                          </div>
+                          <p className="text-sm">{comment.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8 mb-4">
+                      {t('tasks.noComments')}
+                    </p>
+                  )}
+                  
+                  {/* Add comment form */}
+                  <div className="border-t pt-4 mt-4">
+                    <h3 className="font-medium mb-2">{t('tasks.addComment')}</h3>
+                    <form 
+                      className="space-y-4"
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (commentForm.content.trim()) {
+                          addCommentMutation.mutate(commentForm);
+                        }
+                      }}
+                    >
+                      <Textarea 
+                        value={commentForm.content}
+                        onChange={(e) => setCommentForm({ content: e.target.value })}
+                        placeholder={t('tasks.commentPlaceholder')}
+                        rows={3}
+                        required
+                      />
+                      <Button 
+                        type="submit"
+                        disabled={addCommentMutation.isPending || !commentForm.content.trim()}
+                      >
+                        {addCommentMutation.isPending ? (
+                          <>{t('common.saving')}...</>
+                        ) : (
+                          <>
+                            <MessageSquare className="mr-2 h-4 w-4" /> {t('tasks.addComment')}
+                          </>
+                        )}
+                      </Button>
+                    </form>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
@@ -543,27 +581,112 @@ export default function TaskDetails() {
                     <Skeleton key={i} className="h-10 w-full" />
                   ))}
                 </div>
-              ) : resources.length > 0 ? (
-                <div className="space-y-2">
-                  {resources.map(resource => (
-                    <div key={resource.id} className="flex items-center p-3 border rounded-md">
-                      <Paperclip className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <div className="flex-1">
-                        <div className="font-medium">{resource.name}</div>
-                        <div className="text-sm text-muted-foreground">{resource.type}</div>
-                      </div>
-                      <Button size="sm" variant="outline" asChild>
-                        <a href={resource.url} target="_blank" rel="noopener noreferrer">
-                          {t('common.view')}
-                        </a>
-                      </Button>
-                    </div>
-                  ))}
-                </div>
               ) : (
-                <p className="text-center text-muted-foreground py-8">
-                  {t('tasks.noResources')}
-                </p>
+                <>
+                  {resources.length > 0 ? (
+                    <div className="space-y-2 mb-6">
+                      {resources.map(resource => (
+                        <div key={resource.id} className="flex items-center p-3 border rounded-md">
+                          <Paperclip className="h-4 w-4 mr-2 text-muted-foreground" />
+                          <div className="flex-1">
+                            <div className="font-medium">{resource.name}</div>
+                            <div className="text-sm text-muted-foreground">{resource.type}</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button size="sm" variant="outline" asChild>
+                              <a href={resource.url} target="_blank" rel="noopener noreferrer">
+                                <Link className="h-4 w-4 mr-1" /> {t('common.view')}
+                              </a>
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="ghost" 
+                              className="text-destructive hover:text-destructive" 
+                              onClick={() => deleteResourceMutation.mutate(resource.id)}
+                              disabled={deleteResourceMutation.isPending}
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8 mb-4">
+                      {t('tasks.noResources')}
+                    </p>
+                  )}
+                  
+                  {/* Add resource form */}
+                  <div className="border-t pt-4 mt-4">
+                    <h3 className="font-medium mb-2">{t('tasks.addResource')}</h3>
+                    <form 
+                      className="space-y-4"
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (resourceForm.name.trim() && resourceForm.url.trim()) {
+                          addResourceMutation.mutate(resourceForm);
+                        }
+                      }}
+                    >
+                      <div className="grid grid-cols-1 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="resourceName">{t('tasks.resourceName')}</Label>
+                          <Input
+                            id="resourceName"
+                            value={resourceForm.name}
+                            onChange={(e) => setResourceForm(prev => ({ ...prev, name: e.target.value }))}
+                            placeholder={t('tasks.resourceNamePlaceholder')}
+                            required
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="resourceUrl">{t('tasks.resourceUrl')}</Label>
+                          <Input
+                            id="resourceUrl"
+                            value={resourceForm.url}
+                            onChange={(e) => setResourceForm(prev => ({ ...prev, url: e.target.value }))}
+                            placeholder={t('tasks.resourceUrlPlaceholder')}
+                            required
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="resourceType">{t('tasks.resourceType')}</Label>
+                          <Select
+                            value={resourceForm.type}
+                            onValueChange={(value) => setResourceForm(prev => ({ ...prev, type: value }))}
+                          >
+                            <SelectTrigger>
+                              <SelectValue>{resourceForm.type}</SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="link">{t('tasks.resourceTypeLink')}</SelectItem>
+                              <SelectItem value="document">{t('tasks.resourceTypeDocument')}</SelectItem>
+                              <SelectItem value="video">{t('tasks.resourceTypeVideo')}</SelectItem>
+                              <SelectItem value="image">{t('tasks.resourceTypeImage')}</SelectItem>
+                              <SelectItem value="other">{t('tasks.resourceTypeOther')}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      <Button 
+                        type="submit"
+                        disabled={addResourceMutation.isPending || !resourceForm.name.trim() || !resourceForm.url.trim()}
+                      >
+                        {addResourceMutation.isPending ? (
+                          <>{t('common.saving')}...</>
+                        ) : (
+                          <>
+                            <Plus className="mr-2 h-4 w-4" /> {t('tasks.addResource')}
+                          </>
+                        )}
+                      </Button>
+                    </form>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
