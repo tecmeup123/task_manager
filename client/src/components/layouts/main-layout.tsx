@@ -91,9 +91,16 @@ export default function MainLayout({ children }: MainLayoutProps) {
     return '/';
   };
 
-  // Fetch editions for the sidebar
+  // Fetch editions for the sidebar (excluding archived)
   const { data: editions = [], isLoading } = useQuery<any[]>({
-    queryKey: ["/api/editions"],
+    queryKey: ["/api/editions", { includeArchived: false }],
+    queryFn: async () => {
+      const response = await fetch(`/api/editions?includeArchived=false`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch editions');
+      }
+      return response.json();
+    },
     staleTime: 60000, // Consider data fresh for 1 minute
     refetchOnWindowFocus: false, // Don't refetch when window gets focus
   });

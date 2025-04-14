@@ -58,15 +58,21 @@ export default function Editions() {
   // Show archived editions state
   const [showArchived, setShowArchived] = useState(false);
   
-  // Fetch all editions
-  const { data: allEditions, isLoading } = useQuery<any[]>({
-    queryKey: ["/api/editions"],
+  // Fetch all editions, including archived if showArchived is true
+  const { data: editions = [], isLoading } = useQuery<any[]>({
+    queryKey: ["/api/editions", { includeArchived: true }],
+    queryFn: async ({ queryKey }) => {
+      const response = await fetch(`/api/editions?includeArchived=true`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch editions');
+      }
+      const allEditions = await response.json();
+      // Filter editions based on archived status on the client side
+      return allEditions.filter((edition: any) => showArchived ? edition.archived : !edition.archived);
+    },
     staleTime: 60000, // Consider data fresh for 1 minute
     refetchOnWindowFocus: false, // Don't refetch when window gets focus
   });
-  
-  // Filter editions based on archived status
-  const editions = allEditions ? allEditions.filter(edition => showArchived ? edition.archived : !edition.archived) : [];
 
   // Delete edition mutation
   const deleteEdition = useMutation({
