@@ -1792,7 +1792,257 @@ export default function Settings() {
         </CardContent>
           </Card>
         </TabsContent>
+
+        {user?.role === 'admin' && (
+        <TabsContent value="users" className="space-y-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div>
+                <CardTitle className="flex items-center">
+                  <Users className="h-5 w-5 mr-2" />
+                  User Management
+                </CardTitle>
+                <CardDescription>
+                  Manage user accounts, roles and access
+                </CardDescription>
+              </div>
+              <Button 
+                onClick={() => setIsCreateUserDialogOpen(true)}
+                className="flex items-center"
+              >
+                <UserPlus className="h-4 w-4 mr-2" />
+                Add User
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {isUsersLoading ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+                </div>
+              ) : !users || users.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No users found.
+                </div>
+              ) : (
+                <div className="rounded-md border overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Username</TableHead>
+                        <TableHead>Full Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {users.map((user) => (
+                        <TableRow key={user.id}>
+                          <TableCell className="font-medium">{user.username}</TableCell>
+                          <TableCell>{user.fullName}</TableCell>
+                          <TableCell>{user.email || '-'}</TableCell>
+                          <TableCell>
+                            <Badge 
+                              variant={
+                                user.role === 'admin' ? 'destructive' : 
+                                user.role === 'editor' ? 'default' : 'secondary'
+                              }
+                            >
+                              {user.role}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {user.approved ? (
+                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                Approved
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                                <AlertCircle className="h-3 w-3 mr-1" />
+                                Pending
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right space-x-2">
+                            <Button
+                              variant="outline" 
+                              size="icon"
+                              onClick={() => handleEditUser(user)}
+                              className="h-8 w-8 p-0 inline-flex"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline" 
+                              size="icon"
+                              onClick={() => handleToggleApproval(user.id, user.approved)}
+                              className="h-8 w-8 p-0 inline-flex"
+                            >
+                              {user.approved ? (
+                                <XCircle className="h-4 w-4" />
+                              ) : (
+                                <CheckCircle className="h-4 w-4" />
+                              )}
+                            </Button>
+                            <Button
+                              variant="outline" 
+                              size="icon"
+                              onClick={() => handleResetPassword(user.id)}
+                              className="h-8 w-8 p-0 inline-flex"
+                            >
+                              <Lock className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        )}
       </Tabs>
+      
+      {/* Edit User Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+            <DialogDescription>
+              Update the user's role and permissions.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="username" className="text-right">Username</Label>
+              <Input id="username" value={selectedUser?.username || ''} className="col-span-3" disabled />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="fullName" className="text-right">Full Name</Label>
+              <Input id="fullName" value={selectedUser?.fullName || ''} className="col-span-3" disabled />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="role" className="text-right">Role</Label>
+              <Select value={newRole} onValueChange={setNewRole} defaultValue={selectedUser?.role}>
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select user role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="editor">Editor</SelectItem>
+                  <SelectItem value="viewer">Viewer</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleSaveUserEdit} disabled={updateUserMutation.isPending}>
+              {updateUserMutation.isPending ? (
+                <>
+                  <div className="animate-spin h-4 w-4 mr-2 border-2 border-background border-t-transparent rounded-full" />
+                  Saving...
+                </>
+              ) : "Save Changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create User Dialog */}
+      <Dialog open={isCreateUserDialogOpen} onOpenChange={setIsCreateUserDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create New User</DialogTitle>
+            <DialogDescription>
+              Add a new user to the system.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="newUsername" className="text-right">Username</Label>
+              <Input 
+                id="newUsername" 
+                value={newUsername} 
+                onChange={(e) => setNewUsername(e.target.value)}
+                className="col-span-3" 
+                required
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="newFullName" className="text-right">Full Name</Label>
+              <Input 
+                id="newFullName" 
+                value={newUserFullName} 
+                onChange={(e) => setNewUserFullName(e.target.value)}
+                className="col-span-3" 
+                required
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="newEmail" className="text-right">Email</Label>
+              <Input 
+                id="newEmail" 
+                type="email"
+                value={newUserEmail} 
+                onChange={(e) => setNewUserEmail(e.target.value)}
+                className="col-span-3" 
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="newRole" className="text-right">Role</Label>
+              <Select 
+                value={newUserRole} 
+                onValueChange={setNewUserRole} 
+                defaultValue="viewer"
+              >
+                <SelectTrigger className="col-span-3" id="newRole">
+                  <SelectValue placeholder="Select user role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="editor">Editor</SelectItem>
+                  <SelectItem value="viewer">Viewer</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="newPassword" className="text-right">Password</Label>
+              <div className="col-span-3">
+                <Input 
+                  id="newPassword" 
+                  type="text"
+                  value={newUserPassword} 
+                  onChange={(e) => setNewUserPassword(e.target.value)}
+                  className="mb-1" 
+                />
+                <p className="text-xs text-muted-foreground">
+                  Default: ChangeMe123! - Users will be required to change it on first login.
+                </p>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleCreateUser} disabled={createUserMutation.isPending}>
+              {createUserMutation.isPending ? (
+                <>
+                  <div className="animate-spin h-4 w-4 mr-2 border-2 border-background border-t-transparent rounded-full" />
+                  Creating...
+                </>
+              ) : "Create User"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       
       {/* Add invisible spacing div at the bottom for mobile */}
       <div className="h-12 md:hidden" />
