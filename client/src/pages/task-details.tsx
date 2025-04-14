@@ -117,6 +117,12 @@ export default function TaskDetails() {
   } = useQuery<any[]>({
     queryKey: [`/api/audit-logs/task/${taskId}`],
     enabled: !!taskId,
+    select: (data) => {
+      // Sort logs by timestamp (newest first)
+      return [...data].sort((a, b) => {
+        return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+      });
+    }
   });
   
   // Update task mutation
@@ -129,6 +135,7 @@ export default function TaskDetails() {
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: [`/api/tasks/${taskId}`] });
       queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/audit-logs/task/${taskId}`] });
       if (editionId) {
         queryClient.invalidateQueries({ queryKey: [`/api/editions/${editionId}/tasks`] });
       }
@@ -252,6 +259,16 @@ export default function TaskDetails() {
     if (!dateString) return "";
     try {
       return format(parseISO(dateString), "MMM d, yyyy");
+    } catch (e) {
+      return "Invalid date";
+    }
+  };
+  
+  // Format date with time for history entries
+  const formatDateTime = (dateString: string) => {
+    if (!dateString) return "";
+    try {
+      return format(parseISO(dateString), "MMM d, yyyy HH:mm");
     } catch (e) {
       return "Invalid date";
     }
@@ -778,7 +795,7 @@ export default function TaskDetails() {
                                 {user ? (user.fullName || user.username) : t('common.unknownUser')}
                               </span>
                               <span className="text-sm text-muted-foreground">
-                                {formatDate(log.timestamp)}
+                                {formatDateTime(log.timestamp)}
                               </span>
                             </div>
                             
