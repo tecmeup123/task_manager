@@ -1407,8 +1407,7 @@ export default function Settings() {
                 
                 <LoginActivityList limit={5} />
                 
-                <div className="flex justify-between">
-                  <Button variant="outline">View Full Activity Log</Button>
+                <div className="flex justify-end">
                   <Button 
                     onClick={handleSaveSecuritySettings}
                     disabled={!isSecuritySettingsChanged}

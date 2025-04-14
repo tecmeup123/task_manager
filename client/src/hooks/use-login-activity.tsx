@@ -16,9 +16,7 @@ export function useLoginActivity(options: UseLoginActivityOptions = {}) {
     refetch
   } = useQuery<LoginActivity[]>({
     queryKey: ["/api/login-activities", { limit }],
-    queryFn: getQueryFn({ 
-      pathname: `/api/login-activities?limit=${limit}` 
-    }),
+    queryFn: () => fetch(`/api/login-activities?limit=${limit}`).then(res => res.json()),
     enabled: true,
   });
 
