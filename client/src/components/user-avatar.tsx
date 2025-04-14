@@ -57,12 +57,6 @@ export function UserAvatar() {
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
             </DropdownMenuItem>
-            {user.role === 'admin' && (
-              <DropdownMenuItem onClick={() => window.location.href = "/users"}>
-                <User className="mr-2 h-4 w-4" />
-                <span>User Management</span>
-              </DropdownMenuItem>
-            )}
             <DropdownMenuItem onClick={() => startOnboarding()}>
               <HelpCircle className="mr-2 h-4 w-4" />
               <span>Start Onboarding</span>
