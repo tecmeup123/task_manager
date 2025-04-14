@@ -390,24 +390,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const logs = await storage.getAuditLogs(entityType, entityId);
       
-      // Enhance the logs with username information
+      // Enhance the logs with username information and ensure timestamp fields are valid
       const enhancedLogs = await Promise.all(logs.map(async (log) => {
+        // Make sure we have valid timestamp fields
+        // Audit logs use timestamp field, not createdAt
+        const enhancedLog = {
+          ...log,
+          // Ensure timestamp is always a valid string
+          timestamp: log.timestamp ? new Date(log.timestamp).toISOString() : new Date().toISOString()
+        };
+        
         if (log.userId) {
           try {
             const user = await storage.getUser(log.userId);
             return {
-              ...log,
+              ...enhancedLog,
               username: user ? (user.fullName || user.username) : "Unknown User"
             };
           } catch (err) {
             return {
-              ...log,
+              ...enhancedLog,
               username: "Unknown User"
             };
           }
         }
         return {
-          ...log,
+          ...enhancedLog,
           username: "System"
         };
       }));

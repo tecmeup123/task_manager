@@ -139,7 +139,10 @@ export default function TaskDetailModal({
               
               return {
                 action: actionText,
-                timestamp: log.createdAt ? new Date(log.createdAt) : null,
+                // Use log.timestamp if available (from our enhanced API), otherwise fall back to createdAt
+                timestamp: log.timestamp ? new Date(log.timestamp) : 
+                           log.createdAt ? new Date(log.createdAt) : 
+                           new Date(),
                 user: log.username || 'System'
               };
             });
