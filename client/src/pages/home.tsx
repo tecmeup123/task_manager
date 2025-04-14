@@ -34,14 +34,16 @@ import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
   const { t } = useTranslation();
-  const { data: allEditions, isLoading: loadingEditions } = useQuery({
-    queryKey: ["/api/editions"],
+  const { data: editions = [], isLoading: loadingEditions } = useQuery<any[]>({
+    queryKey: ["/api/editions", { includeArchived: false }],
+    queryFn: async () => {
+      const response = await fetch(`/api/editions?includeArchived=false`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch editions');
+      }
+      return response.json();
+    },
   });
-
-  // Filter out archived editions for the dashboard
-  const editions = allEditions && Array.isArray(allEditions) 
-    ? allEditions.filter((edition: any) => !edition.archived) 
-    : [];
   
   const currentEdition = editions?.[0];
   

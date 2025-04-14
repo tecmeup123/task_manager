@@ -56,9 +56,16 @@ export default function Tasks() {
   const [expandedWeeks, setExpandedWeeks] = useState<Record<string, boolean>>({});
   const [editionHasChanged, setEditionHasChanged] = useState(false);
 
-  // Fetch all editions
+  // Fetch all editions (excluding archived)
   const { data: editions = [], isLoading: editionsLoading } = useQuery<any[]>({
-    queryKey: ["/api/editions"],
+    queryKey: ["/api/editions", { includeArchived: false }],
+    queryFn: async () => {
+      const response = await fetch(`/api/editions?includeArchived=false`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch editions');
+      }
+      return response.json();
+    },
   });
 
   // Find the current edition
