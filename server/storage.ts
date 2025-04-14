@@ -17,6 +17,8 @@ import {
   InsertMention,
   TaskComment,
   InsertTaskComment,
+  LoginActivity,
+  InsertLoginActivity,
   users,
   trainers,
   editions,
@@ -25,7 +27,8 @@ import {
   notifications,
   resources,
   mentions,
-  taskComments
+  taskComments,
+  loginActivities
 } from "@shared/schema";
 import { add, format, parseISO, isBefore, subWeeks } from "date-fns";
 import { and, eq, count, inArray } from "drizzle-orm";
@@ -45,6 +48,14 @@ export interface IStorage {
   
   // Session storage for authentication
   sessionStore: any;
+  
+  // Login activity methods
+  createLoginActivity(activity: InsertLoginActivity): Promise<LoginActivity>;
+  getUserLoginActivities(userId: number, limit?: number): Promise<LoginActivity[]>;
+  updateUserSecuritySettings(userId: number, settings: { 
+    rememberMe?: boolean; 
+    sessionTimeoutMinutes?: number;
+  }): Promise<User>;
 
   // Trainer methods
   getAllTrainers(): Promise<Trainer[]>;
@@ -1519,6 +1530,51 @@ export class DatabaseStorage implements IStorage {
       ));
     
     return result ? result.count : 0;
+  }
+  
+  // Login activity methods
+  async createLoginActivity(activity: InsertLoginActivity): Promise<LoginActivity> {
+    const { db } = await import("./db");
+    const { loginActivities } = await import("@shared/schema");
+    
+    const [newActivity] = await db.insert(loginActivities)
+      .values({
+        ...activity,
+        timestamp: new Date()
+      })
+      .returning();
+      
+    return newActivity;
+  }
+  
+  async getUserLoginActivities(userId: number, limit: number = 10): Promise<LoginActivity[]> {
+    const { db, eq, desc } = await import("./db");
+    const { loginActivities } = await import("@shared/schema");
+    
+    return db.select()
+      .from(loginActivities)
+      .where(eq(loginActivities.userId, userId))
+      .orderBy(desc(loginActivities.timestamp))
+      .limit(limit);
+  }
+  
+  async updateUserSecuritySettings(userId: number, settings: { 
+    rememberMe?: boolean; 
+    sessionTimeoutMinutes?: number;
+  }): Promise<User> {
+    const { db, eq } = await import("./db");
+    const { users } = await import("@shared/schema");
+    
+    const [updatedUser] = await db.update(users)
+      .set(settings)
+      .where(eq(users.id, userId))
+      .returning();
+      
+    if (!updatedUser) {
+      throw new Error(`User with id ${userId} not found`);
+    }
+    
+    return updatedUser;
   }
 
   // Method to seed initial data for the database

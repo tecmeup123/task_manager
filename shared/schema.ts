@@ -18,6 +18,10 @@ export const users = pgTable("users", {
   passwordChangeRequired: boolean("password_change_required").default(false).notNull(),
   approved: boolean("approved").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  // Security settings
+  rememberMe: boolean("remember_me").default(false),
+  sessionTimeoutMinutes: integer("session_timeout_minutes").default(120),
+  lastActive: timestamp("last_active"),
   // Avatar settings
   avatarUrl: text("avatar_url"), // URL to the uploaded photo
   avatarColor: text("avatar_color").default("#6366F1"), // Fallback color for avatar
@@ -278,6 +282,26 @@ export const insertTaskReactionSchema = createInsertSchema(taskReactions).omit({
 
 export type InsertTaskReaction = z.infer<typeof insertTaskReactionSchema>;
 export type TaskReaction = typeof taskReactions.$inferSelect;
+
+// Login Activity table to store user login history
+export const loginActivities = pgTable("login_activities", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  deviceInfo: text("device_info"),
+  success: boolean("success").default(true).notNull(),
+  location: text("location"),
+});
+
+export const insertLoginActivitySchema = createInsertSchema(loginActivities).omit({
+  id: true,
+  timestamp: true,
+});
+
+export type InsertLoginActivity = z.infer<typeof insertLoginActivitySchema>;
+export type LoginActivity = typeof loginActivities.$inferSelect;
 
 // Notification table to store user notifications
 export const notifications = pgTable("notifications", {
