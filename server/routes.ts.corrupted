@@ -1106,7 +1106,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             message: `You have been assigned to task "${task.name}" (${editionCode})`,
             entityType: "task",
             entityId: task.id,
-            actionUrl: `/tasks?editionId=${task.editionId}&taskId=${task.id}`,
+            actionUrl: `/tasks?editionId=${task.editionId}actionUrl: `/tasks?editionId=${task.editionId}actionUrl: `/tasks/${task.id}`,taskId=${task.id}`,taskId=${task.id}`,
             metadata: { taskId: task.id, editionId: task.editionId }
           });
         }
@@ -1122,7 +1122,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             message: `You have been assigned to task "${task.name}" (${editionCode}) via role ${newAssignedTo}`,
             entityType: "task",
             entityId: task.id,
-            actionUrl: `/tasks?editionId=${task.editionId}&taskId=${task.id}`,
+            actionUrl: `/tasks?editionId=${task.editionId}actionUrl: `/tasks?editionId=${task.editionId}actionUrl: `/tasks/${task.id}`,taskId=${task.id}`,taskId=${task.id}`,
             metadata: { taskId: task.id, editionId: task.editionId }
           });
         }
@@ -1139,7 +1139,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               message: `Task "${task.name}" has been marked as completed`,
               entityType: "task",
               entityId: task.id,
-              actionUrl: `/tasks?editionId=${task.editionId}&taskId=${task.id}`,
+              actionUrl: `/tasks?editionId=${task.editionId}actionUrl: `/tasks?editionId=${task.editionId}actionUrl: `/tasks/${task.id}`,taskId=${task.id}`,taskId=${task.id}`,
               metadata: { taskId: task.id, editionId: task.editionId }
             });
           } 
@@ -1160,7 +1160,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 message: `Task "${task.name}" has been marked as completed`,
                 entityType: "task",
                 entityId: task.id,
-                actionUrl: `/tasks?editionId=${task.editionId}&taskId=${task.id}`,
+                actionUrl: `/tasks?editionId=${task.editionId}actionUrl: `/tasks/${task.id}`,taskId=${task.id}`,
                 metadata: { taskId: task.id, editionId: task.editionId }
               });
             }
@@ -1182,7 +1182,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             message: `Task "${task.name}" has been updated`,
             entityType: "task",
             entityId: task.id,
-            actionUrl: `/tasks?editionId=${task.editionId}&taskId=${task.id}`,
+            actionUrl: `/tasks?editionId=${task.editionId}actionUrl: `/tasks/${task.id}`,taskId=${task.id}`,
             metadata: { taskId: task.id, editionId: task.editionId }
           });
         }
@@ -1207,7 +1207,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               message: `Task "${task.name}" has been updated`,
               entityType: "task",
               entityId: task.id,
-              actionUrl: `/tasks?editionId=${task.editionId}&taskId=${task.id}`,
+              actionUrl: `/tasks?editionId=${task.editionId}actionUrl: `/tasks/${task.id}`,taskId=${task.id}`,
               metadata: { taskId: task.id, editionId: task.editionId }
             });
           }
