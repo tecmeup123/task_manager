@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatDate, formatTime, getInitials, getStatusColor } from "@/lib/utils";
+import ClickableTaskStatus from "@/components/clickable-task-status";
 
 interface TaskRowProps {
   task: any;
@@ -66,11 +67,7 @@ export default function TaskRow({ task, onClick, isCurrentWeek = false }: TaskRo
         </div>
         
         <div className="md:col-span-1 flex items-center">
-          <Badge
-            className={`${statusColors.bg} ${statusColors.text} font-normal`}
-          >
-            {task.status}
-          </Badge>
+          <ClickableTaskStatus task={task} />
         </div>
       </div>
       
@@ -86,11 +83,7 @@ export default function TaskRow({ task, onClick, isCurrentWeek = false }: TaskRo
           </div>
           
           <div className="col-span-6 flex items-center justify-end">
-            <Badge
-              className={`${statusColors.bg} ${statusColors.text} font-normal text-xs`}
-            >
-              {task.status}
-            </Badge>
+            <ClickableTaskStatus task={task} className="text-xs" />
           </div>
         </div>
         
