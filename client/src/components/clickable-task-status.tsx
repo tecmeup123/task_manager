@@ -77,12 +77,24 @@ export default function ClickableTaskStatus({ task, className }: ClickableTaskSt
     }
   };
 
+  // Wrapper to completely isolate badge from parent
+  const handleBadgeClick = (e: React.MouseEvent) => {
+    // Stop event from propagating up to parent elements
+    e.stopPropagation();
+    e.preventDefault();
+    // Handle the status update
+    handleStatusClick(e);
+    // Return false to prevent default browser action
+    return false;
+  };
+
   return (
-    <Badge
-      className={`${statusColors.bg} ${statusColors.text} font-normal cursor-pointer transition-all duration-200 hover:scale-105 ${className}`}
-      onClick={handleStatusClick}
-    >
-      {isUpdating ? "Updating..." : task.status}
-    </Badge>
+    <div className="inline-block" onClick={handleBadgeClick}>
+      <Badge
+        className={`${statusColors.bg} ${statusColors.text} font-normal cursor-pointer transition-all duration-200 hover:scale-105 ${className}`}
+      >
+        {isUpdating ? "Updating..." : task.status}
+      </Badge>
+    </div>
   );
 }
