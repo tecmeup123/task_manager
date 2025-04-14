@@ -371,7 +371,7 @@ export default function Home() {
                         {getRelativeDateDescription(edition.startDate)}
                       </p>
                     </div>
-                    <Link to={`/tasks/${edition.id}`}>
+                    <Link to={`/tasks?editionId=${edition.id}`}>
                       <Button variant="ghost" size="sm">View</Button>
                     </Link>
                   </div>
@@ -588,7 +588,7 @@ export default function Home() {
                         </div>
                       </div>
                     </div>
-                    <Link to={`/tasks/${task.editionId}`}>
+                    <Link to={`/tasks?editionId=${task.editionId}&taskId=${task.id}`}>
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                         <ChevronRight className="h-4 w-4" />
                       </Button>
@@ -666,7 +666,7 @@ export default function Home() {
                         </div>
                       </div>
                     </div>
-                    <Link to={`/tasks/${task.editionId}`}>
+                    <Link to={`/tasks?editionId=${task.editionId}&taskId=${task.id}`}>
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                         <ChevronRight className="h-4 w-4" />
                       </Button>
