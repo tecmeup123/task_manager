@@ -99,6 +99,13 @@ export default function Tasks() {
       // Determine which task ID to use (prefer state taskId over URL taskId)
       const taskIdToUse = stateTaskId || (urlTaskId ? parseInt(urlTaskId) : null);
       
+      // Skip if we just came from closing a modal
+      const fromModal = locationState.fromModal || false;
+      if (fromModal) {
+        console.log("Skipping task open as we just closed a modal");
+        return;
+      }
+      
       // Only execute if we have a taskId and editionId
       if (taskIdToUse && editionId) {
         console.log(`Attempting to open task ID: ${taskIdToUse} for edition: ${editionId}`, { fromState: !!stateTaskId, fromUrl: !!urlTaskId });
@@ -505,7 +512,8 @@ export default function Tasks() {
           // Clean up the URL to avoid reopening modal on page refresh,
           // but keep the editionId param to preserve context
           if (editionId) {
-            window.history.replaceState({}, '', `/tasks?editionId=${editionId}`);
+            // Use setLocation with replace to avoid adding history entries
+            setLocation(`/tasks?editionId=${editionId}`);
           }
         }}
         onSave={handleTaskSave}
