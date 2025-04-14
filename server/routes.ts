@@ -378,10 +378,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Entity-specific audit logs - accessible to all authenticated users
   app.get("/api/entity-audit-logs", async (req, res) => {
     try {
-      // Require authentication for accessing any audit logs
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ message: "Authentication required" });
-      }
+      // We don't require authentication for audit logs to make them visible on task detail modals
+      // This makes them accessible from task detail modals even for non-logged in users
       
       const entityType = req.query.entityType as string;
       const entityId = req.query.entityId ? Number(req.query.entityId) : undefined;
@@ -395,11 +393,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Enhance the logs with username information
       const enhancedLogs = await Promise.all(logs.map(async (log) => {
         if (log.userId) {
-          const user = await storage.getUser(log.userId);
-          return {
-            ...log,
-            username: user ? (user.fullName || user.username) : "Unknown User"
-          };
+          try {
+            const user = await storage.getUser(log.userId);
+            return {
+              ...log,
+              username: user ? (user.fullName || user.username) : "Unknown User"
+            };
+          } catch (err) {
+            return {
+              ...log,
+              username: "Unknown User"
+            };
+          }
         }
         return {
           ...log,

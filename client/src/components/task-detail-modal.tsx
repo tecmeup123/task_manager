@@ -75,75 +75,87 @@ export default function TaskDetailModal({
 }: TaskDetailModalProps) {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
-  const [activityHistory, setActivityHistory] = useState<any[]>([]);
+  // Use a ref to store activity history for the Task Activity section
+  const [activityHistory, setActivityHistory] = useState<any[]>([
+    {
+      action: "Task created",
+      timestamp: task?.createdAt ? new Date(task.createdAt) : new Date(),
+      user: "System"
+    }
+  ]);
   
-  // Fetch task's audit logs
-  const { data: auditLogs = [] } = useQuery<any[]>({
-    queryKey: ['/api/entity-audit-logs'],
-    queryFn: async () => {
-      if (!task?.id) return [];
-      const res = await fetch(`/api/entity-audit-logs?entityType=task&entityId=${task.id}`);
-      if (!res.ok) throw new Error('Failed to fetch audit logs');
-      return res.json();
-    },
-    enabled: !!task?.id && isOpen
-  });
+  // Flag to track if we've processed logs for this task
+  const processedLogsRef = useRef<boolean>(false);
+  const taskIdRef = useRef<number | null>(null);
   
-  // Transform audit logs into activity history format when logs change
+  // If task ID changes, reset the processed flag
   useEffect(() => {
-    // Log for debugging
-    console.log("Raw history state:", auditLogs);
-    if (task) console.log("Task data example:", task);
-    
-    // Function to transform logs to history
-    const transformLogsToHistory = () => {
-      if (auditLogs && auditLogs.length > 0) {
-        // Transform audit logs into activity history format
-        const history = auditLogs.map((log: any) => {
-          // Determine the action text based on log data
-          let actionText = log.notes;
-          
-          // Special handling for specific actions
-          if (log.action === 'update') {
-            const oldState = log.previousState;
-            const newState = log.newState;
-            
-            if (oldState && newState) {
-              if (oldState.status !== newState.status) {
-                actionText = `Status changed from "${oldState.status}" to "${newState.status}"`;
-              } else if (oldState.owner !== newState.owner) {
-                actionText = `Task ownership changed from "${oldState.owner || 'Unassigned'}" to "${newState.owner || 'Unassigned'}"`;
-              } else if (oldState.assignedUserId !== newState.assignedUserId) {
-                actionText = `Task assignment changed`;
-              }
-            }
-          } else if (log.action === 'create') {
-            actionText = 'Task created';
-          }
-          
-          return {
-            action: actionText,
-            timestamp: new Date(log.createdAt),
-            user: log.username || 'System'
-          };
-        });
-        
-        return history;
-      }
+    if (taskIdRef.current !== task?.id) {
+      processedLogsRef.current = false;
+      taskIdRef.current = task?.id || null;
       
-      // Default history if no logs found
-      return [{
+      // Reset to default state when task changes
+      setActivityHistory([{
         action: "Task created",
         timestamp: task?.createdAt ? new Date(task.createdAt) : new Date(),
         user: "System"
-      }];
-    };
-    
-    // Set history only once based on current auditLogs and task
-    const history = transformLogsToHistory();
-    setActivityHistory(history);
-    
-  }, [auditLogs, task?.id]); // Only depend on task.id, not the entire task object
+      }]);
+    }
+  }, [task?.id, task?.createdAt]);
+  
+  // Fetch task's audit logs directly (not with useQuery)
+  useEffect(() => {
+    // Only fetch if we have a task, the modal is open, and we haven't processed logs yet
+    if (task?.id && isOpen && !processedLogsRef.current) {
+      fetch(`/api/entity-audit-logs?entityType=task&entityId=${task.id}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch audit logs');
+          return res.json();
+        })
+        .then(logs => {
+          if (logs && logs.length > 0) {
+            // Transform logs to activity history
+            const history = logs.map((log: any) => {
+              // Determine the action text based on log data
+              let actionText = log.notes || '';
+              
+              // Special handling for specific actions
+              if (log.action === 'update') {
+                const oldState = log.previousState;
+                const newState = log.newState;
+                
+                if (oldState && newState) {
+                  if (oldState.status !== newState.status) {
+                    actionText = `Status changed from "${oldState.status}" to "${newState.status}"`;
+                  } else if (oldState.owner !== newState.owner) {
+                    actionText = `Task ownership changed from "${oldState.owner || 'Unassigned'}" to "${newState.owner || 'Unassigned'}"`;
+                  } else if (oldState.assignedUserId !== newState.assignedUserId) {
+                    actionText = `Task assignment changed`;
+                  }
+                }
+              } else if (log.action === 'create') {
+                actionText = 'Task created';
+              }
+              
+              return {
+                action: actionText,
+                timestamp: log.createdAt ? new Date(log.createdAt) : null,
+                user: log.username || 'System'
+              };
+            });
+            
+            // Update state only once per task
+            setActivityHistory(history);
+          }
+          
+          // Mark as processed
+          processedLogsRef.current = true;
+        })
+        .catch(error => {
+          console.error('Error fetching audit logs:', error);
+        });
+    }
+  }, [task?.id, isOpen]);
 
   // Fetch users for task assignment
   const { data: users = [], isLoading: isLoadingUsers } = useQuery<User[]>({
@@ -604,7 +616,9 @@ export default function TaskDetailModal({
                     <div className="flex justify-between">
                       <span dangerouslySetInnerHTML={{ __html: activity.action }} />
                       <span className="text-neutral-500">
-                        {format(new Date(activity.timestamp), "MMM d, yyyy - h:mm a")}
+                        {activity.timestamp 
+                          ? format(new Date(activity.timestamp), "MMM d, yyyy - h:mm a") 
+                          : "Unknown time"}
                       </span>
                     </div>
                     <div className="text-neutral-600 text-xs mt-1">
