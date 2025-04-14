@@ -21,7 +21,8 @@ import {
   UserCog,
   Pencil,
   CheckCircle,
-  XCircle
+  XCircle,
+  Trash2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
@@ -532,6 +533,27 @@ export default function Settings() {
     onError: (error: Error) => {
       toast({
         title: "Reset failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  });
+  
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: number) => {
+      const res = await apiRequest("DELETE", `/api/users/${userId}`, {});
+      return res.status === 204 ? {} : await res.json(); // 204 No Content
+    },
+    onSuccess: () => {
+      toast({
+        title: "User deleted",
+        description: "The user has been successfully deleted."
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Delete failed",
         description: error.message,
         variant: "destructive"
       });
