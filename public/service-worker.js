@@ -1,8 +1,8 @@
-// Nome do cache
+// Cache name
 const CACHE_NAME = 'training-session-manager-v1';
 const DYNAMIC_CACHE = 'training-session-manager-dynamic-v1';
 
-// Recursos para cache prévio
+// Resources for precaching
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -11,10 +11,10 @@ const STATIC_ASSETS = [
   '/icons/icon-512x512.png'
 ];
 
-// URLs de API que não devem ser cacheadas
+// API URLs that should not be cached
 const API_URLS = ['/api/'];
 
-// Instalação do service worker
+// Service worker installation
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -25,7 +25,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Ativação do service worker
+// Service worker activation
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -40,18 +40,18 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Estratégia de Cache: Cache First, then Network com fallback para recursos estáticos
+// Cache Strategy: Cache First, then Network with fallback for static resources
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   
-  // Ignorar requisições de API para URLs específicas que não devem ser cacheadas
+  // Skip API requests for URLs that shouldn't be cached
   const isApiRequest = API_URLS.some(apiUrl => event.request.url.includes(apiUrl));
   if (isApiRequest) {
-    // Para requisições de API, sempre tentar rede primeiro, com fallback para cache caso esteja offline
+    // For API requests, always try network first, with fallback to cache if offline
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          // Se uma requisição GET for bem-sucedida, cache o resultado para uso offline futuro
+          // If a GET request is successful, cache the result for future offline use
           if (event.request.method === 'GET' && response.status === 200) {
             const clonedResponse = response.clone();
             caches.open(DYNAMIC_CACHE).then(cache => {
@@ -66,8 +66,8 @@ self.addEventListener('fetch', (event) => {
               if (cachedResponse) {
                 return cachedResponse;
               }
-              // Retornar uma resposta vazia ou personalizada para erros de API
-              return new Response(JSON.stringify({ error: 'Você está offline. Dados não disponíveis.' }), {
+              // Return an empty or custom response for API errors
+              return new Response(JSON.stringify({ error: 'You are offline. Data not available.' }), {
                 headers: { 'Content-Type': 'application/json' }
               });
             });
@@ -76,7 +76,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Para recursos estáticos, use Cache First com fallback para rede
+  // For static resources, use Cache First with fallback to network
   event.respondWith(
     caches.match(event.request)
       .then(cachedResponse => {
@@ -86,12 +86,12 @@ self.addEventListener('fetch', (event) => {
         
         return fetch(event.request)
           .then(response => {
-            // Não cache responses com status diferente de 200
+            // Don't cache responses with status different from 200
             if (!response || response.status !== 200 || response.type !== 'basic') {
               return response;
             }
             
-            // Clonar a resposta e armazenar em cache
+            // Clone the response and store in cache
             const responseToCache = response.clone();
             caches.open(DYNAMIC_CACHE)
               .then(cache => {
@@ -101,8 +101,8 @@ self.addEventListener('fetch', (event) => {
             return response;
           })
           .catch(error => {
-            // Para recursos como HTML, CSS ou JS, que são cruciais para a aplicação,
-            // retornar uma página offline caso esteja sem conexão
+            // For resources like HTML, CSS or JS that are crucial for the application,
+            // return an offline page when connection is lost
             if (event.request.headers.get('accept').includes('text/html')) {
               return caches.match('/offline.html');
             }
@@ -113,21 +113,21 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Processa mensagens do cliente (para sincronizar dados quando online)
+// Process client messages (to synchronize data when online)
 self.addEventListener('message', (event) => {
   if (event.data.action === 'skipWaiting') {
     self.skipWaiting();
   }
 });
 
-// Funcionalidade de sincronização em segundo plano
+// Background synchronization functionality
 self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-tasks') {
     event.waitUntil(syncPendingTasks());
   }
 });
 
-// Função para sincronizar tarefas pendentes quando a conexão for restaurada
+// Function to synchronize pending tasks when connection is restored
 async function syncPendingTasks() {
   try {
     const pendingTasksRequest = await fetch('/api/tasks/pending');
@@ -145,16 +145,16 @@ async function syncPendingTasks() {
     
     await Promise.all(syncPromises);
     
-    // Notifique o cliente que a sincronização foi concluída
+    // Notify client that synchronization is complete
     const clients = await self.clients.matchAll();
     clients.forEach(client => {
       client.postMessage({
         type: 'SYNC_COMPLETE',
-        message: 'Todas as tarefas foram sincronizadas com sucesso!'
+        message: 'All tasks have been successfully synchronized!'
       });
     });
     
   } catch (error) {
-    console.error('Falha na sincronização de tarefas:', error);
+    console.error('Failed to synchronize tasks:', error);
   }
 }

@@ -88,35 +88,35 @@ export function PWAInstallPrompt() {
             <Wifi className="h-4 w-4" /> : 
             <WifiOff className="h-4 w-4" />
           }
-          {isOnline ? 'Instalar App' : 'Modo Offline Disponível'}
+          {isOnline ? 'Install App' : 'Offline Mode Available'}
         </Button>
       </div>
 
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent side="bottom" className="rounded-t-xl">
           <SheetHeader className="text-left">
-            <SheetTitle>Instalar Training Session Manager</SheetTitle>
+            <SheetTitle>Install Training Session Manager</SheetTitle>
             <SheetDescription>
-              Instale o aplicativo no seu dispositivo para acessar mesmo quando estiver offline e ter uma experiência mais fluida.
+              Install the app on your device to access even when you're offline and have a smoother experience.
             </SheetDescription>
           </SheetHeader>
           <div className="mt-6 space-y-4">
             <div className="flex flex-col gap-2">
-              <h3 className="text-sm font-semibold">Benefícios:</h3>
+              <h3 className="text-sm font-semibold">Benefits:</h3>
               <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Acesso mesmo quando estiver sem internet</li>
-                <li>• Melhor desempenho e carregamento mais rápido</li>
-                <li>• Visualização e gerenciamento de tarefas offline</li>
-                <li>• Experiência similar a um aplicativo nativo</li>
+                <li>• Access even when you're offline</li>
+                <li>• Better performance and faster loading</li>
+                <li>• View and manage tasks offline</li>
+                <li>• Experience similar to a native app</li>
               </ul>
             </div>
             <div className="flex justify-end gap-2 pt-4">
               <Button variant="outline" onClick={() => setIsOpen(false)}>
-                Agora não
+                Not now
               </Button>
               <Button onClick={handleInstall} className="gap-2">
                 <Download className="h-4 w-4" />
-                Instalar
+                Install
               </Button>
             </div>
           </div>

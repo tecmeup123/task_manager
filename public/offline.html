@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Você está offline - Training Session Manager</title>
+  <title>You are offline - Training Session Manager</title>
   <style>
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -67,14 +67,14 @@
 <body>
   <div class="container">
     <div class="icon">📶</div>
-    <h1>Você está offline</h1>
-    <p>Não foi possível conectar aos servidores. Você está vendo essa página porque a aplicação Training Session Manager não conseguiu estabelecer uma conexão com a internet.</p>
-    <p>Algumas funcionalidades podem estar disponíveis em modo offline, dependendo dos dados que foram cacheados anteriormente.</p>
-    <a href="/" class="button">Tentar novamente</a>
+    <h1>You are offline</h1>
+    <p>Could not connect to servers. You're seeing this page because the Training Session Manager application couldn't establish a connection to the internet.</p>
+    <p>Some features may be available in offline mode, depending on the data that was previously cached.</p>
+    <a href="/" class="button">Try again</a>
   </div>
   
   <script>
-    // Verificar conexão periodicamente
+    // Check connection periodically
     window.addEventListener('online', () => {
       window.location.reload();
     });
