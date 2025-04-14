@@ -624,6 +624,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Edition not found" });
       }
       
+      // Se a edição estiver arquivada e não for explicitamente solicitado para incluí-la,
+      // retorne um erro ou array vazio
+      if (edition.archived) {
+        return res.status(403).json({ message: "Cannot fetch tasks for archived editions" });
+      }
+      
       const week = req.query.week as string | undefined;
       
       let tasks;
@@ -642,8 +648,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all tasks (for notifications and global search)
   app.get("/api/tasks", async (req, res) => {
     try {
+      // Modifique a API para filtrar tarefas de edições arquivadas
+      // Primeiro, obtenha todas as edições não arquivadas
+      const activeEditions = await storage.getAllEditions(false); // false = não incluir arquivadas
+      const activeEditionIds = activeEditions.map(edition => edition.id);
+      
       const tasks = await storage.getAllTasks();
-      res.json(tasks);
+      
+      // Filtre as tarefas para retornar apenas aquelas de edições ativas
+      const filteredTasks = tasks.filter(task => activeEditionIds.includes(task.editionId));
+      
+      res.json(filteredTasks);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch tasks" });
     }
@@ -768,6 +783,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!task) {
         return res.status(404).json({ message: "Task not found" });
       }
+      
+      // Verificar se a edição da tarefa está arquivada
+      const edition = await storage.getEdition(task.editionId);
+      if (edition && edition.archived) {
+        return res.status(403).json({ message: "Task belongs to an archived edition" });
+      }
+      
       res.json(task);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch task" });
@@ -982,6 +1004,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Edition not found" });
       }
       
+      // Não permitir a criação de tarefas em edições arquivadas
+      if (edition.archived) {
+        return res.status(403).json({ message: "Cannot create tasks for archived editions" });
+      }
+      
       // Verify assignedUserId is valid if provided and not null
       if (taskData.assignedUserId !== null && taskData.assignedUserId !== undefined) {
         const assignedUser = await storage.getUser(taskData.assignedUserId);
@@ -1045,6 +1072,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const task = await storage.getTask(id);
       if (!task) {
         return res.status(404).json({ message: "Task not found" });
+      }
+      
+      // Verificar se a edição da tarefa está arquivada
+      const edition = await storage.getEdition(task.editionId);
+      if (edition && edition.archived) {
+        return res.status(403).json({ message: "Cannot update tasks from archived editions" });
       }
       
       // Track assignment changes for notifications
@@ -1252,10 +1285,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete a task
   app.delete("/api/tasks/:id", async (req, res) => {
     try {
-      const result = await storage.deleteTask(Number(req.params.id));
-      if (!result) {
+      const taskId = Number(req.params.id);
+      const task = await storage.getTask(taskId);
+      
+      if (!task) {
         return res.status(404).json({ message: "Task not found" });
       }
+      
+      // Verificar se a edição da tarefa está arquivada
+      const edition = await storage.getEdition(task.editionId);
+      if (edition && edition.archived) {
+        return res.status(403).json({ message: "Cannot delete tasks from archived editions" });
+      }
+      
+      const result = await storage.deleteTask(taskId);
+      
+      // Create audit log if user is authenticated
+      if (req.isAuthenticated()) {
+        await storage.createAuditLog({
+          userId: req.user.id,
+          entityType: "task",
+          entityId: taskId,
+          action: "delete",
+          previousState: task,
+          newState: null,
+          notes: `Task ${task.taskCode} (${task.name}) deleted by ${req.user.username}`
+        });
+      }
+      
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete task" });
