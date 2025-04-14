@@ -72,9 +72,29 @@ export default function ClickableTaskStatus({ task, className }: ClickableTaskSt
         completionDate
       });
       
-      // Invalidate queries to refetch data
-      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
-      queryClient.invalidateQueries({ queryKey: [`/api/editions/${task.editionId}/tasks`] });
+      // Salvar a posição de rolagem atual antes de atualizar
+      const scrollPosition = window.scrollY;
+      
+      // Invalidate queries to refetch data, mas manter a posição na página
+      queryClient.invalidateQueries({ 
+        queryKey: ['/api/tasks'],
+        refetchType: 'none' // Não refetch automático para controlar melhor a UX
+      });
+      
+      queryClient.invalidateQueries({ 
+        queryKey: [`/api/editions/${task.editionId}/tasks`],
+        refetchType: 'none' // Não refetch automático para controlar melhor a UX
+      });
+      
+      // Realizar o refetch manualmente e restaurar a posição de rolagem
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ['/api/tasks'] }).then(() => {
+          queryClient.refetchQueries({ queryKey: [`/api/editions/${task.editionId}/tasks`] }).then(() => {
+            // Restaurar a posição de rolagem após o refetch
+            window.scrollTo(0, scrollPosition);
+          });
+        });
+      }, 100);
       
       toast({
         title: "Status updated",

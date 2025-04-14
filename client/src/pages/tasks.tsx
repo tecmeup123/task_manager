@@ -245,17 +245,32 @@ export default function Tasks() {
       console.log("Sending task update for:", updatedTask);
       await apiRequest('PATCH', `/api/tasks/${updatedTask.id}`, updatedTask);
       
+      // Salvar a posição de rolagem antes de refetch
+      const scrollPosition = window.scrollY;
+      
       // Also invalidate the general tasks query
-      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
-      queryClient.invalidateQueries({ queryKey: [`/api/editions/${currentEdition?.id}/tasks`] });
+      queryClient.invalidateQueries({ 
+        queryKey: ['/api/tasks'],
+        refetchType: 'none'
+      });
+      
+      queryClient.invalidateQueries({ 
+        queryKey: [`/api/editions/${currentEdition?.id}/tasks`],
+        refetchType: 'none'
+      });
       
       setIsTaskModalOpen(false);
       toast({
         title: "Task updated",
         description: "Task has been successfully updated",
       });
-      // Force refetch to ensure we have the latest data
-      refetchTasks();
+      
+      // Force refetch e restaurar scrolling
+      setTimeout(() => {
+        refetchTasks().then(() => {
+          window.scrollTo(0, scrollPosition);
+        });
+      }, 100);
     } catch (error) {
       console.error("Failed to update task:", error);
       toast({
@@ -274,17 +289,32 @@ export default function Tasks() {
         editionId: currentEdition.id,
       });
       
+      // Salvar a posição de rolagem atual
+      const scrollPosition = window.scrollY;
+      
       // Also invalidate the general tasks query
-      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
-      queryClient.invalidateQueries({ queryKey: [`/api/editions/${currentEdition?.id}/tasks`] });
+      queryClient.invalidateQueries({ 
+        queryKey: ['/api/tasks'],
+        refetchType: 'none'
+      });
+      
+      queryClient.invalidateQueries({ 
+        queryKey: [`/api/editions/${currentEdition?.id}/tasks`],
+        refetchType: 'none'
+      });
       
       setIsAddTaskFormOpen(false);
       toast({
         title: "Task created",
         description: "New task has been created successfully",
       });
-      // Force refetch to ensure we have the latest data
-      refetchTasks();
+      
+      // Force refetch e restaurar posição de rolagem
+      setTimeout(() => {
+        refetchTasks().then(() => {
+          window.scrollTo(0, scrollPosition);
+        });
+      }, 100);
     } catch (error) {
       console.error("Failed to create task:", error);
       toast({
