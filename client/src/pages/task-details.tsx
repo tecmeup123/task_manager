@@ -15,7 +15,8 @@ import {
   Plus,
   Trash,
   X,
-  Link
+  Link,
+  ClipboardList
 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useTranslation } from "react-i18next";
@@ -80,7 +81,7 @@ export default function TaskDetails() {
     data: task, 
     isLoading: isTaskLoading,
     error: taskError
-  } = useQuery({
+  } = useQuery<any>({
     queryKey: [`/api/tasks/${taskId}`],
     enabled: !!taskId,
   });
@@ -706,7 +707,7 @@ export default function TaskDetails() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <History className="mr-2 h-5 w-5" /> {t('tasks.history')}
+                <ClipboardList className="mr-2 h-5 w-5" /> {t('tasks.history')}
               </CardTitle>
             </CardHeader>
             <CardContent>
