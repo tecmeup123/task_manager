@@ -854,8 +854,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/tasks/:id/comments", requireAuth, async (req, res) => {
     try {
       const comments = await storage.getTaskComments(Number(req.params.id));
-      res.json(comments);
+      
+      // Enhance comments with user information
+      const enhancedComments = await Promise.all(comments.map(async (comment) => {
+        const user = await storage.getUser(comment.userId);
+        return {
+          ...comment,
+          user: user ? {
+            id: user.id,
+            username: user.username,
+            fullName: user.fullName
+          } : null
+        };
+      }));
+      
+      res.json(enhancedComments);
     } catch (error) {
+      console.error("Error fetching task comments:", error);
       res.status(500).json({ message: "Failed to fetch task comments" });
     }
   });
@@ -881,8 +896,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const comment = await storage.createTaskComment(commentData);
       
-      res.status(201).json(comment);
+      // Add user information to the response
+      const enhancedComment = {
+        ...comment,
+        user: {
+          id: req.user.id,
+          username: req.user.username,
+          fullName: req.user.fullName
+        }
+      };
+      
+      res.status(201).json(enhancedComment);
     } catch (error) {
+      console.error("Error adding comment to task:", error);
       res.status(500).json({ message: "Failed to add comment to task" });
     }
   });
