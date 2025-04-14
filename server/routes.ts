@@ -362,7 +362,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Change password endpoint has been moved to auth.ts to avoid duplicates
 
-  // Audit Logs
+  // Audit Logs - admin can see all logs
   app.get("/api/audit-logs", requireAdmin, async (req, res) => {
     try {
       const entityType = req.query.entityType as string | undefined;
@@ -371,6 +371,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const logs = await storage.getAuditLogs(entityType, entityId);
       res.json(logs);
     } catch (error) {
+      res.status(500).json({ message: "Failed to fetch audit logs" });
+    }
+  });
+  
+  // Entity-specific audit logs - accessible to all authenticated users
+  app.get("/api/entity-audit-logs", async (req, res) => {
+    try {
+      // Require authentication for accessing any audit logs
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const entityType = req.query.entityType as string;
+      const entityId = req.query.entityId ? Number(req.query.entityId) : undefined;
+      
+      if (!entityType || !entityId) {
+        return res.status(400).json({ message: "Entity type and ID are required" });
+      }
+      
+      const logs = await storage.getAuditLogs(entityType, entityId);
+      
+      // Enhance the logs with username information
+      const enhancedLogs = await Promise.all(logs.map(async (log) => {
+        if (log.userId) {
+          const user = await storage.getUser(log.userId);
+          return {
+            ...log,
+            username: user ? (user.fullName || user.username) : "Unknown User"
+          };
+        }
+        return {
+          ...log,
+          username: "System"
+        };
+      }));
+      
+      res.json(enhancedLogs);
+    } catch (error) {
+      console.error("Error fetching entity audit logs:", error);
       res.status(500).json({ message: "Failed to fetch audit logs" });
     }
   });
@@ -1117,12 +1156,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           req.body.owner = req.user.username;
         }
         
-        // If a new user is being assigned to the task, make that user the owner as well
-        if (newAssignedUserId && (previousAssignedUserId === null || newAssignedUserId !== previousAssignedUserId)) {
+        // If a user is explicitly assigned to the task, make that user the owner
+        if (newAssignedUserId) {
           // Get the assigned user's information
           const assignedUser = await storage.getUser(newAssignedUserId);
           if (assignedUser) {
-            console.log(`Updating task owner to ${assignedUser.username} as they are newly assigned to task ${id}`);
+            console.log(`Updating task owner to ${assignedUser.username} for task ${id}`);
             req.body.owner = assignedUser.username;
           }
         }
