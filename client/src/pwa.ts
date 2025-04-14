@@ -69,10 +69,17 @@ export function setupInstallPrompt() {
   });
 }
 
-// Detectar quando o aplicativo está sendo executado no modo standalone (instalado)
+// Detect when the app is running in standalone mode (installed)
 export function detectStandaloneMode(): boolean {
   return window.matchMedia('(display-mode: standalone)').matches ||
          ('standalone' in navigator && (navigator as any).standalone === true);
+}
+
+// Function to force the welcome screen to show (for testing purposes)
+export function resetWelcomeScreen(): void {
+  localStorage.removeItem('pwa_welcome_seen');
+  localStorage.setItem('force_welcome_screen', 'true');
+  console.log("Welcome screen has been reset. Refresh the page to see it.");
 }
 
 // Verificar status da conexão do usuário
@@ -94,11 +101,12 @@ export function setupOfflineDetection() {
   updateOnlineStatus();
 }
 
-// Exportar todas as funções relacionadas ao PWA
+// Export all PWA-related functions
 export const PWA = {
   register: registerServiceWorker,
   checkForUpdates,
   setupInstallPrompt,
   detectStandaloneMode,
+  resetWelcomeScreen,
   setupOfflineDetection
 };

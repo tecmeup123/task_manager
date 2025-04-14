@@ -19,6 +19,7 @@ import { OnboardingProvider } from "@/hooks/use-onboarding";
 import OnboardingWizard from "@/components/onboarding/onboarding-wizard";
 // PWA components
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
+import { PWAWelcomeScreen } from "@/components/pwa-welcome-screen";
 // i18n
 import { useTranslation } from 'react-i18next';
 
@@ -112,6 +113,7 @@ function App() {
           <Router />
           <OnboardingWizard />
           <PWAInstallPrompt />
+          <PWAWelcomeScreen />
           <Toaster />
         </OnboardingProvider>
       </AuthProvider>
