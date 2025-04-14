@@ -108,13 +108,18 @@ export default function TaskDetailModal({
   useEffect(() => {
     // Only fetch if we have a task, the modal is open, and we haven't processed logs yet
     if (task?.id && isOpen && !processedLogsRef.current) {
+      // Reset processed flag when task changes to ensure we always load fresh data
+      processedLogsRef.current = false;
+      
       // Use the API request function with proper error handling
       console.log('Fetching audit logs for task:', task.id);
-      fetch(`/api/entity-audit-logs?entityType=task&entityId=${task.id}`, {
+      fetch(`/api/audit-logs/task/${task.id}`, {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
+        // Add cache-busting parameter to prevent caching
+        cache: 'no-store'
       })
         .then(res => {
           if (!res.ok) throw new Error('Failed to fetch audit logs');
@@ -124,7 +129,7 @@ export default function TaskDetailModal({
           console.log('Received audit logs:', logs);
           if (logs && logs.length > 0) {
             // Transform logs to activity history
-            const history = logs.map((log: any) => {
+            const history = logs.map((log: AuditLogResponse) => {
               // Determine the action text based on log data
               let actionText = log.notes || '';
               
@@ -156,16 +161,28 @@ export default function TaskDetailModal({
             
             // Update state only once per task
             setActivityHistory(history);
+            
+            // Mark as processed only after successful update
+            processedLogsRef.current = true;
+          } else {
+            // No logs found, set default history
+            setActivityHistory([{
+              action: "Task created",
+              timestamp: parseTimestamp(task?.createdAt) || new Date(),
+              username: "System"
+            }]);
+            
+            // Mark as processed
+            processedLogsRef.current = true;
           }
-          
-          // Mark as processed
-          processedLogsRef.current = true;
         })
         .catch(error => {
           console.error('Error fetching audit logs:', error);
+          // Reset processed flag on error to allow retry
+          processedLogsRef.current = false;
         });
     }
-  }, [task?.id, isOpen]);
+  }, [task?.id, isOpen, task?.createdAt]);
 
   // Fetch users for task assignment
   const { data: users = [], isLoading: isLoadingUsers } = useQuery<User[]>({
