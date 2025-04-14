@@ -1125,6 +1125,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         req.body.completionDate = new Date();
       }
       
+      // Handle task ownership changes per requirement:
+      // 1. When a task has no owner and a user is assigned, that user becomes the owner
+      // 2. When task is reassigned to another user, new assignee becomes the owner
+      if (req.isAuthenticated() && req.user) {
+        // If task status changes from "Not Started" to "In Progress" and has no owner, 
+        // assign the authenticated user as owner
+        if (task.status === "Not Started" && req.body.status === "In Progress" && (!task.owner || task.owner === "")) {
+          console.log(`Setting current user ${req.user.username} as owner for task ${id} that's being started`);
+          req.body.owner = req.user.username;
+        }
+        
+        // If a new user is being assigned to the task, make that user the owner as well
+        if (newAssignedUserId && (previousAssignedUserId === null || newAssignedUserId !== previousAssignedUserId)) {
+          // Get the assigned user's information
+          const assignedUser = await storage.getUser(newAssignedUserId);
+          if (assignedUser) {
+            console.log(`Updating task owner to ${assignedUser.username} as they are newly assigned to task ${id}`);
+            req.body.owner = assignedUser.username;
+          }
+        }
+      }
+      
       // Convert dates if they are strings
       const updatedData = { ...req.body };
       if (typeof updatedData.dueDate === 'string') {
