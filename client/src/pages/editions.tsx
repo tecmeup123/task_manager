@@ -502,7 +502,7 @@ export default function Editions() {
                 const currentDate = new Date();
                 
                 // Filter and sort editions that haven't started yet
-                const upcomingEditions = [...allEditions || []]
+                const upcomingEditions = [...editions || []]
                   .filter((edition: any) => {
                     const startDate = new Date(edition.startDate);
                     // Only show non-archived editions in the upcoming section
