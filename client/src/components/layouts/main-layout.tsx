@@ -13,7 +13,8 @@ import {
   BarChart, 
   Settings,
   BookOpen,
-  KeyRound
+  KeyRound,
+  CalendarDays
 } from "lucide-react";
 import { format, addDays, isAfter, isBefore, parseISO } from "date-fns";
 import { Input } from "@/components/ui/input";
@@ -219,6 +220,15 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 {t('menu_editions')}
               </Button>
             </Link>
+            <Link to="/calendar">
+              <Button
+                variant={location === "/calendar" ? "default" : "ghost"}
+                className={location === "/calendar" ? "bg-primary text-white" : "hover:bg-neutral-100"}
+                size="sm"
+              >
+                {t('menu_calendar')}
+              </Button>
+            </Link>
           </div>
         </div>
         <div className="flex items-center flex-shrink-0">
@@ -382,6 +392,12 @@ export default function MainLayout({ children }: MainLayoutProps) {
                   <span>{t('menu_editions')}</span>
                 </div>
               </Link>
+              <Link to="/calendar">
+                <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/calendar" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
+                  <CalendarDays className="w-5 h-5 mr-3" />
+                  <span>{t('menu_calendar')}</span>
+                </div>
+              </Link>
               {/* Trainers and reports links removed to simplify navigation */}
               <Link to="/settings">
                 <div className={`flex items-center px-4 py-3 text-base rounded-md ${location === "/settings" ? "bg-primary text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>
@@ -461,6 +477,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 </div>
               </Link>
             </div>
+            <div>
+              <Link to="/calendar">
+                <div className={`flex items-center px-4 py-2 text-sm ${location === "/calendar" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
+                  <CalendarDays className="w-5 h-5 mr-2" />
+                  <span>{t('menu_calendar')}</span>
+                </div>
+              </Link>
+            </div>
             <Link to="/settings">
               <div className={`flex items-center px-4 py-2 text-sm ${location === "/settings" ? "bg-primary-light bg-opacity-10 text-primary font-medium" : "text-neutral-600 hover:bg-neutral-100"}`}>
                 <Settings className="w-5 h-5 mr-2" />
@@ -521,6 +545,10 @@ export default function MainLayout({ children }: MainLayoutProps) {
           <Link to="/editions" className={`flex flex-col items-center ${location === '/editions' ? 'text-primary' : 'text-neutral-500'}`}>
             <GraduationCap className="h-6 w-6" />
             <span className="text-xs mt-1">{t('menu_editions')}</span>
+          </Link>
+          <Link to="/calendar" className={`flex flex-col items-center ${location === '/calendar' ? 'text-primary' : 'text-neutral-500'}`}>
+            <CalendarDays className="h-6 w-6" />
+            <span className="text-xs mt-1">{t('menu_calendar')}</span>
           </Link>
           <Link to="/settings" className={`flex flex-col items-center ${location === '/settings' ? 'text-primary' : 'text-neutral-500'}`}>
             <Settings className="h-6 w-6" />
