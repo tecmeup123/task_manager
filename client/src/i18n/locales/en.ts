@@ -160,6 +160,18 @@ const en = {
     'tasks.deleteSuccess': 'Task deleted successfully',
     'tasks.error': 'Error processing task',
     'tasks.backToList': 'Back to Task List',
+    'tasks.updateSuccessDescription': 'The task was updated successfully',
+    'tasks.updateErrorDescription': 'There was an error updating the task',
+    'tasks.tabDetails': 'Details',
+    'tasks.tabComments': 'Comments',
+    'tasks.tabResources': 'Resources',
+    'tasks.comments': 'Comments',
+    'tasks.resources': 'Resources',
+    'tasks.noComments': 'No comments yet',
+    'tasks.noResources': 'No resources available',
+    'tasks.selectAssignee': 'Select assignee',
+    'tasks.noAssignee': 'No assignee',
+    'tasks.notesPlaceholder': 'Add notes about this task...',
     
     // Trainers
     'trainers.title': 'Trainers',
@@ -333,6 +345,12 @@ const en = {
     'common.none': 'None',
     'common.loadingUsers': 'Loading users...',
     'common.noUsersAvailable': 'No users available',
+    'common.back': 'Back',
+    'common.cancel': 'Cancel',
+    'common.save': 'Save',
+    'common.saving': 'Saving',
+    'common.view': 'View',
+    'common.unknownUser': 'Unknown User',
     
     // Training Types
     'trainingType.glr': 'Guided Learning Route',
