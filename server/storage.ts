@@ -620,6 +620,13 @@ export class MemStorage implements IStorage {
   
   // Mention methods
   async createMention(mention: InsertMention): Promise<Mention> {
+    // Buscar o editionId a partir da tarefa se não for fornecido
+    let editionId = mention.editionId;
+    if (!editionId) {
+      const task = await this.getTask(mention.taskId);
+      editionId = task?.editionId;
+    }
+    
     const id = this.currentMentionId++;
     const newMention: Mention = {
       ...mention,
@@ -627,7 +634,8 @@ export class MemStorage implements IStorage {
       commentId: mention.commentId || null,
       createdAt: new Date(),
       createdBy: mention.createdBy || null,
-      isRead: false
+      isRead: false,
+      editionId: editionId || null
     };
     this.mentions.set(id, newMention);
     
@@ -639,7 +647,7 @@ export class MemStorage implements IStorage {
       message: `You were mentioned in task`,
       entityType: "task",
       entityId: mention.taskId,
-      actionUrl: `/tasks?editionId=${mention.editionId}&taskId=${mention.taskId}`
+      actionUrl: `/tasks?editionId=${editionId}&taskId=${mention.taskId}`
     });
     
     return newMention;
@@ -1242,7 +1250,7 @@ export class DatabaseStorage implements IStorage {
       // Remover o usuário
       const result = await db.delete(users).where(eq(users.id, id));
       
-      return result.rowCount > 0;
+      return result && result.rowCount ? result.rowCount > 0 : false;
     } catch (error) {
       console.error("Error deleting user:", error);
       return false;
