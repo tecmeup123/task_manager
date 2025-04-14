@@ -1209,6 +1209,38 @@ export class DatabaseStorage implements IStorage {
     return updatedUser;
   }
   
+  async deleteUser(id: number): Promise<boolean> {
+    try {
+      const { db, eq } = await import("./db");
+      
+      // Remover notificações do usuário
+      await db.delete(notifications).where(eq(notifications.userId, id));
+      
+      // Remover login activities do usuário
+      await db.delete(loginActivities).where(eq(loginActivities.userId, id));
+      
+      // Remover menções do usuário
+      await db.delete(mentions).where(eq(mentions.userId, id));
+      
+      // Remover comentários do usuário
+      await db.delete(taskComments).where(eq(taskComments.userId, id));
+      
+      // Atualizar tarefas atribuídas ao usuário (definir assignedUserId como null)
+      await db
+        .update(tasks)
+        .set({ assignedUserId: null })
+        .where(eq(tasks.assignedUserId, id));
+      
+      // Remover o usuário
+      const result = await db.delete(users).where(eq(users.id, id));
+      
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      return false;
+    }
+  }
+  
   async createAuditLog(log: InsertAuditLog): Promise<AuditLog> {
     const { db } = await import("./db");
     const [auditLog] = await db.insert(auditLogs).values(log).returning();
