@@ -262,6 +262,23 @@ export const insertTaskCommentSchema = createInsertSchema(taskComments).omit({
 export type InsertTaskComment = z.infer<typeof insertTaskCommentSchema>;
 export type TaskComment = typeof taskComments.$inferSelect;
 
+// Task reactions table for emoji reactions to tasks
+export const taskReactions = pgTable("task_reactions", {
+  id: serial("id").primaryKey(),
+  taskId: integer("task_id").notNull().references(() => tasks.id),
+  userId: integer("user_id").notNull().references(() => users.id),
+  emoji: text("emoji").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertTaskReactionSchema = createInsertSchema(taskReactions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertTaskReaction = z.infer<typeof insertTaskReactionSchema>;
+export type TaskReaction = typeof taskReactions.$inferSelect;
+
 // Notification table to store user notifications
 export const notifications = pgTable("notifications", {
   id: serial("id").primaryKey(),
