@@ -36,7 +36,7 @@ export async function checkDueDateNotifications() {
           message: `Task "${task.name}" (${editionCode}) is due in ${daysUntilDue} day${daysUntilDue > 1 ? 's' : ''}`,
           entityType: "task",
           entityId: task.id,
-          actionUrl: `/tasks/${task.id}`,
+          actionUrl: `/tasks?editionId=${task.editionId}&taskId=${task.id}`,
           metadata: { taskId: task.id, editionId: task.editionId, daysUntilDue }
         });
       }

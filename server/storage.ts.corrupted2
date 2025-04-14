@@ -528,7 +528,7 @@ export class MemStorage implements IStorage {
       message: `You were mentioned in task`,
       entityType: "task",
       entityId: mention.taskId,
-      actionUrl: `/tasks?editionId=${mention.editionId}&taskId=${mention.taskId}`
+      actionUrl: `/tasks?editionId=${mention.editionId}actionUrl: `/tasks/${mention.taskId}`taskId=${mention.taskId}`
     });
     
     return newMention;
@@ -950,7 +950,7 @@ export class DatabaseStorage implements IStorage {
       message: `You were mentioned in task`,
       entityType: "task",
       entityId: mention.taskId,
-      actionUrl: `/tasks?editionId=${mention.editionId}&taskId=${mention.taskId}`
+      actionUrl: `/tasks?editionId=${mention.editionId}actionUrl: `/tasks/${mention.taskId}`taskId=${mention.taskId}`
     });
     
     return newMention;
