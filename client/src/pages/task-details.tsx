@@ -783,7 +783,7 @@ export default function TaskDetails() {
                             </div>
                             
                             <div className="text-sm">
-                              <p className="mb-2">
+                              <div className="mb-2">
                                 <span className="font-medium">{t(`tasks.action.${log.action}`)}</span>
                                 {log.action === 'update' && changes.length > 0 && (
                                   <>
@@ -797,7 +797,7 @@ export default function TaskDetails() {
                                     </ul>
                                   </>
                                 )}
-                              </p>
+                              </div>
                               {log.notes && <p className="italic text-muted-foreground">{log.notes}</p>}
                             </div>
                           </div>
