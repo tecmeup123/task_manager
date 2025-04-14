@@ -1958,25 +1958,107 @@ export default function Settings() {
                   No users found.
                 </div>
               ) : (
-                <div className="rounded-md border overflow-hidden">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Username</TableHead>
-                        <TableHead>Full Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {users.map((user) => (
-                        <TableRow key={user.id}>
-                          <TableCell className="font-medium">{user.username}</TableCell>
-                          <TableCell>{user.fullName}</TableCell>
-                          <TableCell>{user.email || '-'}</TableCell>
-                          <TableCell>
+                <>
+                  {/* Desktop Table View */}
+                  <div className="rounded-md border overflow-hidden hidden md:block">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Username</TableHead>
+                          <TableHead>Full Name</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Role</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {users.map((user) => (
+                          <TableRow key={user.id}>
+                            <TableCell className="font-medium">{user.username}</TableCell>
+                            <TableCell>{user.fullName}</TableCell>
+                            <TableCell>{user.email || '-'}</TableCell>
+                            <TableCell>
+                              <Badge 
+                                variant={
+                                  user.role === 'admin' ? 'destructive' : 
+                                  user.role === 'editor' ? 'default' : 'secondary'
+                                }
+                              >
+                                {user.role}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              {user.approved ? (
+                                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Approved
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                                  <AlertCircle className="h-3 w-3 mr-1" />
+                                  Pending
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right space-x-2">
+                              <Button
+                                variant="outline" 
+                                size="icon"
+                                onClick={() => handleEditUser(user)}
+                                className="h-8 w-8 p-0 inline-flex"
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="outline" 
+                                size="icon"
+                                onClick={() => handleToggleApproval(user.id, user.approved)}
+                                className="h-8 w-8 p-0 inline-flex"
+                              >
+                                {user.approved ? (
+                                  <XCircle className="h-4 w-4" />
+                                ) : (
+                                  <CheckCircle className="h-4 w-4" />
+                                )}
+                              </Button>
+                              <Button
+                                variant="outline" 
+                                size="icon"
+                                onClick={() => handleResetPassword(user.id)}
+                                className="h-8 w-8 p-0 inline-flex mr-1"
+                                title="Reset password"
+                              >
+                                <Lock className="h-4 w-4" />
+                              </Button>
+                              {user.role !== "admin" && (
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  onClick={() => handleDeleteUser(user)}
+                                  className="h-8 w-8 p-0 inline-flex text-red-500 hover:text-red-700 hover:bg-red-100"
+                                  title="Delete user"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  
+                  {/* Mobile Card View */}
+                  <div className="space-y-4 md:hidden">
+                    {users.map((user) => (
+                      <Card key={user.id} className="overflow-hidden">
+                        <CardHeader className="pb-2">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <CardTitle className="text-lg">{user.username}</CardTitle>
+                              <CardDescription>{user.fullName}</CardDescription>
+                            </div>
                             <Badge 
                               variant={
                                 user.role === 'admin' ? 'destructive' : 
@@ -1985,68 +2067,78 @@ export default function Settings() {
                             >
                               {user.role}
                             </Badge>
-                          </TableCell>
-                          <TableCell>
-                            {user.approved ? (
-                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                                <CheckCircle className="h-3 w-3 mr-1" />
-                                Approved
-                              </Badge>
-                            ) : (
-                              <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
-                                <AlertCircle className="h-3 w-3 mr-1" />
-                                Pending
-                              </Badge>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right space-x-2">
-                            <Button
-                              variant="outline" 
-                              size="icon"
-                              onClick={() => handleEditUser(user)}
-                              className="h-8 w-8 p-0 inline-flex"
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="outline" 
-                              size="icon"
-                              onClick={() => handleToggleApproval(user.id, user.approved)}
-                              className="h-8 w-8 p-0 inline-flex"
-                            >
+                          </div>
+                        </CardHeader>
+                        <CardContent className="pb-3 pt-0">
+                          {user.email && (
+                            <div className="text-sm mb-2 text-muted-foreground">
+                              {user.email}
+                            </div>
+                          )}
+                          <div className="flex items-center justify-between">
+                            <div>
                               {user.approved ? (
-                                <XCircle className="h-4 w-4" />
+                                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Approved
+                                </Badge>
                               ) : (
-                                <CheckCircle className="h-4 w-4" />
+                                <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                                  <AlertCircle className="h-3 w-3 mr-1" />
+                                  Pending
+                                </Badge>
                               )}
-                            </Button>
-                            <Button
-                              variant="outline" 
-                              size="icon"
-                              onClick={() => handleResetPassword(user.id)}
-                              className="h-8 w-8 p-0 inline-flex mr-1"
-                              title="Reset password"
-                            >
-                              <Lock className="h-4 w-4" />
-                            </Button>
-                            {/* Não permitir que um usuário admin exclua a si mesmo ou outros admins */}
-                            {user.role !== "admin" && (
+                            </div>
+                            <div className="flex space-x-2">
                               <Button
-                                variant="outline"
+                                variant="outline" 
                                 size="icon"
-                                onClick={() => handleDeleteUser(user)}
-                                className="h-8 w-8 p-0 inline-flex text-red-500 hover:text-red-700 hover:bg-red-100"
-                                title="Delete user"
+                                onClick={() => handleEditUser(user)}
+                                className="h-8 w-8 p-0"
+                                title="Edit"
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Pencil className="h-4 w-4" />
                               </Button>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                              <Button
+                                variant="outline" 
+                                size="icon"
+                                onClick={() => handleToggleApproval(user.id, user.approved)}
+                                className="h-8 w-8 p-0"
+                                title={user.approved ? "Revoke approval" : "Approve"}
+                              >
+                                {user.approved ? (
+                                  <XCircle className="h-4 w-4" />
+                                ) : (
+                                  <CheckCircle className="h-4 w-4" />
+                                )}
+                              </Button>
+                              <Button
+                                variant="outline" 
+                                size="icon"
+                                onClick={() => handleResetPassword(user.id)}
+                                className="h-8 w-8 p-0"
+                                title="Reset password"
+                              >
+                                <Lock className="h-4 w-4" />
+                              </Button>
+                              {user.role !== "admin" && (
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  onClick={() => handleDeleteUser(user)}
+                                  className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
+                                  title="Delete user"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
