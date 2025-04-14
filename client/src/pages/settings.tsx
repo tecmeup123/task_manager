@@ -1016,12 +1016,30 @@ export default function Settings() {
       <Tabs defaultValue="dashboard" className="mb-6">
         <div className="mb-4 overflow-x-auto pb-1">
           <TabsList className="grid grid-cols-3 sm:flex sm:w-fit gap-1">
-            <TabsTrigger value="dashboard" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.dashboard')}</TabsTrigger>
-            <TabsTrigger value="tasks" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.tasks')}</TabsTrigger>
-            <TabsTrigger value="account" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.account')}</TabsTrigger>
-            <TabsTrigger value="notifications" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.notifications')}</TabsTrigger>
-            <TabsTrigger value="security" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.security')}</TabsTrigger>
-            <TabsTrigger value="data" className="text-xs px-1 py-1 md:text-sm md:px-3">{t('settings.data')}</TabsTrigger>
+            <TabsTrigger value="dashboard" className="text-xs px-1 py-1 md:text-sm md:px-3">
+              <LayoutDashboard className="h-3 w-3 mr-1 md:h-4 md:w-4" />
+              Dashboard
+            </TabsTrigger>
+            <TabsTrigger value="tasks" className="text-xs px-1 py-1 md:text-sm md:px-3">
+              <CheckSquare className="h-3 w-3 mr-1 md:h-4 md:w-4" />
+              Tasks
+            </TabsTrigger>
+            <TabsTrigger value="account" className="text-xs px-1 py-1 md:text-sm md:px-3">
+              <User className="h-3 w-3 mr-1 md:h-4 md:w-4" />
+              Account
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="text-xs px-1 py-1 md:text-sm md:px-3">
+              <Bell className="h-3 w-3 mr-1 md:h-4 md:w-4" />
+              Notifications
+            </TabsTrigger>
+            <TabsTrigger value="security" className="text-xs px-1 py-1 md:text-sm md:px-3">
+              <Lock className="h-3 w-3 mr-1 md:h-4 md:w-4" />
+              Security
+            </TabsTrigger>
+            <TabsTrigger value="data" className="text-xs px-1 py-1 md:text-sm md:px-3">
+              <Database className="h-3 w-3 mr-1 md:h-4 md:w-4" />
+              Data
+            </TabsTrigger>
             <TabsTrigger value="users" className="text-xs px-1 py-1 md:text-sm md:px-3">
               <Users className="h-3 w-3 mr-1 md:h-4 md:w-4" />
               User Management
