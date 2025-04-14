@@ -84,13 +84,18 @@ export default function Tasks() {
   });
 
   // Check if we have state passed from notification click
-  const historyState = typeof window !== 'undefined' ? window.history.state : {};
-  const fromNotification = historyState?.fromNotification || false;
-  const stateTaskId = historyState?.openTaskId;
+  const historyState = typeof window !== 'undefined' && window.history.state ? window.history.state : {};
+  const locationState = historyState.state || {};
+  const fromNotification = locationState.fromNotification || false;
+  const stateTaskId = locationState.taskId || locationState.openTaskId;
+  const openTaskModal = locationState.openTaskModal || false;
 
   // Open task detail modal when task ID is in URL (from notification) or in history state
   useEffect(() => {
     const openTaskFromUrl = async () => {
+      // Log the state for debugging purposes
+      console.log("Task state:", { historyState, locationState, urlTaskId, stateTaskId, openTaskModal });
+      
       // Determine which task ID to use (prefer state taskId over URL taskId)
       const taskIdToUse = stateTaskId || (urlTaskId ? parseInt(urlTaskId) : null);
       

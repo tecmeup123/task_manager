@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Search, Bell, ChevronDown, Menu, X, ArrowLeft, LogOut } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import TaskLink from "@/components/task-link";
 import { 
   LayoutDashboard, 
   ListTodo,
@@ -50,6 +51,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const [currentEditionId, setCurrentEditionId] = useState<number | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  // State for dropdown menu
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const isMobile = useIsMobile();
   const { user, logoutMutation } = useAuth();
   const { t } = useTranslation();
@@ -227,7 +230,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             />
             <Search className="absolute left-2 top-2.5 w-4 h-4 text-neutral-500" />
           </div>
-          <DropdownMenu>
+          <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full relative">
                 <Bell className="h-5 w-5 text-neutral-500" />
@@ -297,30 +300,24 @@ export default function MainLayout({ children }: MainLayoutProps) {
                             </Button>
                           )}
                           {notification.entityType === 'task' && notification.entityId && (
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
+                            <TaskLink
+                              taskId={notification.entityId}
+                              editionId={notification.metadata?.editionId || 0}
+                              variant="outline"
+                              size="sm"
                               className="h-7 text-xs"
                               onClick={async () => {
-                                // First, mark notification as read
+                                // Mark notification as read when clicked
                                 if (!notification.isRead) {
                                   await markAsRead(notification.id);
                                 }
                                 
-                                // Navigate to tasks page with the correct edition ID
-                                const editionId = notification.metadata?.editionId || '';
-                                const taskId = notification.entityId;
-                                
-                                // Add state to indicate modal should be opened
-                                const taskDetailState = { openTaskId: taskId, fromNotification: true };
-                                
-                                // Navigate with state and then close notification popup
-                                navigate(`/tasks?editionId=${editionId}&taskId=${taskId}`, { state: taskDetailState });
-                                setIsNotificationsOpen(false);
+                                // Close the notifications dropdown
+                                setIsDropdownOpen(false);
                               }}
                             >
                               {t('notifications.goToTask')}
-                            </Button>
+                            </TaskLink>
                           )}
                           {notification.entityType === 'edition' && notification.entityId && (
                             <Link to={`/editions?id=${notification.entityId}`}>
