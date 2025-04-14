@@ -63,6 +63,14 @@ export function setupAuth(app: Express) {
   passport.deserializeUser(async (id: number, done) => {
     try {
       const user = await storage.getUser(id);
+      if (user) {
+        // Update last active timestamp
+        try {
+          await storage.updateUser(user.id, { lastActive: new Date() });
+        } catch (updateError) {
+          console.error('Failed to update last active timestamp:', updateError);
+        }
+      }
       done(null, user);
     } catch (error) {
       done(error, null);
@@ -92,22 +100,71 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err: any, user: any, info: any) => {
+    passport.authenticate("local", async (err: any, user: any, info: any) => {
       if (err) return next(err);
-      if (!user) return res.status(401).json({ message: "Invalid credentials" });
+      
+      // Get client IP and user agent
+      const ip = req.ip || req.socket.remoteAddress || 'unknown';
+      const userAgent = req.headers['user-agent'] || 'unknown';
+      
+      // If authentication failed, log the failed attempt and return error
+      if (!user) {
+        // Log failed login attempt
+        try {
+          await storage.createLoginActivity({
+            userId: 0, // Special user ID for failed logins
+            ipAddress: ip,
+            userAgent: userAgent,
+            success: false,
+            location: null,
+            deviceInfo: null
+          });
+        } catch (logError) {
+          console.error('Failed to log login attempt:', logError);
+        }
+        
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
       
       // Check if user is approved
       if (user.approved === false && user.role !== 'admin') {
         return res.status(403).json({ message: "Your account is pending approval by an administrator" });
       }
       
-      // Set custom session expiration time if "Remember Me" option is selected
-      if (req.body.rememberMe) {
-        // Set session cookie to expire in 8 hours
-        req.session.cookie.maxAge = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
+      // Use user's session timeout if available, otherwise use default
+      const sessionTimeoutMinutes = user.sessionTimeoutMinutes || 120; // Default 2 hours
+      
+      // Check if "Remember Me" is enabled in user settings or requested in this login
+      const rememberMe = req.body.rememberMe || user.rememberMe;
+      
+      // Set session expiration time
+      if (rememberMe) {
+        // Set session cookie to expire in 7 days for "Remember Me"
+        req.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
       } else {
-        // Use default session duration (2 hours)
-        req.session.cookie.maxAge = 2 * 60 * 60 * 1000; // 2 hours
+        // Use user's configured timeout
+        req.session.cookie.maxAge = sessionTimeoutMinutes * 60 * 1000; // Convert minutes to milliseconds
+      }
+      
+      // Update last active timestamp
+      try {
+        await storage.updateUser(user.id, { lastActive: new Date() });
+      } catch (updateError) {
+        console.error('Failed to update last active timestamp:', updateError);
+      }
+      
+      // Log successful login
+      try {
+        await storage.createLoginActivity({
+          userId: user.id,
+          ipAddress: ip,
+          userAgent: userAgent,
+          success: true,
+          location: null,
+          deviceInfo: null
+        });
+      } catch (logError) {
+        console.error('Failed to log login activity:', logError);
       }
       
       req.login(user, (err) => {
