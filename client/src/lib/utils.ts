@@ -6,6 +6,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+
+
 /**
  * Safely parses a date from various formats
  * @param date Date to parse (can be string, Date object, or null/undefined)
@@ -150,20 +152,20 @@ export function getInitials(name: string): string {
     .substring(0, 2);
 }
 
-export function getStatusColor(status: string): {bg: "default" | "destructive" | "outline" | "secondary" | "success", text: string} {
+export function getStatusColor(status: string): {bg: string, text: string} {
   switch (status) {
     case 'Done':
-      return { bg: "success", text: 'text-white' };
+      return { bg: 'bg-green-500 hover:bg-green-600', text: 'text-white' };
     case 'In Progress':
-      return { bg: "default", text: 'text-white' };
+      return { bg: 'bg-blue-500 hover:bg-blue-600', text: 'text-white' };
     case 'Pending':
-      return { bg: "secondary", text: 'text-white' };
+      return { bg: 'bg-yellow-500 hover:bg-yellow-600', text: 'text-white' };
     case 'Not Started':
-      return { bg: "outline", text: 'text-white' };
+      return { bg: 'bg-gray-400 hover:bg-gray-500', text: 'text-white' };
     case 'Blocked':
-      return { bg: "destructive", text: 'text-white' };
+      return { bg: 'bg-red-500 hover:bg-red-600', text: 'text-white' };
     default:
-      return { bg: "outline", text: 'text-white' };
+      return { bg: 'bg-neutral-500 hover:bg-neutral-600', text: 'text-white' };
   }
 }
 

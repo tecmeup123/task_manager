@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Tasks from "@/pages/tasks";
+import TaskDetails from "@/pages/task-details";
 import Editions from "@/pages/editions";
 import Trainers from "@/pages/trainers";
 import Reports from "@/pages/reports";
@@ -38,6 +39,14 @@ function Router() {
         component={() => (
           <MainLayout>
             <Tasks />
+          </MainLayout>
+        )} 
+      />
+      <ProtectedRoute 
+        path="/tasks/:taskId" 
+        component={() => (
+          <MainLayout>
+            <TaskDetails />
           </MainLayout>
         )} 
       />
