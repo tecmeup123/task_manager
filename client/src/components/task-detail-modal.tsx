@@ -51,7 +51,7 @@ const formSchema = z.object({
   trainingType: z.string().min(1, "Training type is required"),
   inflexible: z.boolean().default(false),
   owner: z.string().optional().nullable(),
-  assignedUserId: z.number().optional().nullable(),
+  assignedUserId: z.union([z.number(), z.string(), z.null()]),
   status: z.string(),
   notes: z.string().optional().nullable(),
 });
@@ -138,10 +138,17 @@ export default function TaskDetailModal({
   }, [task, form]);
 
   const onSubmit = (values: FormValues) => {
-    // Process the assignedUserId field (convert "none" to null)
+    // Process the assignedUserId field
     const formData = { ...values };
-    if (typeof formData.assignedUserId === 'string' && formData.assignedUserId === "none") {
-      formData.assignedUserId = null;
+    
+    // Handle different possible assignedUserId values
+    if (typeof formData.assignedUserId === 'string') {
+      if (formData.assignedUserId === "none" || formData.assignedUserId === "") {
+        formData.assignedUserId = null;
+      } else {
+        // Ensure numeric strings are converted to numbers
+        formData.assignedUserId = parseInt(formData.assignedUserId, 10);
+      }
     }
     
     // Debug log for task form submission
@@ -444,7 +451,11 @@ export default function TaskDetailModal({
                   <FormItem className="md:col-span-1">
                     <FormLabel>{t('tasks.assignToUser')}</FormLabel>
                     <Select
-                      onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
+                      onValueChange={(value) => {
+                        console.log("Select assignedUserId changing to:", value);
+                        // Convert to number or null
+                        field.onChange(value === "none" ? null : value ? parseInt(value, 10) : null);
+                      }}
                       value={field.value?.toString() || ""}
                     >
                       <FormControl>
