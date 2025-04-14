@@ -68,7 +68,7 @@ export default function Tasks() {
   useEffect(() => {
     // If editions are loaded and no edition is selected, redirect to the first one
     if (editions && editions.length > 0 && !editionId) {
-      setLocation(`/tasks/${editions[0].id}`);
+      setLocation(`/tasks?editionId=${editions[0].id}`);
     }
   }, [editions, editionId, setLocation]);
   
@@ -245,7 +245,7 @@ export default function Tasks() {
                 <Select
                   value={editionId ? editionId.toString() : ''}
                   onValueChange={(value) => {
-                    setLocation(`/tasks/${value}`);
+                    setLocation(`/tasks?editionId=${value}`);
                   }}
                   disabled={editionsLoading}
                 >

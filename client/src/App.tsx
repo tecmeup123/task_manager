@@ -41,14 +41,7 @@ function Router() {
           </MainLayout>
         )} 
       />
-      <ProtectedRoute 
-        path="/tasks/:editionId" 
-        component={() => (
-          <MainLayout>
-            <Tasks />
-          </MainLayout>
-        )} 
-      />
+      {/* Remove direct path route in favor of query parameter approach */}
       <ProtectedRoute 
         path="/editions" 
         component={() => (
