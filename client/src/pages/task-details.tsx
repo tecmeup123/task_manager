@@ -332,17 +332,17 @@ export default function TaskDetails() {
                     <div className="space-y-2">
                       <Label htmlFor="assignedUserId">{t('tasks.assignedTo')}</Label>
                       <Select 
-                        value={form.assignedUserId?.toString() || ""} 
+                        value={form.assignedUserId?.toString() || "none"} 
                         onValueChange={(value) => setForm(prev => ({ 
                           ...prev, 
-                          assignedUserId: value ? parseInt(value) : null 
+                          assignedUserId: value && value !== "none" ? parseInt(value) : null 
                         }))}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder={t('tasks.selectAssignee')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">
+                          <SelectItem value="none">
                             {t('tasks.noAssignee')}
                           </SelectItem>
                           {users.map(user => (
