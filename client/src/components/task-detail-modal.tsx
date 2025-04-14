@@ -139,11 +139,9 @@ export default function TaskDetailModal({
               
               return {
                 action: actionText,
-                // Use log.timestamp if available (from our enhanced API), otherwise fall back to createdAt
-                timestamp: log.timestamp ? new Date(log.timestamp) : 
-                           log.createdAt ? new Date(log.createdAt) : 
-                           new Date(),
-                user: log.username || 'System'
+                // Use log.timestamp if available (from our enhanced API)
+                timestamp: log.timestamp ? new Date(log.timestamp) : new Date(),
+                username: log.username || 'System'
               };
             });
             
@@ -619,13 +617,15 @@ export default function TaskDetailModal({
                     <div className="flex justify-between">
                       <span dangerouslySetInnerHTML={{ __html: activity.action }} />
                       <span className="text-neutral-500">
-                        {activity.timestamp 
-                          ? format(new Date(activity.timestamp), "MMM d, yyyy - h:mm a") 
-                          : "Unknown time"}
+                        {typeof activity.timestamp === 'string' 
+                          ? format(new Date(activity.timestamp), "MMM d, yyyy - h:mm a")
+                          : activity.timestamp instanceof Date
+                            ? format(activity.timestamp, "MMM d, yyyy - h:mm a")
+                            : format(new Date(), "MMM d, yyyy - h:mm a")}
                       </span>
                     </div>
                     <div className="text-neutral-600 text-xs mt-1">
-                      {t('tasks.by')} {activity.user}
+                      {t('tasks.by')} {activity.username || activity.user || "Unknown"}
                     </div>
                   </div>
                 ))}
