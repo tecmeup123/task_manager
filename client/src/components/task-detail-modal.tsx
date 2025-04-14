@@ -174,7 +174,10 @@ export default function TaskDetailModal({
             className="mr-3 hover:bg-neutral-100 p-1 rounded-full transition-colors"
             onClick={() => {
               onClose();
-              setLocation(redirectPath || '/');
+              // Only redirect if we're not already on the tasks page
+              if (!isOnTasksPage && redirectPath) {
+                setLocation(redirectPath);
+              }
             }}
             aria-label="Back to dashboard"
           >
@@ -580,7 +583,10 @@ export default function TaskDetailModal({
                 variant="outline" 
                 onClick={() => {
                   onClose();
-                  setLocation(redirectPath || '/');
+                  // Only redirect if we're not already on the tasks page
+                  if (!isOnTasksPage && redirectPath) {
+                    setLocation(redirectPath);
+                  }
                 }}
                 className="flex items-center"
               >
