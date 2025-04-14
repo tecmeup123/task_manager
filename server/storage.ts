@@ -1379,7 +1379,6 @@ export class DatabaseStorage implements IStorage {
 
   async deleteEdition(id: number): Promise<boolean> {
     const { db, eq, and, inArray } = await import("./db");
-    const { taskReactions } = await import("@shared/schema");
 
     try {
       // First get all tasks associated with this edition
@@ -1388,8 +1387,7 @@ export class DatabaseStorage implements IStorage {
       
       // If there are tasks, delete all related records
       if (taskIds.length > 0) {
-        // Delete task reactions related to the tasks (ADDED THIS LINE)
-        await db.delete(taskReactions).where(inArray(taskReactions.taskId, taskIds));
+        // Nota: A funcionalidade task_reactions foi descontinuada e removida
         
         // Delete resources related to the tasks
         await db.delete(resources).where(inArray(resources.taskId, taskIds));

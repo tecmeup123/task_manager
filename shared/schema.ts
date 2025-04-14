@@ -19,7 +19,7 @@ export const users = pgTable("users", {
   approved: boolean("approved").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   // Security settings
-  rememberMe: boolean("remember_me").default(false),
+  rememberMe: boolean("remember_me").default(false).notNull(),
   sessionTimeoutMinutes: integer("session_timeout_minutes").default(120),
   lastActive: timestamp("last_active"),
   // Avatar settings
@@ -267,22 +267,7 @@ export const insertTaskCommentSchema = createInsertSchema(taskComments).omit({
 export type InsertTaskComment = z.infer<typeof insertTaskCommentSchema>;
 export type TaskComment = typeof taskComments.$inferSelect;
 
-// Task reactions table for emoji reactions to tasks
-export const taskReactions = pgTable("task_reactions", {
-  id: serial("id").primaryKey(),
-  taskId: integer("task_id").notNull().references(() => tasks.id),
-  userId: integer("user_id").notNull().references(() => users.id),
-  emoji: text("emoji").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-export const insertTaskReactionSchema = createInsertSchema(taskReactions).omit({
-  id: true,
-  createdAt: true,
-});
-
-export type InsertTaskReaction = z.infer<typeof insertTaskReactionSchema>;
-export type TaskReaction = typeof taskReactions.$inferSelect;
+// Nota: A funcionalidade task_reactions foi descontinuada e removida
 
 // Login Activity table to store user login history
 export const loginActivities = pgTable("login_activities", {
