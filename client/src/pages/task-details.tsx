@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useLocation, useParams } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { 
@@ -11,7 +11,11 @@ import {
   AlertCircle,
   MessageSquare,
   Paperclip,
-  CheckCircle
+  CheckCircle,
+  Plus,
+  Trash,
+  X,
+  Link
 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useTranslation } from "react-i18next";
@@ -49,12 +53,24 @@ export default function TaskDetails() {
   const editionId = queryParams.get('editionId');
   const taskId = params.taskId;
   
-  // Form state
+  // Form states
   const [form, setForm] = useState({
     status: "",
     assignedUserId: null as number | null,
     notes: "",
     completionDate: null as string | null,
+  });
+  
+  // Comment form state
+  const [commentForm, setCommentForm] = useState({
+    content: ""
+  });
+  
+  // Resource form state
+  const [resourceForm, setResourceForm] = useState({
+    name: "",
+    url: "",
+    type: "link"
   });
   
   const { toast } = useToast();
@@ -116,6 +132,78 @@ export default function TaskDetails() {
       toast({
         title: t('tasks.updateError'),
         description: error.message || t('tasks.updateErrorDescription'),
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Add comment mutation
+  const addCommentMutation = useMutation({
+    mutationFn: async (comment: { content: string }) => {
+      const response = await apiRequest('POST', `/api/tasks/${taskId}/comments`, comment);
+      return response.json();
+    },
+    onSuccess: () => {
+      // Clear form and invalidate comments query
+      setCommentForm({ content: "" });
+      queryClient.invalidateQueries({ queryKey: [`/api/tasks/${taskId}/comments`] });
+      
+      toast({
+        title: t('tasks.commentAdded'),
+        description: t('tasks.commentAddedDescription'),
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: t('tasks.commentError'),
+        description: error.message || t('tasks.commentErrorDescription'),
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Add resource mutation
+  const addResourceMutation = useMutation({
+    mutationFn: async (resource: { name: string, url: string, type: string }) => {
+      const response = await apiRequest('POST', `/api/tasks/${taskId}/resources`, resource);
+      return response.json();
+    },
+    onSuccess: () => {
+      // Clear form and invalidate resources query
+      setResourceForm({ name: "", url: "", type: "link" });
+      queryClient.invalidateQueries({ queryKey: [`/api/tasks/${taskId}/resources`] });
+      
+      toast({
+        title: t('tasks.resourceAdded'),
+        description: t('tasks.resourceAddedDescription'),
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: t('tasks.resourceError'),
+        description: error.message || t('tasks.resourceErrorDescription'),
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Delete resource mutation
+  const deleteResourceMutation = useMutation({
+    mutationFn: async (resourceId: number) => {
+      await apiRequest('DELETE', `/api/tasks/${taskId}/resources/${resourceId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/tasks/${taskId}/resources`] });
+      
+      toast({
+        title: t('tasks.resourceDeleted'),
+        description: t('tasks.resourceDeletedDescription'),
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: t('tasks.deleteError'),
+        description: error.message || t('tasks.deleteErrorDescription'),
         variant: "destructive",
       });
     }
