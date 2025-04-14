@@ -581,7 +581,7 @@ export default function Home() {
                         <p className="font-medium">{task.name}</p>
                         <div className="flex flex-wrap items-center gap-1 mt-1">
                           <Badge variant="outline">{task.week}</Badge>
-                          <Badge variant={getStatusColor(task.status).bg}>{task.status}</Badge>
+                          <Badge className={getStatusColor(task.status).bg}>{task.status}</Badge>
                           <span className="text-xs text-red-500">
                             {t('tasks.due')}: {formatDate(task.dueDate)} ({getRelativeDateDescription(task.dueDate)})
                           </span>
@@ -659,7 +659,7 @@ export default function Home() {
                         <p className="font-medium">{task.name}</p>
                         <div className="flex flex-wrap items-center gap-1 mt-1">
                           <Badge variant="outline">{task.week}</Badge>
-                          <Badge variant={getStatusColor(task.status).bg}>{task.status}</Badge>
+                          <Badge className={getStatusColor(task.status).bg}>{task.status}</Badge>
                           <span className="text-xs text-amber-600">
                             {t('tasks.due')}: {formatDate(task.dueDate)} ({getRelativeDateDescription(task.dueDate)})
                           </span>
