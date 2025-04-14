@@ -201,6 +201,13 @@ const en = {
     'tasks.resourceDeletedDescription': 'The resource has been deleted successfully',
     'tasks.deleteError': 'Error deleting',
     'tasks.deleteErrorDescription': 'There was an error deleting the item',
+    'tasks.tabHistory': 'History',
+    'tasks.history': 'Task History',
+    'tasks.noHistory': 'No history available for this task',
+    'tasks.changedFields': 'Changed fields',
+    'tasks.action.create': 'Created task',
+    'tasks.action.update': 'Updated task',
+    'tasks.action.delete': 'Deleted task',
     
     // Trainers
     'trainers.title': 'Trainers',
