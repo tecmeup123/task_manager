@@ -24,7 +24,13 @@ import {
   XCircle,
   Trash2,
   LayoutDashboard,
-  CheckSquare
+  CheckSquare,
+  Smartphone,
+  RefreshCw,
+  Monitor,
+  Download,
+  Wifi,
+  WifiOff
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
@@ -35,6 +41,7 @@ import { useTranslation } from "react-i18next";
 import { LoginActivityList } from "@/components/login-activity-list";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { PWA } from "../pwa";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -113,6 +120,14 @@ export default function Settings() {
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserRole, setNewUserRole] = useState("viewer");
   const [newUserPassword, setNewUserPassword] = useState("ChangeMe123!");
+  
+  // PWA settings
+  const [isStandaloneMode, setIsStandaloneMode] = useState(false);
+  const [isPWAInstalled, setIsPWAInstalled] = useState(false);
+  const [isPWASettingsChanged, setIsPWASettingsChanged] = useState(false);
+  const [autoCheckForUpdates, setAutoCheckForUpdates] = useState(true);
+  const [showUpdateNotifications, setShowUpdateNotifications] = useState(true);
+  const [welcomeScreenEnabled, setWelcomeScreenEnabled] = useState(true);
   
   // Fetch all users for the admin panel
   const { data: users, isLoading: isUsersLoading } = useQuery<any[]>({
