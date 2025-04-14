@@ -2051,6 +2051,157 @@ export default function Settings() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="pwa" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Smartphone className="h-5 w-5 mr-2" />
+                App Settings
+              </CardTitle>
+              <CardDescription>
+                Manage app installation and appearance options
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                  {isStandaloneMode ? (
+                    <>
+                      <Monitor className="h-8 w-8 text-primary" />
+                      <div>
+                        <p className="font-medium">App is running in standalone mode</p>
+                        <p className="text-sm text-muted-foreground">The application is currently installed and running as a Progressive Web App</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <Smartphone className="h-8 w-8 text-muted-foreground" />
+                      <div>
+                        <p className="font-medium">Install as application</p>
+                        <p className="text-sm text-muted-foreground">Install this application on your device for a better experience and offline access</p>
+                      </div>
+                      <Button variant="outline" size="sm" className="ml-auto" onClick={() => PWA.setupInstallPrompt()}>
+                        <Download className="h-4 w-4 mr-2" />
+                        Install
+                      </Button>
+                    </>
+                  )}
+                </div>
+
+                <h3 className="text-lg font-medium mt-6">Application Preferences</h3>
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Automatically Check for Updates</Label>
+                    <p className="text-sm text-muted-foreground">Check for application updates when the app starts</p>
+                  </div>
+                  <Switch 
+                    checked={autoCheckForUpdates} 
+                    onCheckedChange={(value) => {
+                      setAutoCheckForUpdates(value);
+                      setIsPWASettingsChanged(true);
+                    }}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Show Update Notifications</Label>
+                    <p className="text-sm text-muted-foreground">Display a notification when updates are available</p>
+                  </div>
+                  <Switch 
+                    checked={showUpdateNotifications} 
+                    onCheckedChange={(value) => {
+                      setShowUpdateNotifications(value);
+                      setIsPWASettingsChanged(true);
+                    }}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Show Welcome Screen</Label>
+                    <p className="text-sm text-muted-foreground">Display a welcome screen when the app is launched as an installed PWA</p>
+                  </div>
+                  <Switch 
+                    checked={welcomeScreenEnabled} 
+                    onCheckedChange={(value) => {
+                      setWelcomeScreenEnabled(value);
+                      setIsPWASettingsChanged(true);
+                    }}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 mt-2">
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Wifi className="h-5 w-5 text-green-500" />
+                      <span>Online</span>
+                    </div>
+                    <span className="text-sm text-muted-foreground">Current network status</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                    <RefreshCw className="h-5 w-5 text-primary" />
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        PWA.checkForUpdates();
+                        toast({
+                          title: "Checking for updates",
+                          description: "Checking for the latest version of the application"
+                        });
+                      }}
+                    >
+                      Check for updates
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="pt-4 border-t flex justify-end">
+                <Button 
+                  onClick={handleSavePWASettings} 
+                  disabled={!isPWASettingsChanged}
+                >
+                  Save App Settings
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <WifiOff className="h-5 w-5 mr-2" />
+                Offline Capabilities
+              </CardTitle>
+              <CardDescription>
+                Manage how the application works without internet connection
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  When installed as a PWA, this application will work offline with limited functionality. 
+                  Your tasks and editions will be available for viewing, but some features may be restricted.
+                </AlertDescription>
+              </Alert>
+              
+              <div className="mt-4 text-sm text-muted-foreground">
+                <p>The following features are available offline:</p>
+                <ul className="list-disc pl-5 mt-2 space-y-1">
+                  <li>Viewing tasks and editions</li>
+                  <li>Checking task details</li>
+                  <li>Accessing previously loaded data</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
       
       {/* Edit User Dialog */}
