@@ -388,7 +388,160 @@ export default function Home() {
           </CardContent>
         </Card>
 
+        {/* Task management column */}
+        <div className="md:col-span-2 space-y-6">
+          {/* Overdue Tasks */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-lg flex items-center">
+                  <AlertTriangle className="mr-2 h-5 w-5 text-red-500" />
+                  {t('dashboard.overdueTasks')}
+                </CardTitle>
+                <div className="flex items-center gap-2">
+                  {!isLoading && overdueTasks.length > 0 && (
+                    <Badge variant="destructive">
+                      {isFiltersVisible ? filteredOverdueTasks.length : overdueTasks.length}
+                    </Badge>
+                  )}
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    onClick={() => setOverdueCollapsed(!overdueCollapsed)}
+                  >
+                    {overdueCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+              <CardDescription>{t('dashboard.tasksDueSoon')}</CardDescription>
+            </CardHeader>
+            <CardContent className={`transition-all duration-300 ease-in-out ${overdueCollapsed ? 'hidden' : ''}`}>
+              {isLoading ? (
+                <>
+                  <Skeleton className="h-12 w-full mb-2" />
+                  <Skeleton className="h-12 w-full mb-2" />
+                  <Skeleton className="h-12 w-full" />
+                </>
+              ) : filteredOverdueTasks && filteredOverdueTasks.length > 0 ? (
+                <div className="space-y-4 max-h-[calc(40vh-50px)] overflow-y-auto pr-2">
+                  {filteredOverdueTasks.map((task: any) => (
+                    <div key={task.id} className="flex justify-between items-start border-b pb-3">
+                      <div className="flex items-start gap-3">
+                        <div className="bg-red-100 p-2 rounded-md mt-1">
+                          <AlertTriangle className="h-4 w-4 text-red-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{task.name}</p>
+                          <div className="flex flex-wrap items-center gap-1 mt-1">
+                            <Badge variant="outline">{task.week}</Badge>
+                            <Badge className={getStatusColor(task.status).bg}>{task.status}</Badge>
+                            <span className="text-xs text-red-500">
+                              {t('tasks.due')}: {formatDate(task.dueDate)} ({getRelativeDateDescription(task.dueDate)})
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <Link to={`/task-details/${task.id}?editionId=${task.editionId}`}>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                    </div>
+                  ))}
 
+                  {filteredOverdueTasks.length > 5 && (
+                    <div className="text-center pt-2">
+                      <p className="text-sm text-muted-foreground">
+                        {t('dashboard.viewAllOverdueTasks', { count: filteredOverdueTasks.length })}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-center py-8 text-muted-foreground">
+                  {t('dashboard.noOverdueTasks')}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Upcoming Tasks */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-lg flex items-center">
+                  <Clock className="mr-2 h-5 w-5 text-amber-500" />
+                  {t('dashboard.upcomingTasks')}
+                </CardTitle>
+                <div className="flex items-center gap-2">
+                  {!isLoading && upcomingTasks.length > 0 && (
+                    <Badge variant="outline" className="bg-amber-100 text-amber-800 hover:bg-amber-100">
+                      {isFiltersVisible ? filteredUpcomingTasks.length : upcomingTasks.length}
+                    </Badge>
+                  )}
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    onClick={() => setUpcomingCollapsed(!upcomingCollapsed)}
+                  >
+                    {upcomingCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+              <CardDescription>{t('dashboard.tasksInNext7Days')}</CardDescription>
+            </CardHeader>
+            <CardContent className={`transition-all duration-300 ease-in-out ${upcomingCollapsed ? 'hidden' : ''}`}>
+              {isLoading ? (
+                <>
+                  <Skeleton className="h-12 w-full mb-2" />
+                  <Skeleton className="h-12 w-full mb-2" />
+                  <Skeleton className="h-12 w-full" />
+                </>
+              ) : filteredUpcomingTasks && filteredUpcomingTasks.length > 0 ? (
+                <div className="space-y-4 max-h-[calc(40vh-50px)] overflow-y-auto pr-2">
+                  {filteredUpcomingTasks.map((task: any) => (
+                    <div key={task.id} className="flex justify-between items-start border-b pb-3">
+                      <div className="flex items-start gap-3">
+                        <div className="bg-amber-100 p-2 rounded-md mt-1">
+                          <Clock className="h-4 w-4 text-amber-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{task.name}</p>
+                          <div className="flex flex-wrap items-center gap-1 mt-1">
+                            <Badge variant="outline">{task.week}</Badge>
+                            <Badge className={getStatusColor(task.status).bg}>{task.status}</Badge>
+                            <span className="text-xs text-amber-600">
+                              {t('tasks.due')}: {formatDate(task.dueDate)} ({getRelativeDateDescription(task.dueDate)})
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <Link to={`/task-details/${task.id}?editionId=${task.editionId}`}>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                    </div>
+                  ))}
+
+                  {filteredUpcomingTasks.length > 5 && (
+                    <div className="text-center pt-2">
+                      <p className="text-sm text-muted-foreground">
+                        {t('dashboard.viewAllUpcomingTasks', { count: filteredUpcomingTasks.length })}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-center py-8 text-muted-foreground">
+                  {t('dashboard.noUpcomingTasksDue')}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Task Filtering UI */}
@@ -413,27 +566,26 @@ export default function Home() {
                 <div className="space-y-2">
                   <Label htmlFor="search">{t('dashboard.searchTasks')}</Label>
                   <div className="relative">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       id="search"
-                      placeholder={t('dashboard.searchPlaceholder')}
-                      className="pl-8"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder={t('dashboard.searchPlaceholder')}
+                      className="pl-8"
                     />
                     {searchQuery && (
                       <Button
                         variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-3"
                         onClick={() => setSearchQuery("")}
+                        className="absolute right-0 top-0 h-full px-3"
                       >
                         <X className="h-4 w-4" />
                       </Button>
                     )}
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="status-filter">{t('tasks.status')}</Label>
                   <Select 
@@ -533,168 +685,6 @@ export default function Home() {
           </Card>
         )}
       </div>
-
-      {/* Overdue and Upcoming Tasks */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        {/* Overdue Tasks */}
-        <Card>
-          <CardHeader className="pb-3">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-lg flex items-center">
-                <AlertTriangle className="mr-2 h-5 w-5 text-red-500" />
-                {t('dashboard.overdueTasks')}
-              </CardTitle>
-              <div className="flex items-center gap-2">
-                {!isLoading && overdueTasks.length > 0 && (
-                  <Badge variant="destructive">
-                    {isFiltersVisible ? filteredOverdueTasks.length : overdueTasks.length}
-                  </Badge>
-                )}
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="h-8 w-8 p-0"
-                  onClick={() => setOverdueCollapsed(!overdueCollapsed)}
-                >
-                  {overdueCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-                </Button>
-              </div>
-            </div>
-            <CardDescription>{t('dashboard.tasksDueSoon')}</CardDescription>
-          </CardHeader>
-          <CardContent className={`transition-all duration-300 ease-in-out ${overdueCollapsed ? 'hidden' : ''}`}>
-            {isLoading ? (
-              <>
-                <Skeleton className="h-12 w-full mb-2" />
-                <Skeleton className="h-12 w-full mb-2" />
-                <Skeleton className="h-12 w-full" />
-              </>
-            ) : filteredOverdueTasks && filteredOverdueTasks.length > 0 ? (
-              <div className="space-y-4 max-h-[calc(40vh-50px)] overflow-y-auto pr-2">
-                {filteredOverdueTasks.map((task: any) => (
-                  <div key={task.id} className="flex justify-between items-start border-b pb-3">
-                    <div className="flex items-start gap-3">
-                      <div className="bg-red-100 p-2 rounded-md mt-1">
-                        <AlertTriangle className="h-4 w-4 text-red-500" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{task.name}</p>
-                        <div className="flex flex-wrap items-center gap-1 mt-1">
-                          <Badge variant="outline">{task.week}</Badge>
-                          <Badge className={getStatusColor(task.status).bg}>{task.status}</Badge>
-                          <span className="text-xs text-red-500">
-                            {t('tasks.due')}: {formatDate(task.dueDate)} ({getRelativeDateDescription(task.dueDate)})
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <Link to={`/tasks?editionId=${task.editionId}&taskId=${task.id}`}>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                  </div>
-                ))}
-
-                {filteredOverdueTasks.length > 5 && (
-                  <div className="text-center pt-2">
-                    <Link to="/tasks">
-                      <Button variant="link" size="sm">
-                        {t('dashboard.viewAll')} {filteredOverdueTasks.length} {t('dashboard.overdueTasks').toLowerCase()}
-                      </Button>
-                    </Link>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-6 text-muted-foreground">
-                <p>{t('dashboard.noOverdueTasks')}</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Upcoming Tasks */}
-        <Card>
-          <CardHeader className="pb-3">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-lg flex items-center">
-                <Clock className="mr-2 h-5 w-5 text-amber-500" />
-                {t('dashboard.upcomingTasks')}
-              </CardTitle>
-              <div className="flex items-center gap-2">
-                {!isLoading && upcomingTasks.length > 0 && (
-                  <Badge variant="secondary">
-                    {isFiltersVisible ? filteredUpcomingTasks.length : upcomingTasks.length}
-                  </Badge>
-                )}
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="h-8 w-8 p-0"
-                  onClick={() => setUpcomingCollapsed(!upcomingCollapsed)}
-                >
-                  {upcomingCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-                </Button>
-              </div>
-            </div>
-            <CardDescription>{t('dashboard.tasksInNext7Days')}</CardDescription>
-          </CardHeader>
-          <CardContent className={`transition-all duration-300 ease-in-out ${upcomingCollapsed ? 'hidden' : ''}`}>
-            {isLoading ? (
-              <>
-                <Skeleton className="h-12 w-full mb-2" />
-                <Skeleton className="h-12 w-full mb-2" />
-                <Skeleton className="h-12 w-full" />
-              </>
-            ) : filteredUpcomingTasks && filteredUpcomingTasks.length > 0 ? (
-              <div className="space-y-4 max-h-[calc(40vh-50px)] overflow-y-auto pr-2">
-                {filteredUpcomingTasks.map((task: any) => (
-                  <div key={task.id} className="flex justify-between items-start border-b pb-3">
-                    <div className="flex items-start gap-3">
-                      <div className="bg-amber-100 p-2 rounded-md mt-1">
-                        <Clock className="h-4 w-4 text-amber-500" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{task.name}</p>
-                        <div className="flex flex-wrap items-center gap-1 mt-1">
-                          <Badge variant="outline">{task.week}</Badge>
-                          <Badge className={getStatusColor(task.status).bg}>{task.status}</Badge>
-                          <span className="text-xs text-amber-600">
-                            {t('tasks.due')}: {formatDate(task.dueDate)} ({getRelativeDateDescription(task.dueDate)})
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <Link to={`/tasks?editionId=${task.editionId}&taskId=${task.id}`}>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                  </div>
-                ))}
-
-                {filteredUpcomingTasks.length > 5 && (
-                  <div className="text-center pt-2">
-                    <Link to="/tasks">
-                      <Button variant="link" size="sm">
-                        {t('dashboard.viewAll')} {filteredUpcomingTasks.length} {t('dashboard.upcomingTasks').toLowerCase()}
-                      </Button>
-                    </Link>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-6 text-muted-foreground">
-                <p>{t('dashboard.noUpcomingTasks')}</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Add invisible spacing div at the bottom for mobile */}
-      <div className="h-12 md:hidden" />
     </div>
   );
 }
