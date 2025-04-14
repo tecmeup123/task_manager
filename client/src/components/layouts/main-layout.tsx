@@ -297,7 +297,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
                             </Button>
                           )}
                           {notification.entityType === 'task' && notification.entityId && (
-                            <Link to={`/tasks/${notification.entityId}`}>
+                            <Link to={`/tasks?editionId=${notification.metadata?.editionId || ''}&taskId=${notification.entityId}`}>
                               <Button size="sm" variant="outline" className="h-7 text-xs">
                                 {t('notifications.goToTask')}
                               </Button>
