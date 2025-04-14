@@ -234,7 +234,7 @@ export default function TaskDetails() {
             {task.taskCode}
           </Badge>
           <Badge 
-            className={getStatusColor(task.status)}
+            className={`${getStatusColor(task.status).bg}`}
           >
             {task.status}
           </Badge>
