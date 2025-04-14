@@ -86,9 +86,43 @@ export default function Tasks() {
   // Check if we have state passed from notification click
   const historyState = typeof window !== 'undefined' && window.history.state ? window.history.state : {};
   const locationState = historyState.state || {};
+  
+  // Log the state for debugging
+  console.log("Raw history state:", historyState);
+  
   const fromNotification = locationState.fromNotification || false;
   const stateTaskId = locationState.taskId || locationState.openTaskId;
   const openTaskModal = locationState.openTaskModal || false;
+  
+  // Also check URL for taskId as a fallback
+  useEffect(() => {
+    if (urlTaskId && editionId && !isTaskModalOpen) {
+      console.log("Opening task from URL params:", urlTaskId);
+      
+      // If we have a taskId in the URL but modal isn't open, try to open it
+      const taskIdInt = parseInt(urlTaskId);
+      if (!isNaN(taskIdInt) && tasks && tasks.length > 0) {
+        const taskToOpen = tasks.find((t: any) => t.id === taskIdInt);
+        if (taskToOpen) {
+          console.log("Found task in loaded tasks, opening modal");
+          setSelectedTask(taskToOpen);
+          setIsTaskModalOpen(true);
+        } else {
+          // Try to fetch the specific task
+          console.log("Task not in loaded tasks, fetching directly");
+          apiRequest('GET', `/api/tasks/${taskIdInt}`)
+            .then(res => res.json())
+            .then(task => {
+              if (task) {
+                setSelectedTask(task);
+                setIsTaskModalOpen(true);
+              }
+            })
+            .catch(err => console.error("Failed to fetch task:", err));
+        }
+      }
+    }
+  }, [urlTaskId, editionId, tasks, isTaskModalOpen]);
 
   // Open task detail modal when task ID is in URL (from notification) or in history state
   useEffect(() => {
@@ -106,8 +140,11 @@ export default function Tasks() {
         return;
       }
       
-      // Only execute if we have a taskId and editionId
-      if (taskIdToUse && editionId) {
+      // If explicitly requested to open modal via state or taskId present
+      const shouldOpenModal = openTaskModal || locationState.openTaskModal || !!stateTaskId;
+      
+      // Only execute if we have a taskId and editionId and should open modal
+      if (taskIdToUse && editionId && shouldOpenModal) {
         console.log(`Attempting to open task ID: ${taskIdToUse} for edition: ${editionId}`, { fromState: !!stateTaskId, fromUrl: !!urlTaskId });
         
         // If tasks aren't loaded yet or the specific task isn't found, fetch it directly

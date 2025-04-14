@@ -33,9 +33,32 @@ export default function TaskLink({
     // Call the optional onClick handler
     if (onClick) onClick();
     
-    // Navigate to the tasks page with the right state and URL params
+    // Navigate to the tasks page with the right URL params
+    // We'll add taskId to URL params for direct access and also pass via state
     const url = `/tasks?editionId=${editionId}&taskId=${taskId}`;
-    navigate(url, { state: { openTaskModal: true, taskId, fromNotification: true } });
+    
+    // WORKAROUND: Use direct history manipulation to force the state to be set
+    // This is more reliable than using the navigate function's state parameter
+    window.history.pushState(
+      { 
+        state: { 
+          openTaskModal: true, 
+          taskId: taskId, 
+          fromNotification: true 
+        } 
+      }, 
+      '', 
+      url
+    );
+    
+    // Also use navigate to trigger the route change
+    navigate(url, { 
+      replace: true,
+    });
+    
+    // Force window reload to ensure the task modal opens
+    // This is necessary because the state might not be properly set otherwise
+    window.location.href = url;
   };
 
   return (
