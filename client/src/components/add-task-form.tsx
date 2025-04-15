@@ -46,7 +46,7 @@ const formSchema = z.object({
   trainingType: z.string().min(1, "Training type is required"),
   inflexible: z.boolean().default(false),
   owner: z.string().optional().nullable(),
-  assignedTo: z.string().optional().nullable(),
+  // assignedTo field removed as requested
   assignedUserId: z.number().optional().nullable(),
   status: z.string(),
 });
@@ -101,7 +101,7 @@ export default function AddTaskForm({
       trainingType: edition?.trainingType || "GLR",
       inflexible: false,
       owner: "",
-      assignedTo: "",
+      // assignedTo removed
       assignedUserId: null,
       status: "Not Started",
     },
