@@ -426,6 +426,191 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch audit logs" });
     }
   });
+  
+  // Task Template management routes
+  app.get("/api/templates", requireAuth, async (req, res) => {
+    try {
+      const templates = await storage.getAllTaskTemplates();
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching templates:", error);
+      res.status(500).json({ error: "Failed to fetch templates" });
+    }
+  });
+  
+  app.get("/api/templates/active", requireAuth, async (req, res) => {
+    try {
+      const activeTemplate = await storage.getActiveTaskTemplate();
+      if (!activeTemplate) {
+        return res.status(404).json({ error: "No active template found" });
+      }
+      res.json(activeTemplate);
+    } catch (error) {
+      console.error("Error fetching active template:", error);
+      res.status(500).json({ error: "Failed to fetch active template" });
+    }
+  });
+  
+  app.get("/api/templates/:id", requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid template ID" });
+      }
+      
+      const template = await storage.getTaskTemplate(id);
+      if (!template) {
+        return res.status(404).json({ error: "Template not found" });
+      }
+      
+      res.json(template);
+    } catch (error) {
+      console.error("Error fetching template:", error);
+      res.status(500).json({ error: "Failed to fetch template" });
+    }
+  });
+
+  app.post("/api/templates", requireAdmin, async (req, res) => {
+    try {
+      const { name, data, isActive } = req.body;
+      if (!name || !data) {
+        return res.status(400).json({ error: "Name and data are required" });
+      }
+      
+      // Store the data as JSON string if it's an object
+      const templateData = typeof data === 'object' ? JSON.stringify(data) : data;
+      
+      const template = await storage.createTaskTemplate({
+        name,
+        data: templateData,
+        isActive: isActive || false,
+        createdBy: req.user.id
+      });
+      
+      // Create audit log
+      await storage.createAuditLog({
+        entityType: "template",
+        entityId: template.id,
+        action: "create",
+        userId: req.user.id,
+        username: req.user.username,
+        newState: JSON.stringify(template),
+        timestamp: new Date()
+      });
+      
+      res.status(201).json(template);
+    } catch (error) {
+      console.error("Error creating template:", error);
+      res.status(500).json({ error: "Failed to create template" });
+    }
+  });
+
+  app.put("/api/templates/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid template ID" });
+      }
+      
+      const { name, data, isActive } = req.body;
+      const updateData: any = {};
+      
+      if (name !== undefined) updateData.name = name;
+      if (data !== undefined) {
+        updateData.data = typeof data === 'object' ? JSON.stringify(data) : data;
+      }
+      if (isActive !== undefined) updateData.isActive = isActive;
+      
+      // Get current template for audit log
+      const currentTemplate = await storage.getTaskTemplate(id);
+      if (!currentTemplate) {
+        return res.status(404).json({ error: "Template not found" });
+      }
+      
+      const updatedTemplate = await storage.updateTaskTemplate(id, updateData);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        entityType: "template",
+        entityId: id,
+        action: "update",
+        userId: req.user.id,
+        username: req.user.username,
+        previousState: JSON.stringify(currentTemplate),
+        newState: JSON.stringify(updatedTemplate),
+        timestamp: new Date()
+      });
+      
+      res.json(updatedTemplate);
+    } catch (error) {
+      console.error("Error updating template:", error);
+      res.status(500).json({ error: "Failed to update template" });
+    }
+  });
+
+  app.put("/api/templates/:id/activate", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid template ID" });
+      }
+      
+      const template = await storage.setActiveTaskTemplate(id);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        entityType: "template",
+        entityId: template.id,
+        action: "update",
+        userId: req.user.id,
+        username: req.user.username,
+        newState: JSON.stringify({ isActive: true }),
+        timestamp: new Date()
+      });
+      
+      res.json(template);
+    } catch (error) {
+      console.error("Error activating template:", error);
+      res.status(500).json({ error: "Failed to activate template" });
+    }
+  });
+
+  app.delete("/api/templates/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid template ID" });
+      }
+      
+      // Get template before deletion for audit log
+      const template = await storage.getTaskTemplate(id);
+      if (!template) {
+        return res.status(404).json({ error: "Template not found" });
+      }
+      
+      const result = await storage.deleteTaskTemplate(id);
+      
+      if (!result) {
+        return res.status(404).json({ error: "Template not found or could not be deleted" });
+      }
+      
+      // Create audit log
+      await storage.createAuditLog({
+        entityType: "template",
+        entityId: id,
+        action: "delete",
+        userId: req.user.id,
+        username: req.user.username,
+        previousState: JSON.stringify(template),
+        timestamp: new Date()
+      });
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting template:", error);
+      res.status(500).json({ error: "Failed to delete template" });
+    }
+  });
 
   // Get all editions
   app.get("/api/editions", async (req, res) => {
@@ -656,9 +841,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "An edition with this code already exists" });
       }
       
+      // Create audit log if user is authenticated
+      if (req.isAuthenticated()) {
+        await storage.createAuditLog({
+          userId: req.user.id,
+          entityType: "edition",
+          entityId: id,
+          action: "duplicate",
+          previousState: null,
+          newState: editionData,
+          notes: `Duplicate edition initiated from edition ID ${id} by ${req.user.username}`
+        });
+      }
+      
+      // Use the updated duplicateEdition method which checks for active templates
       const newEdition = await storage.duplicateEdition(id, editionData);
+      
+      // Create another audit log for the successful duplication
+      if (req.isAuthenticated()) {
+        await storage.createAuditLog({
+          userId: req.user.id,
+          entityType: "edition",
+          entityId: newEdition.id,
+          action: "create",
+          previousState: null,
+          newState: newEdition,
+          notes: `Edition ${newEdition.code} created from duplication by ${req.user.username}`
+        });
+      }
+      
       res.status(201).json(newEdition);
     } catch (error) {
+      console.error("Error duplicating edition:", error);
+      
       if (error instanceof ZodError) {
         const validationError = fromZodError(error);
         return res.status(400).json({ message: validationError.message });

@@ -51,11 +51,13 @@ export interface IStorage {
   getAuditLogs(entityType?: string, entityId?: number): Promise<AuditLog[]>;
   
   // Task template methods
+  getAllTaskTemplates(): Promise<TaskTemplate[]>; 
   getTaskTemplate(id: number): Promise<TaskTemplate | undefined>;
   getActiveTaskTemplate(): Promise<TaskTemplate | undefined>;
   createTaskTemplate(template: InsertTaskTemplate): Promise<TaskTemplate>;
   updateTaskTemplate(id: number, template: Partial<TaskTemplate>): Promise<TaskTemplate>;
   setActiveTaskTemplate(id: number): Promise<TaskTemplate>;
+  deleteTaskTemplate(id: number): Promise<boolean>;
   
   // Session storage for authentication
   sessionStore: any;
