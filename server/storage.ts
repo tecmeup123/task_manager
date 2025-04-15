@@ -462,13 +462,57 @@ export class MemStorage implements IStorage {
   
   // Helper method to duplicate an edition with all its tasks
   async duplicateEdition(editionId: number, newEditionData: InsertEdition): Promise<Edition> {
-    const sourceEdition = await this.getEdition(editionId);
-    if (!sourceEdition) {
-      throw new Error(`Source edition with id ${editionId} not found`);
-    }
-    
     // Create new edition
     const newEdition = await this.createEdition(newEditionData);
+    
+    // Get the active template if it exists
+    const activeTemplate = await this.getActiveTaskTemplate();
+    
+    // If there's an active template, use its data to create tasks
+    if (activeTemplate && activeTemplate.data) {
+      // Parse the template data
+      const templateData = typeof activeTemplate.data === 'string' 
+        ? JSON.parse(activeTemplate.data) 
+        : activeTemplate.data;
+      
+      // Create tasks from the template
+      if (Array.isArray(templateData)) {
+        for (const taskTemplate of templateData) {
+          // Calculate due date based on week
+          let dueDate;
+          if (taskTemplate.week && taskTemplate.week.startsWith("Week -")) {
+            const weekNumber = parseInt(taskTemplate.week.replace("Week -", ""));
+            dueDate = subWeeks(newEdition.startDate, weekNumber);
+          } else if (taskTemplate.week && taskTemplate.week.startsWith("Week ")) {
+            const weekNumber = parseInt(taskTemplate.week.replace("Week ", ""));
+            dueDate = add(newEdition.startDate, { weeks: weekNumber - 1 });
+          }
+          
+          await this.createTask({
+            editionId: newEdition.id,
+            taskCode: taskTemplate.taskCode,
+            week: taskTemplate.week,
+            name: taskTemplate.name,
+            duration: taskTemplate.duration,
+            dueDate: dueDate,
+            trainingType: taskTemplate.trainingType || newEdition.trainingType,
+            owner: taskTemplate.owner,
+            assignedTo: taskTemplate.assignedTo,
+            status: "Not Started",
+            inflexible: taskTemplate.inflexible || false,
+            notes: taskTemplate.notes || null
+          });
+        }
+      }
+      
+      return newEdition;
+    }
+    
+    // If no active template exists, fall back to duplicating from the source edition
+    const sourceEdition = await this.getEdition(editionId);
+    if (!sourceEdition) {
+      throw new Error(`Source edition with id ${editionId} not found and no active template exists`);
+    }
     
     // Get all tasks for the source edition
     const sourceTasks = await this.getTasksByEdition(editionId);
@@ -759,6 +803,79 @@ export class MemStorage implements IStorage {
   async deleteTaskComment(id: number): Promise<boolean> {
     return this.taskComments.delete(id);
   }
+  
+  // Task Template methods
+  async getTaskTemplate(id: number): Promise<TaskTemplate | undefined> {
+    return this.taskTemplates.get(id);
+  }
+  
+  async getActiveTaskTemplate(): Promise<TaskTemplate | undefined> {
+    return Array.from(this.taskTemplates.values()).find(template => template.isActive);
+  }
+  
+  async createTaskTemplate(template: InsertTaskTemplate): Promise<TaskTemplate> {
+    const id = this.currentTaskTemplateId++;
+    const templateRecord: TaskTemplate = {
+      ...template,
+      id,
+      createdAt: new Date(),
+      updatedAt: null
+    };
+    
+    // If this is the first template or isActive is true, 
+    // make sure all other templates are set to inactive
+    if (template.isActive || this.taskTemplates.size === 0) {
+      // Set all existing templates to inactive
+      Array.from(this.taskTemplates.entries()).forEach(([tempId, temp]) => {
+        this.taskTemplates.set(tempId, { ...temp, isActive: false });
+      });
+    }
+    
+    this.taskTemplates.set(id, templateRecord);
+    return templateRecord;
+  }
+  
+  async updateTaskTemplate(id: number, templateData: Partial<TaskTemplate>): Promise<TaskTemplate> {
+    const template = this.taskTemplates.get(id);
+    if (!template) {
+      throw new Error(`Template with id ${id} not found`);
+    }
+    
+    const updatedTemplate = { 
+      ...template, 
+      ...templateData,
+      updatedAt: new Date() 
+    };
+    
+    // If setting this template to active, make all others inactive
+    if (templateData.isActive) {
+      Array.from(this.taskTemplates.entries()).forEach(([tempId, temp]) => {
+        if (tempId !== id) {
+          this.taskTemplates.set(tempId, { ...temp, isActive: false });
+        }
+      });
+    }
+    
+    this.taskTemplates.set(id, updatedTemplate);
+    return updatedTemplate;
+  }
+  
+  async setActiveTaskTemplate(id: number): Promise<TaskTemplate> {
+    const template = this.taskTemplates.get(id);
+    if (!template) {
+      throw new Error(`Template with id ${id} not found`);
+    }
+    
+    // Set all templates to inactive
+    Array.from(this.taskTemplates.entries()).forEach(([tempId, temp]) => {
+      this.taskTemplates.set(tempId, { ...temp, isActive: false });
+    });
+    
+    // Set the selected template to active
+    const activeTemplate = { ...template, isActive: true, updatedAt: new Date() };
+    this.taskTemplates.set(id, activeTemplate);
+    return activeTemplate;
+  }
 
   // Seed some initial data
   private seedData() {
@@ -1023,6 +1140,83 @@ export class DatabaseStorage implements IStorage {
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000 // 24 hours
     });
+  }
+  
+  // Task Template methods
+  async getTaskTemplate(id: number): Promise<TaskTemplate | undefined> {
+    const { db, eq } = await import("./db");
+    const [template] = await db.select().from(taskTemplates).where(eq(taskTemplates.id, id));
+    return template || undefined;
+  }
+  
+  async getActiveTaskTemplate(): Promise<TaskTemplate | undefined> {
+    const { db, eq } = await import("./db");
+    const [template] = await db.select().from(taskTemplates).where(eq(taskTemplates.isActive, true));
+    return template || undefined;
+  }
+  
+  async createTaskTemplate(template: InsertTaskTemplate): Promise<TaskTemplate> {
+    const { db, eq } = await import("./db");
+    
+    // If this template is active, make all other templates inactive
+    if (template.isActive) {
+      await db.update(taskTemplates).set({ isActive: false }).where(eq(taskTemplates.isActive, true));
+    }
+    
+    const [newTemplate] = await db.insert(taskTemplates).values({
+      ...template,
+      createdAt: new Date(),
+      updatedAt: null
+    }).returning();
+    
+    return newTemplate;
+  }
+  
+  async updateTaskTemplate(id: number, templateData: Partial<TaskTemplate>): Promise<TaskTemplate> {
+    const { db, eq } = await import("./db");
+    
+    // If setting this template to active, make all others inactive
+    if (templateData.isActive) {
+      await db.update(taskTemplates).set({ isActive: false }).where(eq(taskTemplates.isActive, true));
+    }
+    
+    const [updatedTemplate] = await db
+      .update(taskTemplates)
+      .set({
+        ...templateData,
+        updatedAt: new Date()
+      })
+      .where(eq(taskTemplates.id, id))
+      .returning();
+    
+    if (!updatedTemplate) {
+      throw new Error(`Template with id ${id} not found`);
+    }
+    
+    return updatedTemplate;
+  }
+  
+  async setActiveTaskTemplate(id: number): Promise<TaskTemplate> {
+    const { db, eq } = await import("./db");
+    
+    // Make all templates inactive
+    await db.update(taskTemplates).set({ isActive: false });
+    
+    // Set this one to active
+    const [activeTemplate] = await db
+      .update(taskTemplates)
+      .set({
+        isActive: true,
+        updatedAt: new Date()
+      })
+      .where(eq(taskTemplates.id, id))
+      .returning();
+    
+    if (!activeTemplate) {
+      throw new Error(`Template with id ${id} not found`);
+    }
+    
+    return activeTemplate;
   }
   
   // Resource methods
