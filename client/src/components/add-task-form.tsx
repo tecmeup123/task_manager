@@ -34,7 +34,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CalendarIcon, Loader2 } from "lucide-react";
-import { WEEK_OPTIONS, TASK_STATUS_OPTIONS, OWNER_OPTIONS, ASSIGNED_TO_OPTIONS, TASK_TEMPLATE } from "@/lib/constants";
+import { WEEK_OPTIONS, TASK_STATUS_OPTIONS, OWNER_OPTIONS, TASK_TEMPLATE } from "@/lib/constants";
 
 // Schema for the form
 const formSchema = z.object({
@@ -134,7 +134,7 @@ export default function AddTaskForm({
       // Get a template for this week if available
       const template = weekTasks[0];
       if (template) {
-        form.setValue("assignedTo", template.assignedTo || "");
+        // assignedTo field removed
         form.setValue("owner", template.owner || "");
         form.setValue("trainingType", template.trainingType || edition?.trainingType || "GLR");
         form.setValue("duration", template.duration || "0:30:00");
@@ -357,33 +357,7 @@ export default function AddTaskForm({
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="assignedTo"
-                render={({ field }) => (
-                  <FormItem className="md:col-span-1">
-                    <FormLabel>Assigned To (Role/Group)</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value || ""}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select assignment" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {ASSIGNED_TO_OPTIONS.map(option => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Assigned To (Role/Group) field removed as requested */}
               
               <FormField
                 control={form.control}

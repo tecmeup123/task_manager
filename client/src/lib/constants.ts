@@ -39,13 +39,7 @@ export const OWNER_OPTIONS = [
   { value: "Platform Engineering", label: "Platform Engineering" },
 ];
 
-export const ASSIGNED_TO_OPTIONS = [
-  { value: "Organizer", label: "Organizer" },
-  { value: "Trainers", label: "Trainers" },
-  { value: "E-learning Q&A", label: "E-learning Q&A" },
-  { value: "Hands-on Q&A", label: "Hands-on Q&A" },
-  { value: "Enviroment", label: "Enviroment" },
-];
+// ASSIGNED_TO_OPTIONS removed as requested
 
 export const TASK_TEMPLATE = {
   "Week -5": [
