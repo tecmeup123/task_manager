@@ -217,7 +217,7 @@ export class MemStorage implements IStorage {
       avatarShape: insertUser.avatarShape || null,
       avatarIcon: insertUser.avatarIcon || null,
       avatarBackground: insertUser.avatarBackground || null,
-      rememberMe: insertUser.rememberMe || null,
+      rememberMe: insertUser.rememberMe || false,
       sessionTimeoutMinutes: insertUser.sessionTimeoutMinutes || 120,
       lastActive: null,
       createdAt: new Date()  
