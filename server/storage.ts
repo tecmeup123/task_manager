@@ -807,6 +807,11 @@ export class MemStorage implements IStorage {
   }
   
   // Task Template methods
+  async getAllTaskTemplates(): Promise<TaskTemplate[]> {
+    return Array.from(this.taskTemplates.values())
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+  
   async getTaskTemplate(id: number): Promise<TaskTemplate | undefined> {
     return this.taskTemplates.get(id);
   }
@@ -877,6 +882,20 @@ export class MemStorage implements IStorage {
     const activeTemplate = { ...template, isActive: true, updatedAt: new Date() };
     this.taskTemplates.set(id, activeTemplate);
     return activeTemplate;
+  }
+  
+  async deleteTaskTemplate(id: number): Promise<boolean> {
+    const template = this.taskTemplates.get(id);
+    if (!template) {
+      return false;
+    }
+    
+    // Do not delete the active template
+    if (template.isActive) {
+      throw new Error(`Cannot delete the active template. Deactivate it first or set another template as active.`);
+    }
+    
+    return this.taskTemplates.delete(id);
   }
 
   // Seed some initial data
@@ -1145,6 +1164,11 @@ export class DatabaseStorage implements IStorage {
   }
   
   // Task Template methods
+  async getAllTaskTemplates(): Promise<TaskTemplate[]> {
+    const { db, desc } = await import("./db");
+    return db.select().from(taskTemplates).orderBy(desc(taskTemplates.createdAt));
+  }
+  
   async getTaskTemplate(id: number): Promise<TaskTemplate | undefined> {
     const { db, eq } = await import("./db");
     const [template] = await db.select().from(taskTemplates).where(eq(taskTemplates.id, id));
@@ -1219,6 +1243,20 @@ export class DatabaseStorage implements IStorage {
     }
     
     return activeTemplate;
+  }
+  
+  async deleteTaskTemplate(id: number): Promise<boolean> {
+    const { db, eq } = await import("./db");
+    
+    // Check if this is the active template
+    const template = await this.getTaskTemplate(id);
+    if (template && template.isActive) {
+      throw new Error(`Cannot delete the active template. Deactivate it first or set another template as active.`);
+    }
+    
+    // Delete the template
+    const result = await db.delete(taskTemplates).where(eq(taskTemplates.id, id)).returning();
+    return result.length > 0;
   }
   
   // Resource methods
