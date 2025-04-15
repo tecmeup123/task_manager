@@ -2094,9 +2094,8 @@ export class DatabaseStorage implements IStorage {
       const week = weeks[weekIndex];
       
       const status = parseInt(week) < (e2.currentWeek || 1)
-        ? Math.random() > 0.2 ? "Done" : "In Progress" 
-          ? Math.random() > 0.7 ? "Not Started" : "In Progress"
-          : "Not Started";
+        ? (Math.random() > 0.2 ? "Done" : "In Progress")
+        : "Not Started";
       
       return {
         editionId: e2.id,
@@ -2114,7 +2113,6 @@ export class DatabaseStorage implements IStorage {
         owner: owners[Math.floor(Math.random() * owners.length)],
         status,
         completionDate: status === "Done" ? new Date("2024-04-25") : null,
-        assignedTo: "Training Coordinator",
         notes: `Sample notes for task ${i1} (Edition B)`,
         links: null,
         inflexible: Math.random() > 0.7
