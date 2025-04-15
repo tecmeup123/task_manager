@@ -823,8 +823,12 @@ export class MemStorage implements IStorage {
     const templateRecord: TaskTemplate = {
       ...template,
       id,
+      name: template.name || "Default Template",
+      isActive: template.isActive || false,
+      data: template.data,
       createdAt: new Date(),
-      updatedAt: null
+      updatedAt: null,
+      createdBy: template.createdBy || null
     };
     
     // If this is the first template or isActive is true, 
