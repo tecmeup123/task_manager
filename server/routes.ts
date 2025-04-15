@@ -700,7 +700,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 week: templateTask.week || "Week 1",
                 name: templateTask.name,
                 taskCode: templateTask.taskCode,
-                trainingType: templateTask.trainingType || edition.trainingType,
+                trainingType: edition.trainingType, // Use the edition's training type, not the template's
                 status: "Not Started",
                 duration: templateTask.duration || null,
                 assignedTo: templateTask.assignedTo || null,
@@ -727,7 +727,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     week,
                     name: templateTask.name,
                     taskCode: templateTask.taskCode,
-                    trainingType: templateTask.trainingType || edition.trainingType,
+                    trainingType: edition.trainingType, // Use the edition's training type, not the template's
                     status: "Not Started",
                     duration: templateTask.duration || null,
                     assignedTo: templateTask.assignedTo || null,
