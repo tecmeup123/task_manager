@@ -438,7 +438,6 @@ export class MemStorage implements IStorage {
       duration: task.duration || null,
       dueDate: task.dueDate || null,
       links: task.links || null,
-      assignedTo: task.assignedTo || null,
       owner: task.owner || null,
       inflexible: task.inflexible || false,
       completionDate: task.completionDate || null
@@ -499,7 +498,6 @@ export class MemStorage implements IStorage {
             dueDate: dueDate,
             trainingType: taskTemplate.trainingType || newEdition.trainingType,
             owner: taskTemplate.owner,
-            assignedTo: taskTemplate.assignedTo,
             status: "Not Started",
             inflexible: taskTemplate.inflexible || false,
             notes: taskTemplate.notes || null
@@ -1672,7 +1670,6 @@ export class DatabaseStorage implements IStorage {
             trainingType: taskTemplate.trainingType || newEdition.trainingType,
             owner: taskTemplate.owner,
             assignedTo: taskTemplate.assignedTo,
-            status: "Not Started",
             inflexible: taskTemplate.inflexible || false,
             notes: taskTemplate.notes || null
           });
