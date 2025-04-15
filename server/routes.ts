@@ -671,37 +671,149 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate edition data
       const editionData = insertEditionSchema.parse(formattedData);
       
-      // Create the edition (set a temporary current week which we'll update later)
+      // Create the edition
       const edition = await storage.createEdition(editionData);
       
-      // Add template tasks to the new edition
-      const { TASK_TEMPLATE } = await import("../client/src/lib/constants");
+      // Check if custom template data was provided in the request
+      const { template } = req.body;
+      
+      // Get the utils for task due date calculation
       const { calculateTaskDueDate, getCurrentWeekFromDate } = await import("../client/src/lib/utils");
       
-      // Loop through all weeks and tasks in the template
-      for (const [week, weekTasks] of Object.entries(TASK_TEMPLATE)) {
-        for (const templateTask of weekTasks) {
-          // Calculate due date based on week number and training start date
-          const dueDate = calculateTaskDueDate(week.replace("Week ", ""), edition.startDate);
+      if (template) {
+        console.log("Using provided template data for tasks");
+        
+        // If template data was provided in the request, use it to create tasks
+        try {
+          const templateData = typeof template === 'string' ? JSON.parse(template) : template;
           
-          // Create a task in the database for each template task
-          const task = {
-            editionId: edition.id,
-            week,
-            name: templateTask.name,
-            taskCode: templateTask.taskCode,
-            trainingType: templateTask.trainingType,
-            status: "Not Started",
-            duration: templateTask.duration || null,
-            assignedTo: templateTask.assignedTo || null,
-            owner: templateTask.owner || null,
-            dueDate: dueDate,
-            links: null,
-            inflexible: false,
-            notes: null
-          };
+          // If the template is an array of tasks
+          if (Array.isArray(templateData)) {
+            for (const templateTask of templateData) {
+              // Calculate due date based on week and training start date
+              const week = templateTask.week || "Week 1";
+              const dueDate = calculateTaskDueDate(week.replace("Week ", ""), edition.startDate);
+              
+              // Create a task
+              const task = {
+                editionId: edition.id,
+                week: templateTask.week || "Week 1",
+                name: templateTask.name,
+                taskCode: templateTask.taskCode,
+                trainingType: templateTask.trainingType || edition.trainingType,
+                status: "Not Started",
+                duration: templateTask.duration || null,
+                assignedTo: templateTask.assignedTo || null,
+                owner: templateTask.owner || null,
+                dueDate: dueDate,
+                links: templateTask.links || null,
+                inflexible: templateTask.inflexible || false,
+                notes: templateTask.notes || null
+              };
+              
+              await storage.createTask(task);
+            }
+          } else if (typeof templateData === 'object') {
+            // If it's an object with weeks as keys
+            for (const [week, weekTasks] of Object.entries(templateData)) {
+              if (Array.isArray(weekTasks)) {
+                for (const templateTask of weekTasks) {
+                  // Calculate due date based on week and training start date
+                  const dueDate = calculateTaskDueDate(week.replace("Week ", ""), edition.startDate);
+                  
+                  // Create a task
+                  const task = {
+                    editionId: edition.id,
+                    week,
+                    name: templateTask.name,
+                    taskCode: templateTask.taskCode,
+                    trainingType: templateTask.trainingType || edition.trainingType,
+                    status: "Not Started",
+                    duration: templateTask.duration || null,
+                    assignedTo: templateTask.assignedTo || null,
+                    owner: templateTask.owner || null,
+                    dueDate: dueDate,
+                    links: templateTask.links || null,
+                    inflexible: templateTask.inflexible || false,
+                    notes: templateTask.notes || null
+                  };
+                  
+                  await storage.createTask(task);
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.error("Error processing template data:", e);
+          // Continue with fallback template if there's an error with the provided template
+        }
+      } else {
+        console.log("Using active template from database");
+        
+        // First try to use the active template from the database
+        const activeTemplate = await storage.getActiveTaskTemplate();
+        
+        if (activeTemplate && activeTemplate.data) {
+          // Use the active template from the database
+          const templateData = typeof activeTemplate.data === 'string' 
+            ? JSON.parse(activeTemplate.data) 
+            : activeTemplate.data;
           
-          await storage.createTask(task);
+          if (Array.isArray(templateData)) {
+            for (const templateTask of templateData) {
+              // Calculate due date based on week
+              const week = templateTask.week || "Week 1";
+              const dueDate = calculateTaskDueDate(week.replace("Week ", ""), edition.startDate);
+              
+              await storage.createTask({
+                editionId: edition.id,
+                week: templateTask.week,
+                name: templateTask.name,
+                taskCode: templateTask.taskCode,
+                trainingType: templateTask.trainingType || edition.trainingType,
+                status: "Not Started",
+                duration: templateTask.duration || null,
+                assignedTo: templateTask.assignedTo || null,
+                owner: templateTask.owner || null,
+                dueDate: dueDate,
+                links: templateTask.links || null,
+                inflexible: templateTask.inflexible || false,
+                notes: templateTask.notes || null
+              });
+            }
+          }
+        } else {
+          console.log("Using default TASK_TEMPLATE constant");
+          
+          // If no template was provided and no active template exists, use the default template
+          const { TASK_TEMPLATE } = await import("../client/src/lib/constants");
+          
+          // Loop through all weeks and tasks in the template
+          for (const [week, weekTasks] of Object.entries(TASK_TEMPLATE)) {
+            for (const templateTask of weekTasks) {
+              // Calculate due date based on week number and training start date
+              const dueDate = calculateTaskDueDate(week.replace("Week ", ""), edition.startDate);
+              
+              // Create a task in the database for each template task
+              const task = {
+                editionId: edition.id,
+                week,
+                name: templateTask.name,
+                taskCode: templateTask.taskCode,
+                trainingType: templateTask.trainingType || edition.trainingType,
+                status: "Not Started",
+                duration: templateTask.duration || null,
+                assignedTo: templateTask.assignedTo || null,
+                owner: templateTask.owner || null,
+                dueDate: dueDate,
+                links: null,
+                inflexible: false,
+                notes: null
+              };
+              
+              await storage.createTask(task);
+            }
+          }
         }
       }
       
@@ -711,7 +823,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update the edition with the correct current week
       const updatedEdition = await storage.updateEdition(edition.id, { currentWeek });
-      
       
       res.status(201).json(edition);
     } catch (error) {
