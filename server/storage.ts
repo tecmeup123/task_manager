@@ -19,6 +19,8 @@ import {
   InsertTaskComment,
   LoginActivity,
   InsertLoginActivity,
+  TaskTemplate,
+  InsertTaskTemplate,
   users,
   trainers,
   editions,
@@ -28,7 +30,8 @@ import {
   resources,
   mentions,
   taskComments,
-  loginActivities
+  loginActivities,
+  taskTemplates
 } from "@shared/schema";
 import { add, format, parseISO, isBefore, subWeeks } from "date-fns";
 import { and, eq, count, inArray } from "drizzle-orm";
@@ -46,6 +49,13 @@ export interface IStorage {
   // Audit logs methods
   createAuditLog(log: InsertAuditLog): Promise<AuditLog>;
   getAuditLogs(entityType?: string, entityId?: number): Promise<AuditLog[]>;
+  
+  // Task template methods
+  getTaskTemplate(id: number): Promise<TaskTemplate | undefined>;
+  getActiveTaskTemplate(): Promise<TaskTemplate | undefined>;
+  createTaskTemplate(template: InsertTaskTemplate): Promise<TaskTemplate>;
+  updateTaskTemplate(id: number, template: Partial<TaskTemplate>): Promise<TaskTemplate>;
+  setActiveTaskTemplate(id: number): Promise<TaskTemplate>;
   
   // Session storage for authentication
   sessionStore: any;
@@ -130,6 +140,7 @@ export class MemStorage implements IStorage {
   private mentions: Map<number, Mention>;
   private taskComments: Map<number, TaskComment>;
   private loginActivities: Map<number, LoginActivity>;
+  private taskTemplates: Map<number, TaskTemplate>;
   private currentUserId: number;
   private currentTrainerId: number;
   private currentEditionId: number;
@@ -140,6 +151,7 @@ export class MemStorage implements IStorage {
   private currentMentionId: number;
   private currentTaskCommentId: number;
   private currentLoginActivityId: number;
+  private currentTaskTemplateId: number;
   sessionStore: session.Store;
 
   constructor() {
@@ -153,6 +165,7 @@ export class MemStorage implements IStorage {
     this.mentions = new Map();
     this.taskComments = new Map();
     this.loginActivities = new Map();
+    this.taskTemplates = new Map();
     this.currentUserId = 1;
     this.currentTrainerId = 1;
     this.currentEditionId = 1;
@@ -163,6 +176,7 @@ export class MemStorage implements IStorage {
     this.currentMentionId = 1;
     this.currentTaskCommentId = 1;
     this.currentLoginActivityId = 1;
+    this.currentTaskTemplateId = 1;
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000 // 24 hours
     });

@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, varchar, json } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, varchar, json, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -314,3 +314,23 @@ export const insertNotificationSchema = createInsertSchema(notifications).omit({
 
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type Notification = typeof notifications.$inferSelect;
+
+// Task Template table to store customized task templates
+export const taskTemplates = pgTable("task_templates", {
+  id: serial("id").primaryKey(),
+  name: text("name").default("default").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  data: jsonb("data").notNull(), // Stores the entire template data structure
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at"),
+  createdBy: integer("created_by").references(() => users.id),
+});
+
+export const insertTaskTemplateSchema = createInsertSchema(taskTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTaskTemplate = z.infer<typeof insertTaskTemplateSchema>;
+export type TaskTemplate = typeof taskTemplates.$inferSelect;
