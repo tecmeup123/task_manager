@@ -945,6 +945,7 @@ export class MemStorage implements IStorage {
           dueDate: subWeeks(edition.startDate, 5),
           trainingType: "GLR",
           owner: "Telmo",
+          assignedTo: "Organizer",
           inflexible: false,
           completionDate: subWeeks(edition.startDate, 4)
         },
@@ -957,6 +958,7 @@ export class MemStorage implements IStorage {
           dueDate: subWeeks(edition.startDate, 5),
           trainingType: "GLR",
           owner: "Miguel",
+          assignedTo: "Organizer",
           status: "Done",
           completionDate: subWeeks(edition.startDate, 4)
         },
@@ -969,6 +971,7 @@ export class MemStorage implements IStorage {
           dueDate: subWeeks(edition.startDate, 5),
           trainingType: "GLR",
           owner: "Trainers",
+          assignedTo: "Trainers",
           status: "Done",
           inflexible: false,
         }
@@ -984,10 +987,10 @@ export class MemStorage implements IStorage {
           dueDate: subWeeks(edition.startDate, 4),
           trainingType: "GLR",
           owner: "Miguel",
+          assignedTo: "Organizer",
           status: "Done",
           inflexible: false,
           completionDate: subWeeks(edition.startDate, 3)
-        }
       ];
       
       const week5Tasks = [
@@ -1000,11 +1003,11 @@ export class MemStorage implements IStorage {
           dueDate: add(edition.startDate, { days: 7 }),
           trainingType: "GLR",
           owner: "Hands-on Q&A",
+          assignedTo: "Hands-on Q&A",
           status: "Done",
           inflexible: true,
           completionDate: add(edition.startDate, { days: 7 })
         },
-        {
           editionId: edition.id,
           taskCode: "W5T02",
           week: "Week 5",
@@ -1013,6 +1016,7 @@ export class MemStorage implements IStorage {
           dueDate: add(edition.startDate, { days: 9 }),
           trainingType: "GLR",
           owner: "Hands-on Q&A",
+          assignedTo: "Hands-on Q&A",
           status: "Pending",
           inflexible: true
         },
@@ -1024,6 +1028,7 @@ export class MemStorage implements IStorage {
           dueDate: add(edition.startDate, { days: 11 }),
           trainingType: "GLR",
           owner: "Platform Engineering",
+          assignedTo: "Enviroment",
           status: "Pending",
           inflexible: true
         },
@@ -1035,6 +1040,7 @@ export class MemStorage implements IStorage {
           dueDate: add(edition.startDate, { days: 11 }),
           trainingType: "GLR",
           owner: "Miguel",
+          assignedTo: "Organizer",
           status: "In Progress",
           inflexible: true,
           notes: "Send survey to all participants by email. Download previous surveys for comparison. Update mailing list with completion status."
@@ -1047,6 +1053,7 @@ export class MemStorage implements IStorage {
           dueDate: add(edition.startDate, { days: 11 }),
           trainingType: "GLR",
           owner: "Telmo",
+          assignedTo: "Organizer",
           status: "Not Started",
           inflexible: false
         },
@@ -1058,6 +1065,7 @@ export class MemStorage implements IStorage {
           dueDate: add(edition.startDate, { days: 11 }),
           trainingType: "GLR",
           owner: "Telmo",
+          assignedTo: "Organizer",
           status: "Not Started",
           inflexible: false
         }
@@ -1072,6 +1080,7 @@ export class MemStorage implements IStorage {
           dueDate: add(edition.startDate, { days: 14 }),
           trainingType: "GLR",
           owner: "Platform Engineering",
+          assignedTo: "Enviroment",
           status: "Not Started",
           inflexible: true
         },
@@ -1083,6 +1092,7 @@ export class MemStorage implements IStorage {
           duration: "0:10:00",
           dueDate: add(edition.startDate, { days: 14 }),
           owner: "Organizer",
+          assignedTo: "Organizer",
           status: "Not Started",
           inflexible: false
         },
@@ -1094,6 +1104,7 @@ export class MemStorage implements IStorage {
           duration: "0:05:00",
           dueDate: add(edition.startDate, { days: 14 }),
           trainingType: "GLR",
+          assignedTo: "Organizer",
           status: "Not Started",
           inflexible: false
         }

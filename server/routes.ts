@@ -703,7 +703,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 trainingType: edition.trainingType, // Use the edition's training type, not the template's
                 status: "Not Started",
                 duration: templateTask.duration || null,
-                assignedTo: templateTask.assignedTo || null,
                 owner: templateTask.owner || null,
                 dueDate: dueDate,
                 links: templateTask.links || null,
@@ -730,7 +729,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     trainingType: edition.trainingType, // Use the edition's training type, not the template's
                     status: "Not Started",
                     duration: templateTask.duration || null,
-                    assignedTo: templateTask.assignedTo || null,
                     owner: templateTask.owner || null,
                     dueDate: dueDate,
                     links: templateTask.links || null,
@@ -773,8 +771,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 trainingType: edition.trainingType, // Always use the editions training type
                 status: "Not Started",
                 duration: templateTask.duration || null,
-                assignedTo: templateTask.assignedTo || null,
-                owner: templateTask.owner || null,
                 dueDate: dueDate,
                 links: templateTask.links || null,
                 inflexible: templateTask.inflexible || false,
@@ -803,9 +799,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 trainingType: edition.trainingType, // Always use the editions training type
                 status: "Not Started",
                 duration: templateTask.duration || null,
-                assignedTo: templateTask.assignedTo || null,
                 owner: templateTask.owner || null,
-                dueDate: dueDate,
                 links: null,
                 inflexible: false,
                 notes: null
