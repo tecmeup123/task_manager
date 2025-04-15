@@ -2132,6 +2132,7 @@ export class DatabaseStorage implements IStorage {
 const dbStorage = new DatabaseStorage();
 dbStorage.seedInitialData()
   .catch(error => {
+    console.error("Error seeding initial data:", error.message);
   });
 
 // Use the database storage implementation
