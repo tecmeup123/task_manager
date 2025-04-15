@@ -141,9 +141,16 @@ export default function CreateEditionForm({
       onClose();
     },
     onError: (error: any) => {
+      // Check if it's a duplicate key error
+      const errorMessage = error.message || "Failed to create edition";
+      const isDuplicateError = errorMessage.includes("duplicate key") || 
+                               errorMessage.includes("already exists");
+      
       toast({
         title: "Error",
-        description: error.message || "Failed to create edition",
+        description: isDuplicateError 
+          ? `Edition code already exists. Please choose a different code.` 
+          : errorMessage,
         variant: "destructive",
       });
     },

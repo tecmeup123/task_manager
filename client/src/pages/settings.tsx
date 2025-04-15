@@ -372,6 +372,34 @@ export default function Settings() {
     }, 500);
   };
   
+  // Template upload mutation
+  const uploadTemplateMutation = useMutation({
+    mutationFn: async (templateData: any) => {
+      const res = await apiRequest("POST", "/api/templates", {
+        name: "Custom Template",
+        data: templateData,
+        isActive: true
+      });
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Template uploaded",
+        description: `Successfully imported template and set as active`
+      });
+      setTemplateFile(null);
+      // If we had a templates list component, we'd refresh it here
+      // queryClient.invalidateQueries({ queryKey: ["/api/templates"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Template upload failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  });
+  
   // Template upload handler
   const handleUploadTemplate = () => {
     if (!templateFile) {
@@ -395,20 +423,13 @@ export default function Settings() {
         const content = e.target?.result as string;
         const templateData = JSON.parse(content);
         
-        if (!Array.isArray(templateData)) {
-          throw new Error("Invalid template format. Expected an array of tasks.");
+        // Validate the template - can be either an array or an object with week keys
+        if (!Array.isArray(templateData) && typeof templateData !== 'object') {
+          throw new Error("Invalid template format. Expected an array of tasks or object with week keys.");
         }
         
-        // In a real implementation, would send this to the server
-        // In this prototype, just show success
-        
-        setTimeout(() => {
-          toast({
-            title: "Template uploaded",
-            description: `Successfully imported ${templateData.length} tasks from template`
-          });
-          setTemplateFile(null);
-        }, 1000);
+        // Upload the template to the server
+        uploadTemplateMutation.mutate(templateData);
       } catch (error) {
         toast({
           title: "Error parsing template",
