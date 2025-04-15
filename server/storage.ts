@@ -1585,6 +1585,97 @@ export class DatabaseStorage implements IStorage {
     return updatedEdition;
   }
 
+  async duplicateEdition(editionId: number, newEditionData: InsertEdition): Promise<Edition> {
+    const { db, eq } = await import("./db");
+    
+    // First create the new edition
+    const [newEdition] = await db
+      .insert(editions)
+      .values({
+        ...newEditionData,
+        status: "active",
+        currentWeek: 1,
+        archived: false
+      })
+      .returning();
+    
+    // Try to get active template first
+    const activeTemplate = await this.getActiveTaskTemplate();
+    
+    // If there's an active template, use it to create tasks
+    if (activeTemplate && activeTemplate.data) {
+      // Parse the template data
+      const templateData = typeof activeTemplate.data === 'string' 
+        ? JSON.parse(activeTemplate.data) 
+        : activeTemplate.data;
+      
+      // Create tasks from the template
+      if (Array.isArray(templateData)) {
+        for (const taskTemplate of templateData) {
+          // Calculate due date based on week
+          let dueDate;
+          if (taskTemplate.week && taskTemplate.week.startsWith("Week -")) {
+            const weekNumber = parseInt(taskTemplate.week.replace("Week -", ""));
+            dueDate = subWeeks(newEdition.startDate, weekNumber);
+          } else if (taskTemplate.week && taskTemplate.week.startsWith("Week ")) {
+            const weekNumber = parseInt(taskTemplate.week.replace("Week ", ""));
+            dueDate = add(newEdition.startDate, { weeks: weekNumber - 1 });
+          }
+          
+          await this.createTask({
+            editionId: newEdition.id,
+            taskCode: taskTemplate.taskCode,
+            week: taskTemplate.week,
+            name: taskTemplate.name,
+            duration: taskTemplate.duration,
+            dueDate: dueDate,
+            trainingType: taskTemplate.trainingType || newEdition.trainingType,
+            owner: taskTemplate.owner,
+            assignedTo: taskTemplate.assignedTo,
+            status: "Not Started",
+            inflexible: taskTemplate.inflexible || false,
+            notes: taskTemplate.notes || null
+          });
+        }
+        
+        console.log(`Created ${templateData.length} tasks from template for edition ${newEdition.code}`);
+        return newEdition;
+      }
+    }
+    
+    // If no active template, fall back to duplicating from source edition
+    const sourceEdition = await this.getEdition(editionId);
+    if (!sourceEdition) {
+      throw new Error(`Source edition with id ${editionId} not found and no active template exists`);
+    }
+    
+    // Get all tasks for the source edition
+    const sourceTasks = await db.select().from(tasks).where(eq(tasks.editionId, editionId));
+    
+    // Create new tasks for the new edition
+    for (const task of sourceTasks) {
+      const { id, editionId, completionDate, ...taskData } = task;
+      
+      // Calculate new due date
+      let dueDate = null;
+      if (task.dueDate) {
+        const differenceInMs = newEdition.startDate.getTime() - sourceEdition.startDate.getTime();
+        dueDate = new Date(task.dueDate.getTime() + differenceInMs);
+      }
+      
+      await this.createTask({
+        ...taskData,
+        editionId: newEdition.id,
+        status: "Not Started",
+        dueDate,
+        completionDate: null
+      });
+    }
+    
+    console.log(`Created ${sourceTasks.length} tasks from source edition for edition ${newEdition.code}`);
+    return newEdition;
+  }
+  
   async deleteEdition(id: number): Promise<boolean> {
     const { db, eq, and, inArray } = await import("./db");
 
@@ -1727,73 +1818,6 @@ export class DatabaseStorage implements IStorage {
     const { db } = await import("./db");
     const result = await db.delete(tasks).where(eq(tasks.id, id)).returning();
     return result.length > 0;
-  }
-
-  async duplicateEdition(editionId: number, newEditionData: InsertEdition): Promise<Edition> {
-    const { db } = await import("./db");
-    const { calculateTaskDueDate, getCurrentWeekFromDate } = await import("../client/src/lib/utils");
-    
-    // First, get the source edition
-    const sourceEdition = await this.getEdition(editionId);
-    if (!sourceEdition) {
-      throw new Error(`Edition with id ${editionId} not found`);
-    }
-    
-    // Calculate the current week based on today's date relative to the start date
-    const today = new Date();
-    const newStartDate = new Date(newEditionData.startDate);
-    const currentWeek = getCurrentWeekFromDate(today, newStartDate);
-    
-    // Create the new edition with default values
-    const editionWithDefaults = {
-      ...newEditionData,
-      status: "active",
-      currentWeek
-    };
-    
-    // Use a transaction to ensure all operations succeed or fail together
-    const newEdition = await db.transaction(async (tx) => {
-      // Create new edition
-      const [newEdition] = await tx
-        .insert(editions)
-        .values(editionWithDefaults)
-        .returning();
-      
-      // Get all tasks from the source edition
-      const sourceTasks = await tx
-        .select()
-        .from(tasks)
-        .where(eq(tasks.editionId, editionId));
-      
-      // Create new tasks in the new edition
-      const newStartDate = new Date(newEdition.startDate);
-      
-      // Prepare batch insert for all tasks
-      if (sourceTasks.length > 0) {
-        const taskValues = sourceTasks.map(sourceTask => {
-          const { id, editionId, completionDate, ...taskProps } = sourceTask;
-          
-          // Calculate the due date based on the week number and new start date
-          // Extract just the number from the week string (e.g., "Week -5" -> "-5")
-          const weekNumber = taskProps.week.replace(/Week\s+/, "");
-          const dueDate = calculateTaskDueDate(weekNumber, newStartDate);
-          
-          return {
-            ...taskProps,
-            editionId: newEdition.id,
-            dueDate: dueDate,
-            status: "Not Started",
-            completionDate: null,
-          };
-        });
-        
-        await tx.insert(tasks).values(taskValues);
-      }
-      
-      return newEdition;
-    });
-    
-    return newEdition;
   }
 
   // Notification methods
