@@ -273,7 +273,7 @@ export default function Home() {
                         // Get all tasks that match this edition's current week
                         const editionTasks = tasks?.filter((task: any) => 
                           task.editionId === edition.id && 
-                          parseInt(task.week) === edition.currentWeek
+                          getWeekNumber(task.week) === edition.currentWeek
                         )?.length || 0;
                         return count + editionTasks;
                       }, 0)}
@@ -304,7 +304,7 @@ export default function Home() {
                         // Get all completed tasks that match this edition's current week
                         const completedTasks = tasks?.filter((task: any) => 
                           task.editionId === edition.id && 
-                          parseInt(task.week) === edition.currentWeek &&
+                          getWeekNumber(task.week) === edition.currentWeek &&
                           task.status === 'Done'
                         )?.length || 0;
                         return count + completedTasks;

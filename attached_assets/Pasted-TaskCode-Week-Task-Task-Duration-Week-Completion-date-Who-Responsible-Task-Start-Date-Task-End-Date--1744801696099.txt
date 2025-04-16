@@ -1,0 +1,31 @@
+TaskCode	Week	Task	Task Duration	Week Completion date	Who	Responsible	Task Start Date	Task End Date	Training Type
+SLW1T01	Week 1	Check if the cohort for the edition exists and if not create it	0:10:00		Organizer	Miguel\ Afonso\ Telmo\ Luis	0	4	SLR
+SLW1T02	Week 1	Create mailing list (names; groups information; schedule; edition)	0:10:00		Organizer	Miguel\ Afonso\ Telmo\ Luis	0	4	SLR
+SLW1T03	Week 1	Copy course's path and update exam and assignments dates and configure cohorts	0:15:00		Organizer	Miguel\ Afonso\ Telmo\ Luis	0	4	SLR
+SLW1T04	Week 1	Alert: Platform Engineering\Marco and Jorge (Administrator) create training environments until day 4	0:01:00		Enviroment	Platform Engineering 	0	4	SLR
+SLW1T05	Week 1	Include links of the exam, mailing and edition folder to trainers	0:10:00		Organizer	Miguel\ Afonso\ Telmo\ Luis	0	4	SLR
+SLW1T06	Week 1	Send welcome to e-learning email 	0:10:00		Organizer	Miguel\ Afonso\ Telmo\ Luis	0	4	SLR
+SLW2T01	Week 2	Send welcome to e-learning email 	0:10:00		Organizer	Miguel\ Afonso\ Telmo\ Luis	7	11	SLR
+SLW2T02	Week 2	Trainers should send changes in the final exam (2 weeks)	0:01:00		Trainers	"Joaquim Matos \ Jorge Neto
+Pedro Tinoco
+Micael Queiroz \ 
+Miguel\ Afonso\ Telmo\ Luis"	7	11	SLR
+SLW3T01	Week 3	Send credentials to trainees after Platform Engineering\Marco\Jorge(Administrator) provide us (until day 4)	0:30:00	Inflexible	Organizer	Miguel\ Afonso\ Telmo\ Luis	14	15	SLR
+SLW4T01	Week 4	Send changes in the Final exam to Training Team - until the end of the week	0:01:00	Inflexible	Organizer	Miguel\ Afonso\ Telmo\ Luis	21	25	SLR
+SLW5T01	Week 5	Platform Engineering reset training environments next week (alert) and create environments for CM Modelers	0:01:00	Inflexible	Hands-on Q&A	"Luis Pereira
+Micael Queiroz
+Telmo Silva\ Afonso"	28	32	SLR
+SLW5T02	Week 5	Mailing survey Hands-on stage & Download previous edition surveys	0:15:00	Inflexible	Organizer	Miguel\ Afonso\ Telmo\ Luis	28	32	SLR
+SLW5T03	Week 5	Send exam information to trainees	0:10:00	Inflexible	Organizer	Miguel\ Afonso\ Telmo\ Luis	28	32	SLR
+SLW5T04	Week 5	Send VM's and practice exam information for Administrators	0:10:00	Inflexible	Organizer	Miguel\ Afonso\ Telmo\ Luis	28	32	SLR
+SLW6T01	Week 6	Reset training environments for exam (upload Master Data)	0:01:00	Inflexible	Enviroment	Platform Engineering 	35	39	SLR
+SLW6T02	Week 6	Send Modelers environment information - after Platform Engineering it is ok and Training teams checked the environments	0:10:00	Inflexible	Organizer	Miguel\ Afonso\ Telmo\ Luis	35	39	SLR
+SLW6T03	Week 6	Request Platform Engineering  to remove cloud environment and delete training Boxs	0:05:00	Inflexible	Organizer	Miguel\ Afonso\ Telmo\ Luis	39	39	SLR
+SLW7T01	Week 7	Final exam evaluation	0:01:00	Inflexible	Trainers	"Joaquim Matos \ Jorge Neto
+Pedro Tinoco
+Micael Queiroz \ 
+Miguel\ Afonso\ Telmo\ Luis"	42	46	SLR
+SLW8T01	Week 8	Update mailing list with grades (Final exam)	0:15:00		Organizer	Miguel\ Afonso\ Telmo\ Luis	49	53	SLR
+SLW8T02	Week 8	Send grades by email (and report to managers)	0:10:00		Organizer	Miguel\ Afonso\ Telmo\ Luis	49	53	SLR
+SLW8T03	Week 8	Issue badges	0:20:00		Organizer	Miguel\ Afonso\ Telmo\ Luis	49	53	SLR
+SLW8T04	Week 8	Download survey	0:10:00		Organizer	Miguel\ Afonso\ Telmo\ Luis	49	53	SLR
