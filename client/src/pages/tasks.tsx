@@ -20,7 +20,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronDown, ChevronRight, Plus, Copy, Download, MoreVertical } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, Copy, Download, MoreVertical, CalendarDays } from "lucide-react";
 import AddTaskForm from "@/components/add-task-form";
 import WeekTasks from "@/components/week-tasks";
 import TaskDetailModal from "@/components/task-detail-modal";
