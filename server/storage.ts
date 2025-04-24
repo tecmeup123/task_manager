@@ -685,6 +685,8 @@ export class MemStorage implements IStorage {
   }
 }
 
+export const storage = new MemStorage();
+
 // Initialize admin user
 async function initializeAdmin() {
   const existingAdmin = await storage.getUserByUsername("admin");
@@ -702,5 +704,3 @@ async function initializeAdmin() {
 
 // Call initialization
 initializeAdmin().catch(console.error);
-
-export const storage = new MemStorage();
