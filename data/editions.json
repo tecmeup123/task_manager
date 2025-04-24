@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "code": "2501-B",
+    "trainingType": "SLR",
+    "startDate": "2025-01-30T00:00:00.000Z",
+    "tasksStartDate": "2024-12-23T00:00:00.000Z",
+    "id": 1,
+    "status": "active",
+    "currentWeek": 8,
+    "archived": false
+  },
+  {
+    "code": "2502-B",
+    "trainingType": "SLR",
+    "startDate": "2025-02-27T00:00:00.000Z",
+    "tasksStartDate": "2025-01-20T00:00:00.000Z",
+    "id": 2,
+    "status": "active",
+    "currentWeek": 8,
+    "archived": false
+  }
+]
