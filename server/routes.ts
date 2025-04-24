@@ -480,18 +480,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store the data as JSON string if it's an object
       const templateData = typeof data === 'object' ? JSON.stringify(data) : data;
 
-      // Create template and ensure it's active if specified
+      // First, deactivate all existing templates
+      const existingTemplates = await storage.getAllTaskTemplates();
+      for (const existingTemplate of existingTemplates) {
+        await storage.updateTaskTemplate(existingTemplate.id, { isActive: false });
+      }
+
+      // Create new template and set it as active
       const template = await storage.createTaskTemplate({
         name,
         data: templateData,
-        isActive: isActive || false,
+        isActive: true,
         createdBy: req.user.id
       });
-
-      // If this template should be active, deactivate other templates
-      if (isActive) {
-        await storage.setActiveTaskTemplate(template.id);
-      }
 
       // Create audit log
       await storage.createAuditLog({
