@@ -27,6 +27,7 @@ import path from 'path';
 import session from 'express-session';
 import createMemoryStore from 'memorystore';
 import { add, format, parseISO, isBefore, subWeeks } from "date-fns";
+import { hashPassword } from './auth'; // Assuming hashPassword function exists elsewhere
 
 
 // Store data in JSON files
@@ -684,5 +685,22 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Create and export the storage instance
+// Initialize admin user
+async function initializeAdmin() {
+  const existingAdmin = await storage.getUserByUsername("admin");
+  if (!existingAdmin) {
+    const hashedPassword = await hashPassword("admin123");
+    await storage.createUser({
+      username: "admin",
+      password: hashedPassword,
+      role: "admin",
+      approved: true,
+      fullName: "Administrator"
+    });
+  }
+}
+
+// Call initialization
+initializeAdmin().catch(console.error);
+
 export const storage = new MemStorage();
