@@ -7,7 +7,7 @@
     "id": 1,
     "status": "active",
     "currentWeek": 8,
-    "archived": false
+    "archived": true
   },
   {
     "code": "2502-B",
@@ -17,6 +17,6 @@
     "id": 2,
     "status": "active",
     "currentWeek": 8,
-    "archived": false
+    "archived": true
   }
 ]
