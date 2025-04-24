@@ -96,8 +96,19 @@ export default function CreateEditionForm({
         examStartDate.setDate(examStartDate.getDate() - 1);
         
         // Calculate task start date: 35 days before exam start, adjusted to previous Monday
+        // Calculate task start date: 25 working days before exam start
         const taskStartDate = new Date(examStartDate);
-        taskStartDate.setDate(taskStartDate.getDate() - 35);
+        let daysToSubtract = 25; // 5 weeks * 5 working days
+        
+        while (daysToSubtract > 0) {
+          taskStartDate.setDate(taskStartDate.getDate() - 1);
+          // Skip weekends (0 = Sunday, 6 = Saturday)
+          if (taskStartDate.getDay() !== 0 && taskStartDate.getDay() !== 6) {
+            daysToSubtract--;
+          }
+        }
+        
+        // Adjust to previous Monday if not already on Monday
         while (taskStartDate.getDay() !== 1) { // 1 is Monday
           taskStartDate.setDate(taskStartDate.getDate() - 1);
         }
