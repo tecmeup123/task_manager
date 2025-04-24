@@ -205,33 +205,52 @@ export default function CreateEditionForm({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
+                name="trainingType"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>Training Type</FormLabel>
+                    <Select
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        setVariant(value === "GLR" ? "A" : "B");
+                        form.setValue("code", getEditionCode(year, month, value === "GLR" ? "A" : "B"));
+                      }}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select training type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="GLR">GLR (Guided Learning Route)</SelectItem>
+                        <SelectItem value="SLR">SLR (Self Learning Route)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      GLR editions use variant A, SLR editions use variant B
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="code"
                 render={({ field }) => (
                   <FormItem className="md:col-span-1">
                     <FormLabel>Edition Code</FormLabel>
                     <FormControl>
-                      <div className="flex gap-2">
-                        <Input 
-                          {...field} 
-                          placeholder="e.g. 2406-A"
-                          className="flex-grow"
-                        />
-                        {sourceEditionId && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={() => {
-                              setVariant(variant === "A" ? "B" : "A");
-                            }}
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
+                      <Input 
+                        {...field} 
+                        placeholder="e.g. 2406-A"
+                        className="flex-grow"
+                        readOnly
+                      />
                     </FormControl>
                     <FormDescription>
-                      Format: YYMM-A/B (e.g., 2405-A)
+                      Auto-generated based on training type (A for GLR, B for SLR)
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
