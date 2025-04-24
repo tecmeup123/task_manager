@@ -18,5 +18,15 @@
     "status": "active",
     "currentWeek": 8,
     "archived": false
+  },
+  {
+    "code": "2503-B",
+    "trainingType": "SLR",
+    "startDate": "2025-03-27T00:00:00.000Z",
+    "tasksStartDate": "2025-02-17T00:00:00.000Z",
+    "id": 3,
+    "status": "active",
+    "currentWeek": 5,
+    "archived": false
   }
 ]
