@@ -768,14 +768,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 week: templateTask.week,
                 name: templateTask.name,
                 taskCode: templateTask.taskCode,
-                trainingType: edition.trainingType, // Always use the editions training type
+                trainingType: edition.trainingType,
                 status: "Not Started",
                 duration: templateTask.duration || null,
-                owner: null, // Don't inherit owner from template
+                owner: "",
                 dueDate: dueDate,
-                links: templateTask.links || null,
-                inflexible: templateTask.inflexible || false,
-                notes: templateTask.notes || null
+                links: null,
+                inflexible: false,
+                notes: null
               });
             }
           }
