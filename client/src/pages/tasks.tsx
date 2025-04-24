@@ -572,10 +572,27 @@ export default function Tasks() {
             ))}
           </>
         ) : (
-          // No tasks found
+          // No tasks found - different message depending on whether an edition exists
           <div className="p-8 text-center text-neutral-500">
-            <p className="mb-2">No tasks found for the selected filters.</p>
-            <Button onClick={() => setIsAddTaskFormOpen(true)}>Add Your First Task</Button>
+            {currentEdition ? (
+              <>
+                <p className="mb-2">No tasks found for the selected filters.</p>
+                <Button onClick={() => setIsAddTaskFormOpen(true)}>Add Your First Task</Button>
+              </>
+            ) : (
+              <div className="space-y-4">
+                <div className="mx-auto w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center">
+                  <CalendarDays className="h-8 w-8 text-yellow-600" />
+                </div>
+                <h3 className="text-lg font-medium">No Edition Available</h3>
+                <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                  You need to create an edition first before you can add tasks. An edition represents a training period.
+                </p>
+                <Button onClick={() => setIsCreateEditionOpen(true)}>
+                  Create Your First Edition
+                </Button>
+              </div>
+            )}
           </div>
         )}
 
