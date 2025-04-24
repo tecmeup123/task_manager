@@ -81,22 +81,22 @@ function createAuditLog(entityType: string, action: string) {
     if (!req.isAuthenticated()) {
       return next();
     }
-    
+
     // Store the original response methods
     const originalJson = res.json;
     const originalSend = res.send;
-    
+
     // Override json method to capture response
     res.json = function(body) {
       // Try to identify the entity ID - specific handling for different routes
       let entityId: number | undefined;
-      
+
       if (req.params.id) {
         entityId = parseInt(req.params.id);
       } else if (body && body.id) {
         entityId = body.id;
       }
-      
+
       // Only log if we have an entity ID
       if (entityId) {
         const auditLog = {
@@ -108,16 +108,16 @@ function createAuditLog(entityType: string, action: string) {
           newState: req.method === 'POST' || req.method === 'PATCH' ? body : null,
           notes: `${action} ${entityType} by ${req.user.username}`
         };
-        
+
         // Log to audit log asynchronously (don't wait for completion)
         storage.createAuditLog(auditLog)
           .catch(err => console.error('Error creating audit log:', err));
       }
-      
+
       // Call the original method
       return originalJson.call(res, body);
     };
-    
+
     // Override send method (for DELETE responses)
     res.send = function(body) {
       if (req.method === 'DELETE' && req.params.id) {
@@ -130,16 +130,16 @@ function createAuditLog(entityType: string, action: string) {
           newState: null,
           notes: `${action} ${entityType} by ${req.user.username}`
         };
-        
+
         // Log to audit log asynchronously
         storage.createAuditLog(auditLog)
           .catch(err => console.error('Error creating audit log:', err));
       }
-      
+
       // Call the original method
       return originalSend.call(res, body);
     };
-    
+
     next();
   };
 }
@@ -151,39 +151,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     fs.mkdirSync(uploadDir, { recursive: true });
   }
   app.use('/uploads', express.static(uploadDir));
-  
+
   // Set up authentication
   setupAuth(app);
-  
+
   // Note: The uploads directory is already served at line 153
-  
+
   // Notification endpoints
   app.get("/api/notifications", requireAuth, async (req, res) => {
     try {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
       const includeRead = req.query.includeRead === 'true';
       const userId = req.user!.id;
-      
+
       console.log(`Fetching notifications for user ${userId}, limit: ${limit}, includeRead: ${includeRead}`);
       const notifications = await storage.getUserNotifications(userId, limit, includeRead);
       console.log(`Found ${notifications.length} notifications for user ${userId}`);
-      
+
       res.json(notifications);
     } catch (error) {
       console.error("Error fetching notifications:", error);
       res.status(500).json({ message: "Failed to fetch notifications" });
     }
   });
-  
+
   // Test endpoint to create a notification (for debugging)
   app.post("/api/notifications/test", requireAuth, async (req, res) => {
     try {
       const userId = req.user!.id;
-      
+
       // Find a valid task to use as entity
       const tasks = await storage.getAllTasks();
       const task = tasks.length > 0 ? tasks[0] : null;
-      
+
       // Create a test notification
       const notification = await storage.createNotification({
         userId,
@@ -199,7 +199,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           created_by: "admin"
         }
       });
-      
+
       console.log("Created test notification:", notification);
       res.json({ success: true, notification });
     } catch (error) {
@@ -207,7 +207,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to create test notification" });
     }
   });
-  
+
   app.get("/api/notifications/count", requireAuth, async (req, res) => {
     try {
       const userId = req.user!.id;
@@ -218,7 +218,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to count notifications" });
     }
   });
-  
+
   app.post("/api/notifications/mark-read/:id", requireAuth, async (req, res) => {
     try {
       const notificationId = parseInt(req.params.id);
@@ -229,7 +229,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to mark notification as read" });
     }
   });
-  
+
   app.post("/api/notifications/mark-all-read", requireAuth, async (req, res) => {
     try {
       const userId = req.user!.id;
@@ -240,23 +240,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to mark all notifications as read" });
     }
   });
-  
+
   // put application routes here
   // prefix all routes with /api
   const apiRouter = app.route("/api");
-  
+
   // User profile endpoint
   app.get("/api/user/profile", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Authentication required" });
     }
-    
+
     try {
       const user = await storage.getUser(req.user.id);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      
+
       // Return user without password
       const { password, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
@@ -265,22 +265,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch user profile" });
     }
   });
-  
+
   // Update user profile
   app.patch("/api/user/profile", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Authentication required" });
     }
-    
+
     try {
       const { fullName, email, avatarUrl, avatarColor, avatarShape, avatarIcon, avatarBackground } = req.body;
-      
+
       // Get the current user for the audit log
       const currentUser = await storage.getUser(req.user.id);
       if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
       }
-      
+
       // Update only the fields provided
       const updatedFields: any = {};
       if (fullName !== undefined) updatedFields.fullName = fullName;
@@ -290,16 +290,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (avatarShape !== undefined) updatedFields.avatarShape = avatarShape;
       if (avatarIcon !== undefined) updatedFields.avatarIcon = avatarIcon;
       if (avatarBackground !== undefined) updatedFields.avatarBackground = avatarBackground;
-      
+
       // Skip update if no fields provided
       if (Object.keys(updatedFields).length === 0) {
         const { password, ...userWithoutPassword } = currentUser;
         return res.json(userWithoutPassword);
       }
-      
+
       // Update the user profile
       const updatedUser = await storage.updateUser(req.user.id, updatedFields);
-      
+
       // Create audit log for profile update
       await storage.createAuditLog({
         userId: req.user.id,
@@ -310,7 +310,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newState: { ...updatedUser, password: "[REDACTED]" },
         notes: "User profile updated"
       });
-      
+
       // Return updated user without password
       const { password, ...userWithoutPassword } = updatedUser;
       res.json(userWithoutPassword);
@@ -319,25 +319,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update user profile" });
     }
   });
-  
+
   // Upload avatar
   app.post("/api/user/avatar", avatarUpload.single('avatar'), async (req: Request & { file?: Express.Multer.File }, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Authentication required" });
     }
-    
+
     try {
       const file = req.file;
       if (!file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
-      
+
       // Generate URL for the uploaded file
       const avatarUrl = `/uploads/avatars/${file.filename}`;
-      
+
       // Update user with avatar URL
       const updatedUser = await storage.updateUser(req.user.id, { avatarUrl });
-      
+
       // Create audit log for avatar upload
       await storage.createAuditLog({
         userId: req.user.id,
@@ -348,7 +348,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newState: { avatarUrl },
         notes: "User avatar updated"
       });
-      
+
       // Return success with the URL
       res.json({ 
         message: "Avatar uploaded successfully", 
@@ -359,7 +359,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to upload avatar" });
     }
   });
-  
+
   // Change password endpoint has been moved to auth.ts to avoid duplicates
 
   // Audit Logs - admin can see all logs
@@ -367,29 +367,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const entityType = req.query.entityType as string | undefined;
       const entityId = req.query.entityId ? Number(req.query.entityId) : undefined;
-      
+
       const logs = await storage.getAuditLogs(entityType, entityId);
       res.json(logs);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch audit logs" });
     }
   });
-  
+
   // Entity-specific audit logs - accessible to all authenticated users
   app.get("/api/entity-audit-logs", async (req, res) => {
     try {
       // We don't require authentication for audit logs to make them visible on task detail modals
       // This makes them accessible from task detail modals even for non-logged in users
-      
+
       const entityType = req.query.entityType as string;
       const entityId = req.query.entityId ? Number(req.query.entityId) : undefined;
-      
+
       if (!entityType || !entityId) {
         return res.status(400).json({ message: "Entity type and ID are required" });
       }
-      
+
       const logs = await storage.getAuditLogs(entityType, entityId);
-      
+
       // Enhance the logs with username information and ensure timestamp fields are valid
       const enhancedLogs = await Promise.all(logs.map(async (log) => {
         // Make sure we have valid timestamp fields
@@ -399,7 +399,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Ensure timestamp is always a valid string
           timestamp: log.timestamp ? new Date(log.timestamp).toISOString() : new Date().toISOString()
         };
-        
+
         if (log.userId) {
           try {
             const user = await storage.getUser(log.userId);
@@ -419,14 +419,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           username: "System"
         };
       }));
-      
+
       res.json(enhancedLogs);
     } catch (error) {
       console.error("Error fetching entity audit logs:", error);
       res.status(500).json({ message: "Failed to fetch audit logs" });
     }
   });
-  
+
   // Task Template management routes
   app.get("/api/templates", requireAuth, async (req, res) => {
     try {
@@ -437,7 +437,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch templates" });
     }
   });
-  
+
   app.get("/api/templates/active", requireAuth, async (req, res) => {
     try {
       const activeTemplate = await storage.getActiveTaskTemplate();
@@ -450,19 +450,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch active template" });
     }
   });
-  
+
   app.get("/api/templates/:id", requireAuth, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
         return res.status(400).json({ error: "Invalid template ID" });
       }
-      
+
       const template = await storage.getTaskTemplate(id);
       if (!template) {
         return res.status(404).json({ error: "Template not found" });
       }
-      
+
       res.json(template);
     } catch (error) {
       console.error("Error fetching template:", error);
@@ -476,17 +476,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!name || !data) {
         return res.status(400).json({ error: "Name and data are required" });
       }
-      
+
       // Store the data as JSON string if it's an object
       const templateData = typeof data === 'object' ? JSON.stringify(data) : data;
-      
+
       const template = await storage.createTaskTemplate({
         name,
         data: templateData,
         isActive: isActive || false,
         createdBy: req.user.id
       });
-      
+
       // Create audit log
       await storage.createAuditLog({
         entityType: "template",
@@ -497,7 +497,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newState: JSON.stringify(template),
         timestamp: new Date()
       });
-      
+
       res.status(201).json(template);
     } catch (error) {
       console.error("Error creating template:", error);
@@ -511,24 +511,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (isNaN(id)) {
         return res.status(400).json({ error: "Invalid template ID" });
       }
-      
+
       const { name, data, isActive } = req.body;
       const updateData: any = {};
-      
+
       if (name !== undefined) updateData.name = name;
       if (data !== undefined) {
         updateData.data = typeof data === 'object' ? JSON.stringify(data) : data;
       }
       if (isActive !== undefined) updateData.isActive = isActive;
-      
+
       // Get current template for audit log
       const currentTemplate = await storage.getTaskTemplate(id);
       if (!currentTemplate) {
         return res.status(404).json({ error: "Template not found" });
       }
-      
+
       const updatedTemplate = await storage.updateTaskTemplate(id, updateData);
-      
+
       // Create audit log
       await storage.createAuditLog({
         entityType: "template",
@@ -540,7 +540,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newState: JSON.stringify(updatedTemplate),
         timestamp: new Date()
       });
-      
+
       res.json(updatedTemplate);
     } catch (error) {
       console.error("Error updating template:", error);
@@ -554,9 +554,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (isNaN(id)) {
         return res.status(400).json({ error: "Invalid template ID" });
       }
-      
+
       const template = await storage.setActiveTaskTemplate(id);
-      
+
       // Create audit log
       await storage.createAuditLog({
         entityType: "template",
@@ -567,7 +567,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newState: JSON.stringify({ isActive: true }),
         timestamp: new Date()
       });
-      
+
       res.json(template);
     } catch (error) {
       console.error("Error activating template:", error);
@@ -581,19 +581,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (isNaN(id)) {
         return res.status(400).json({ error: "Invalid template ID" });
       }
-      
+
       // Get template before deletion for audit log
       const template = await storage.getTaskTemplate(id);
       if (!template) {
         return res.status(404).json({ error: "Template not found" });
       }
-      
+
       const result = await storage.deleteTaskTemplate(id);
-      
+
       if (!result) {
         return res.status(404).json({ error: "Template not found or could not be deleted" });
       }
-      
+
       // Create audit log
       await storage.createAuditLog({
         entityType: "template",
@@ -604,7 +604,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         previousState: JSON.stringify(template),
         timestamp: new Date()
       });
-      
+
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting template:", error);
@@ -652,48 +652,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to create edition" });
     }
   });
-  
+
   // Create a new edition with template tasks
   app.post("/api/editions/with-template", async (req, res) => {
     try {
       // Log the received data for debugging
       console.log("Received data for edition with template:", req.body);
-      
+
       // Ensure dates are properly formatted
       const formattedData = {
         ...req.body,
         startDate: req.body.startDate ? new Date(req.body.startDate) : new Date(),
         tasksStartDate: req.body.tasksStartDate ? new Date(req.body.tasksStartDate) : new Date()
       };
-      
+
       console.log("Formatted data:", formattedData);
-      
+
       // Validate edition data
       const editionData = insertEditionSchema.parse(formattedData);
-      
+
       // Create the edition
       const edition = await storage.createEdition(editionData);
-      
+
       // Check if custom template data was provided in the request
       const { template } = req.body;
-      
+
       // Get the utils for task due date calculation
       const { calculateTaskDueDate, getCurrentWeekFromDate } = await import("../client/src/lib/utils");
-      
+
       if (template) {
         console.log("Using provided template data for tasks");
-        
+
         // If template data was provided in the request, use it to create tasks
         try {
           const templateData = typeof template === 'string' ? JSON.parse(template) : template;
-          
+
           // If the template is an array of tasks
           if (Array.isArray(templateData)) {
             for (const templateTask of templateData) {
               // Calculate due date based on week and training start date
               const week = templateTask.week || "Week 1";
               const dueDate = calculateTaskDueDate(week.replace("Week ", ""), edition.startDate);
-              
+
               // Create a task
               const task = {
                 editionId: edition.id,
@@ -703,13 +703,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 trainingType: edition.trainingType, // Use the edition's training type, not the template's
                 status: "Not Started",
                 duration: templateTask.duration || null,
-                owner: templateTask.owner || null,
+                owner: null, // Don't inherit owner from template
                 dueDate: dueDate,
                 links: templateTask.links || null,
                 inflexible: templateTask.inflexible || false,
                 notes: templateTask.notes || null
               };
-              
+
               await storage.createTask(task);
             }
           } else if (typeof templateData === 'object') {
@@ -719,7 +719,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 for (const templateTask of weekTasks) {
                   // Calculate due date based on week and training start date
                   const dueDate = calculateTaskDueDate(week.replace("Week ", ""), edition.startDate);
-                  
+
                   // Create a task
                   const task = {
                     editionId: edition.id,
@@ -729,13 +729,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     trainingType: edition.trainingType, // Use the edition's training type, not the template's
                     status: "Not Started",
                     duration: templateTask.duration || null,
-                    owner: templateTask.owner || null,
+                    owner: null, // Don't inherit owner from template
                     dueDate: dueDate,
                     links: templateTask.links || null,
                     inflexible: templateTask.inflexible || false,
                     notes: templateTask.notes || null
                   };
-                  
+
                   await storage.createTask(task);
                 }
               }
@@ -747,22 +747,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       } else {
         console.log("Using active template from database");
-        
+
         // First try to use the active template from the database
         const activeTemplate = await storage.getActiveTaskTemplate();
-        
+
         if (activeTemplate && activeTemplate.data) {
           // Use the active template from the database
           const templateData = typeof activeTemplate.data === 'string' 
             ? JSON.parse(activeTemplate.data) 
             : activeTemplate.data;
-          
+
           if (Array.isArray(templateData)) {
             for (const templateTask of templateData) {
               // Calculate due date based on week
               const week = templateTask.week || "Week 1";
               const dueDate = calculateTaskDueDate(week.replace("Week ", ""), edition.startDate);
-              
+
               await storage.createTask({
                 editionId: edition.id,
                 week: templateTask.week,
@@ -771,6 +771,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 trainingType: edition.trainingType, // Always use the editions training type
                 status: "Not Started",
                 duration: templateTask.duration || null,
+                owner: null, // Don't inherit owner from template
                 dueDate: dueDate,
                 links: templateTask.links || null,
                 inflexible: templateTask.inflexible || false,
@@ -780,16 +781,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         } else {
           console.log("Using default TASK_TEMPLATE constant");
-          
+
           // If no template was provided and no active template exists, use the default template
           const { TASK_TEMPLATE } = await import("../client/src/lib/constants");
-          
+
           // Loop through all weeks and tasks in the template
           for (const [week, weekTasks] of Object.entries(TASK_TEMPLATE)) {
             for (const templateTask of weekTasks) {
               // Calculate due date based on week number and training start date
               const dueDate = calculateTaskDueDate(week.replace("Week ", ""), edition.startDate);
-              
+
               // Create a task in the database for each template task
               const task = {
                 editionId: edition.id,
@@ -799,25 +800,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 trainingType: edition.trainingType, // Always use the editions training type
                 status: "Not Started",
                 duration: templateTask.duration || null,
-                owner: templateTask.owner || null,
+                owner: null, // Don't inherit owner from template
                 links: null,
                 inflexible: false,
                 notes: null
               };
-              
+
               await storage.createTask(task);
             }
           }
         }
       }
-      
+
       // Calculate current week based on today's date relative to the start date
       const today = new Date();
       const currentWeek = getCurrentWeekFromDate(today, edition.startDate);
-      
+
       // Update the edition with the correct current week
       const updatedEdition = await storage.updateEdition(edition.id, { currentWeek });
-      
+
       res.status(201).json(edition);
     } catch (error) {
       if (error instanceof ZodError) {
@@ -837,7 +838,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!edition) {
         return res.status(404).json({ message: "Edition not found" });
       }
-      
+
       // Create audit log for the edition update
       if (req.user) {
         await storage.createAuditLog({
@@ -850,7 +851,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           notes: `Edition ${edition.code} updated by ${req.user.username}`
         });
       }
-      
+
       const updatedEdition = await storage.updateEdition(id, req.body);
       res.json(updatedEdition);
     } catch (error) {
@@ -877,11 +878,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = Number(req.params.id);
       const edition = await storage.getEdition(id);
-      
+
       if (!edition) {
         return res.status(404).json({ message: "Edition not found" });
       }
-      
+
       // Create audit log
       if (req.isAuthenticated()) {
         await storage.createAuditLog({
@@ -894,7 +895,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           notes: `Edition ${edition.code} archived by ${req.user.username}`
         });
       }
-      
+
       const updatedEdition = await storage.updateEdition(id, { archived: true });
       res.json(updatedEdition);
     } catch (error) {
@@ -902,17 +903,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to archive edition" });
     }
   });
-  
+
   // Restore (unarchive) an edition
   app.patch("/api/editions/:id/restore", async (req, res) => {
     try {
       const id = Number(req.params.id);
       const edition = await storage.getEdition(id);
-      
+
       if (!edition) {
         return res.status(404).json({ message: "Edition not found" });
       }
-      
+
       // Create audit log
       if (req.isAuthenticated()) {
         await storage.createAuditLog({
@@ -925,7 +926,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           notes: `Edition ${edition.code} restored from archive by ${req.user.username}`
         });
       }
-      
+
       const updatedEdition = await storage.updateEdition(id, { archived: false });
       res.json(updatedEdition);
     } catch (error) {
@@ -939,13 +940,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = Number(req.params.id);
       const editionData = insertEditionSchema.parse(req.body);
-      
+
       // Check if edition with the same code already exists
       const existingEdition = await storage.getEditionByCode(editionData.code);
       if (existingEdition) {
         return res.status(400).json({ message: "An edition with this code already exists" });
       }
-      
+
       // Create audit log if user is authenticated
       if (req.isAuthenticated()) {
         await storage.createAuditLog({
@@ -958,10 +959,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           notes: `Duplicate edition initiated from edition ID ${id} by ${req.user.username}`
         });
       }
-      
+
       // Use the updated duplicateEdition method which checks for active templates
       const newEdition = await storage.duplicateEdition(id, editionData);
-      
+
       // Create another audit log for the successful duplication
       if (req.isAuthenticated()) {
         await storage.createAuditLog({
@@ -974,11 +975,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           notes: `Edition ${newEdition.code} created from duplication by ${req.user.username}`
         });
       }
-      
+
       res.status(201).json(newEdition);
     } catch (error) {
       console.error("Error duplicating edition:", error);
-      
+
       if (error instanceof ZodError) {
         const validationError = fromZodError(error);
         return res.status(400).json({ message: validationError.message });
@@ -995,22 +996,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!edition) {
         return res.status(404).json({ message: "Edition not found" });
       }
-      
+
       // Se a edição estiver arquivada e não for explicitamente solicitado para incluí-la,
       // retorne um erro ou array vazio
       if (edition.archived) {
         return res.status(403).json({ message: "Cannot fetch tasks for archived editions" });
       }
-      
+
       const week = req.query.week as string | undefined;
-      
+
       let tasks;
       if (week) {
         tasks = await storage.getTasksByEditionAndWeek(editionId, week);
       } else {
         tasks = await storage.getTasksByEdition(editionId);
       }
-      
+
       res.json(tasks);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch tasks" });
@@ -1024,18 +1025,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Primeiro, obtenha todas as edições não arquivadas
       const activeEditions = await storage.getAllEditions(false); // false = não incluir arquivadas
       const activeEditionIds = activeEditions.map(edition => edition.id);
-      
+
       const tasks = await storage.getAllTasks();
-      
+
       // Filtre as tarefas para retornar apenas aquelas de edições ativas
       const filteredTasks = tasks.filter(task => activeEditionIds.includes(task.editionId));
-      
+
       res.json(filteredTasks);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch tasks" });
     }
   });
-  
+
   // Special route to update email/mailing terminology in task names
   app.post("/api/tasks/update-terminology", requireAuth, requireAdmin, async (req, res) => {
     try {
@@ -1102,12 +1103,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         let newName = task.name;
         let wasUpdated = false;
-        
+
         // Check for exact matches first
         const exactMatch = exactReplacements.find(pair => 
           pair.search.toLowerCase() === task.name.toLowerCase()
         );
-        
+
         // Log for debugging
         console.log(`Cleaning task data for update: ${task.id}`, {
           before: { name: task.name },
@@ -1126,7 +1127,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           }
         }
-        
+
         // Update the task if changes were made
         if (wasUpdated && newName !== task.name) {
           console.log(`Updating task ${task.id}:`, {
@@ -1155,19 +1156,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!task) {
         return res.status(404).json({ message: "Task not found" });
       }
-      
+
       // Verificar se a edição da tarefa está arquivada
       const edition = await storage.getEdition(task.editionId);
       if (edition && edition.archived) {
         return res.status(403).json({ message: "Task belongs to an archived edition" });
       }
-      
+
       res.json(task);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch task" });
     }
   });
-  
+
   // Get task resources
   app.get("/api/tasks/:id/resources", requireAuth, async (req, res) => {
     try {
@@ -1177,7 +1178,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch task resources" });
     }
   });
-  
+
   // Add a resource to a task
   app.post("/api/tasks/:id/resources", requireAuth, async (req, res) => {
     try {
@@ -1186,20 +1187,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!task) {
         return res.status(404).json({ message: "Task not found" });
       }
-      
+
       // Since requireAuth middleware ensures req.user exists, we can safely assert it's non-null
       if (!req.user) {
         return res.status(401).json({ message: "User not authenticated" });
       }
-      
+
       const resourceData = {
         taskId,
         uploadedBy: req.user.id,
         ...req.body
       };
-      
+
       const resource = await storage.createResource(resourceData);
-      
+
       // Create audit log
       await storage.createAuditLog({
         userId: req.user.id,
@@ -1208,29 +1209,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         action: "update",
         notes: `Added resource: ${resource.name}`
       });
-      
+
       res.status(201).json(resource);
     } catch (error) {
       res.status(500).json({ message: "Failed to add resource to task" });
     }
   });
-  
+
   // Delete a resource
   app.delete("/api/resources/:id", requireAuth, async (req, res) => {
     try {
       const resourceId = Number(req.params.id);
       const resource = await storage.getResource(resourceId);
-      
+
       if (!resource) {
         return res.status(404).json({ message: "Resource not found" });
       }
-      
+
       if (!req.user) {
         return res.status(401).json({ message: "User not authenticated" });
       }
-      
+
       await storage.deleteResource(resourceId);
-      
+
       // Create audit log
       await storage.createAuditLog({
         userId: req.user.id,
@@ -1239,18 +1240,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         action: "update",
         notes: `Deleted resource: ${resource.name}`
       });
-      
+
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete resource" });
     }
   });
-  
+
   // Get task comments
   app.get("/api/tasks/:id/comments", requireAuth, async (req, res) => {
     try {
       const comments = await storage.getTaskComments(Number(req.params.id));
-      
+
       // Enhance comments with user information
       const enhancedComments = await Promise.all(comments.map(async (comment) => {
         const user = await storage.getUser(comment.userId);
@@ -1263,14 +1264,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           } : null
         };
       }));
-      
+
       res.json(enhancedComments);
     } catch (error) {
       console.error("Error fetching task comments:", error);
       res.status(500).json({ message: "Failed to fetch task comments" });
     }
   });
-  
+
   // Add a comment to a task
   app.post("/api/tasks/:id/comments", requireAuth, async (req, res) => {
     try {
@@ -1279,19 +1280,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!task) {
         return res.status(404).json({ message: "Task not found" });
       }
-      
+
       if (!req.user) {
         return res.status(401).json({ message: "User not authenticated" });
       }
-      
+
       const commentData = {
         taskId,
         userId: req.user.id,
         content: req.body.content
       };
-      
+
       const comment = await storage.createTaskComment(commentData);
-      
+
       // Add user information to the response
       const enhancedComment = {
         ...comment,
@@ -1301,47 +1302,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
           fullName: req.user.fullName
         }
       };
-      
+
       res.status(201).json(enhancedComment);
     } catch (error) {
       console.error("Error adding comment to task:", error);
       res.status(500).json({ message: "Failed to add comment to task" });
     }
   });
-  
+
   // Delete a comment
   app.delete("/api/comments/:id", requireAuth, async (req, res) => {
     try {
       const commentId = Number(req.params.id);
       const comment = await storage.getTaskComment(commentId);
-      
+
       if (!comment) {
         return res.status(404).json({ message: "Comment not found" });
       }
-      
+
       if (!req.user) {
         return res.status(401).json({ message: "User not authenticated" });
       }
-      
+
       // Only the comment author or admins can delete comments
       if (comment.userId !== req.user.id && req.user.role !== "admin") {
         return res.status(403).json({ message: "Not authorized to delete this comment" });
       }
-      
+
       await storage.deleteTaskComment(commentId);
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete comment" });
     }
   });
-  
+
   // Get user mentions
   app.get("/api/mentions", requireAuth, async (req, res) => {
     try {
       if (!req.user) {
         return res.status(401).json({ message: "User not authenticated" });
       }
-      
+
       const isRead = req.query.read === "true";
       const mentions = await storage.getUserMentions(req.user.id, isRead);
       res.json(mentions);
@@ -1349,14 +1350,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch mentions" });
     }
   });
-  
+
   // Mark mention as read
   app.patch("/api/mentions/:id/read", requireAuth, async (req, res) => {
     try {
       if (!req.user) {
         return res.status(401).json({ message: "User not authenticated" });
       }
-      
+
       const mentionId = Number(req.params.id);
       const mention = await storage.markMentionAsRead(mentionId);
       res.json(mention);
@@ -1369,18 +1370,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/tasks", async (req, res) => {
     try {
       const taskData = insertTaskSchema.parse(req.body);
-      
+
       // Validate that the edition exists
       const edition = await storage.getEdition(taskData.editionId);
       if (!edition) {
         return res.status(404).json({ message: "Edition not found" });
       }
-      
+
       // Não permitir a criação de tarefas em edições arquivadas
       if (edition.archived) {
         return res.status(403).json({ message: "Cannot create tasks for archived editions" });
       }
-      
+
       // Verify assignedUserId is valid if provided and not null
       if (taskData.assignedUserId !== null && taskData.assignedUserId !== undefined) {
         const assignedUser = await storage.getUser(taskData.assignedUserId);
@@ -1391,7 +1392,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
       }
-      
+
       // Create audit log if user is authenticated
       if (req.isAuthenticated()) {
         await storage.createAuditLog({
@@ -1404,13 +1405,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           notes: `New task "${taskData.name}" created for edition ${edition.code}`
         });
       }
-      
+
       const task = await storage.createTask(taskData);
-      
+
       // Create notification if task is assigned to a user
       if (req.isAuthenticated() && task.assignedUserId) {
         const editionCode = edition ? edition.code : "Unknown";
-        
+
         // Create notification for the assigned user
         await storage.createNotification({
           userId: task.assignedUserId,
@@ -1423,7 +1424,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           metadata: { taskId: task.id, editionId: task.editionId }
         });
       }
-      
+
       res.status(201).json(task);
     } catch (error) {
       if (error instanceof ZodError) {
@@ -1440,28 +1441,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = Number(req.params.id);
       console.log(`Updating task ${id} with data:`, req.body);
-      
+
       const task = await storage.getTask(id);
       if (!task) {
         return res.status(404).json({ message: "Task not found" });
       }
-      
+
       // Verificar se a edição da tarefa está arquivada
       const edition = await storage.getEdition(task.editionId);
       if (edition && edition.archived) {
         return res.status(403).json({ message: "Cannot update tasks from archived editions" });
       }
-      
+
       // Track assignment changes for notifications (user ID only)
       const previousAssignedUserId = task.assignedUserId;
       const newAssignedUserId = req.body.assignedUserId !== undefined ? req.body.assignedUserId : previousAssignedUserId;
-      
+
       // Debug log for assignment changes
       console.log("Task assignment changes:", {
         previousAssignedUserId,
         newAssignedUserId
       });
-      
+
       // Verify assignedUserId is valid if provided and not null
       if (newAssignedUserId !== null && newAssignedUserId !== undefined) {
         const assignedUser = await storage.getUser(newAssignedUserId);
@@ -1472,12 +1473,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
       }
-      
+
       // If status is being updated to "Done", add completion date if not provided
       if (req.body.status === "Done" && !req.body.completionDate) {
         req.body.completionDate = new Date();
       }
-      
+
       // Handle task ownership changes per requirement:
       // 1. When a task has no owner and a user is assigned, that user becomes the owner
       // 2. When task is reassigned to another user, new assignee becomes the owner
@@ -1488,7 +1489,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`Setting current user ${req.user.username} as owner for task ${id} that's being started`);
           req.body.owner = req.user.username;
         }
-        
+
         // If a user is explicitly assigned to the task, make that user the owner
         if (newAssignedUserId) {
           // Get the assigned user's information
@@ -1499,7 +1500,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
       }
-      
+
       // Convert dates if they are strings
       const updatedData = { ...req.body };
       if (typeof updatedData.dueDate === 'string') {
@@ -1508,7 +1509,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (typeof updatedData.completionDate === 'string') {
         updatedData.completionDate = new Date(updatedData.completionDate);
       }
-      
+
       // Create audit log before updating the task
       if (req.user) {
         await storage.createAuditLog({
@@ -1521,22 +1522,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           notes: `Task ${task.taskCode} (${task.name}) updated by ${req.user.username}`
         });
       }
-      
+
       // Debug cleaning process
       console.log("Cleaning task data for update:", id, {
         before: task,
         after: updatedData
       });
-      
+
       const updatedTask = await storage.updateTask(id, updatedData);
       console.log(`Task ${id} updated successfully:`, updatedTask);
-      
+
       // Create notifications based on task updates
       if (req.isAuthenticated()) {
         // Get the edition details for notifications
         const edition = await storage.getEdition(task.editionId);
         const editionCode = edition ? edition.code : "Unknown";
-        
+
         // If task is newly assigned to a user via assignedUserId
         if (newAssignedUserId && (previousAssignedUserId === null || newAssignedUserId !== previousAssignedUserId)) {
           // Create notification for the assigned user
@@ -1552,9 +1553,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             metadata: { taskId: task.id, editionId: task.editionId }
           });
         }
-        
+
         // We've removed the assignedTo role-based assignment flow
-        
+
         // If task status is changed to "Done"
         if (req.body.status === "Done" && task.status !== "Done") {
           // Check if we have a direct user ID assigned
@@ -1573,12 +1574,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           } 
           // We've removed the assignedTo role-based assignment flow
         }
-        
+
         // If task is updated with changes other than assignment
         // Check if there are updates beyond assignment changes
         const hasNonAssignmentChanges = Object.keys(updatedData).some(key => 
           key !== 'assignedUserId');
-          
+
         // Notify assigned user through assignedUserId
         if (hasNonAssignmentChanges && newAssignedUserId && newAssignedUserId === previousAssignedUserId) {
           // Only notify for other updates if the user was already assigned and not just now
@@ -1594,7 +1595,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
       }
-      
+
       res.json(updatedTask);
     } catch (error) {
       console.error(`Error updating task ${req.params.id}:`, error);
@@ -1607,19 +1608,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const taskId = Number(req.params.id);
       const task = await storage.getTask(taskId);
-      
+
       if (!task) {
         return res.status(404).json({ message: "Task not found" });
       }
-      
+
       // Verificar se a edição da tarefa está arquivada
       const edition = await storage.getEdition(task.editionId);
       if (edition && edition.archived) {
         return res.status(403).json({ message: "Cannot delete tasks from archived editions" });
       }
-      
+
       const result = await storage.deleteTask(taskId);
-      
+
       // Create audit log if user is authenticated
       if (req.isAuthenticated()) {
         await storage.createAuditLog({
@@ -1632,7 +1633,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           notes: `Task ${task.taskCode} (${task.name}) deleted by ${req.user.username}`
         });
       }
-      
+
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete task" });
@@ -1686,7 +1687,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!trainer) {
         return res.status(404).json({ message: "Trainer not found" });
       }
-      
+
       const updatedTrainer = await storage.updateTrainer(id, req.body);
       res.json(updatedTrainer);
     } catch (error) {
@@ -1727,7 +1728,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch users" });
     }
   });
-  
+
   // Create a new user (admin only)
   app.post("/api/users", requireAdmin, async (req, res) => {
     try {
@@ -1736,25 +1737,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (existingUser) {
         return res.status(400).json({ message: "Username already exists" });
       }
-      
+
       // Set a generic initial password if not provided
       const initialPassword = req.body.password || "ChangeMe123!";
-      
+
       // Hash password
       const hashedPassword = await hashPassword(initialPassword);
-      
+
       // Admins are auto-approved, other users need approval
       const isAdmin = req.body.role === 'admin';
-      
+
       // Create the user with appropriate flags
       const user = await storage.createUser({
         ...req.body,
         password: hashedPassword,
-        forcePasswordChange: true, // Force password change on first login
-        passwordChangeRequired: true, // Mark that password change is required
+        forcePasswordChange: true, // Force password change on first login        passwordChangeRequired: true, // Mark that password change is required
         approved: isAdmin // Automatically approve admins, regular users need approval
       });
-      
+
       // Create audit log
       if (req.user) {
         await storage.createAuditLog({
@@ -1767,7 +1767,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           notes: "User created by admin with generic password"
         });
       }
-      
+
       // Return user without password
       const { password, ...userWithoutPassword } = user;
       res.status(201).json(userWithoutPassword);
@@ -1776,22 +1776,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to create user" });
     }
   });
-  
+
   // Update a user (used for changing role)
   app.patch("/api/users/:id", requireAdmin, async (req, res) => {
     try {
       const id = Number(req.params.id);
-      
+
       // Don't allow changing user's own role (to prevent removing all admins)
       if (id === req.user?.id && req.body.role && req.body.role !== req.user.role) {
         return res.status(400).json({ message: "You cannot change your own role" });
       }
-      
+
       const user = await storage.getUser(id);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      
+
       // Create audit log before updating
       if (req.user) {
         await storage.createAuditLog({
@@ -1804,29 +1804,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
           notes: `User ${user.username} updated by ${req.user.username}`
         });
       }
-      
+
       const updatedUser = await storage.updateUser(id, req.body);
-      
+
       // Remove password from response
       const { password, ...safeUser } = updatedUser;
-      
+
       res.json(safeUser);
     } catch (error) {
       console.error("Error updating user:", error);
       res.status(500).json({ message: "Failed to update user" });
     }
   });
-  
+
   // Approve a user (admin only)
   app.post("/api/users/:id/approve", requireAdmin, async (req, res) => {
     try {
       const id = Number(req.params.id);
-      
+
       const user = await storage.getUser(id);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      
+
       // Create audit log before updating
       if (req.user) {
         await storage.createAuditLog({
@@ -1839,50 +1839,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
           notes: `User ${user.username} approved by ${req.user.username}`
         });
       }
-      
+
       const updatedUser = await storage.updateUser(id, { approved: true });
-      
+
       // Remove password from response
       const { password, ...safeUser } = updatedUser;
-      
+
       res.json(safeUser);
     } catch (error) {
       console.error("Error approving user:", error);
       res.status(500).json({ message: "Failed to approve user" });
     }
   });
-  
+
   // Delete a user (admin only)
   app.delete("/api/users/:id", requireAdmin, async (req, res) => {
     try {
       const id = Number(req.params.id);
-      
+
       // Não permitir que o usuário delete a si mesmo
       if (id === req.user?.id) {
         return res.status(400).json({ message: "You cannot delete your own account" });
       }
-      
+
       const user = await storage.getUser(id);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      
+
       // Não permitir deletar administradores
       if (user.role === 'admin') {
         return res.status(403).json({ message: "Administrator accounts cannot be deleted" });
       }
-      
+
       // Verificar se o usuário tem tarefas atribuídas
       const tasks = await storage.getAllTasks();
       const userTasks = tasks.filter(task => task.assignedUserId === id);
-      
+
       if (userTasks.length > 0) {
         return res.status(409).json({ 
           message: "Cannot delete user with assigned tasks. Please reassign or complete all tasks first.", 
           affectedTasks: userTasks 
         });
       }
-      
+
       // Create audit log before deleting
       if (req.user) {
         await storage.createAuditLog({
@@ -1895,20 +1895,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           notes: `User ${user.username} deleted by ${req.user.username}`
         });
       }
-      
+
       // Deletar o usuário
       const result = await storage.deleteUser(id);
-      
+
       res.status(204).send();
     } catch (error) {
       console.error("Error deleting user:", error);
       res.status(500).json({ message: "Failed to delete user" });
     }
   });
-  
+
   // Audit logs routes
   // Get all audit logs endpoint is already defined above
-  
+
   // TEMPORARY ENDPOINT: Make Telmo an admin (will be removed after use)
   app.get("/api/make-telmo-admin", async (req, res) => {
     try {
@@ -1917,10 +1917,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!telmo) {
         return res.status(404).json({ message: "User not found" });
       }
-      
+
       // Update to admin role
       const updatedUser = await storage.updateUser(telmo.id, { role: "admin" });
-      
+
       // Create audit log
       await storage.createAuditLog({
         userId: telmo.id,
@@ -1931,7 +1931,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newState: updatedUser,
         notes: "Automatic role update to admin via temporary endpoint"
       });
-      
+
       // Force refresh the session data
       if (req.user && req.user.id === telmo.id) {
         req.logout((err) => {
@@ -1939,13 +1939,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             console.error("Error during logout", err);
             return res.status(500).json({ message: "Error refreshing session" });
           }
-          
+
           req.login(updatedUser, (err) => {
             if (err) {
               console.error("Error during re-login", err);
               return res.status(500).json({ message: "Error refreshing session" });
             }
-            
+
             res.json({ message: "User role updated to admin", user: { ...updatedUser, password: undefined } });
           });
         });
@@ -1957,13 +1957,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update user role" });
     }
   });
-  
+
   // Get audit logs for a specific entity
   app.get("/api/audit-logs/:type/:id", requireEditor, async (req, res) => {
     try {
       const entityType = req.params.type;
       const entityId = Number(req.params.id);
-      
+
       const logs = await storage.getAuditLogs(entityType, entityId);
       res.json(logs);
     } catch (error) {
@@ -1973,7 +1973,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Note: Notification routes are defined earlier in this file
-  
+
   // System backup and restore endpoints
   app.get("/api/system/backup", requireAdmin, async (req, res) => {
     try {
@@ -1983,7 +1983,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const editions = await storage.getAllEditions();
       const tasks = await storage.getAllTasks();
       const auditLogs = await storage.getAuditLogs();
-      
+
       // Create a backup object with metadata
       const backup = {
         metadata: {
@@ -2003,13 +2003,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           auditLogs
         }
       };
-      
+
       // Send as a download with a timestamp filename
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       res.setHeader('Content-Disposition', `attachment; filename="training-system-backup-${timestamp}.json"`);
       res.setHeader('Content-Type', 'application/json');
       res.json(backup);
-      
+
       // Log the export
       await storage.createAuditLog({
         action: "export",
@@ -2020,7 +2020,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         previousState: null,
         newState: null
       });
-      
+
     } catch (error) {
       console.error("Export error:", error);
       res.status(500).json({ error: "Failed to export system data" });
