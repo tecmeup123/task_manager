@@ -1,1 +1,59 @@
-[]
+[
+  {
+    "userId": 1,
+    "entityType": "user",
+    "entityId": 2,
+    "action": "create",
+    "previousState": null,
+    "newState": {
+      "username": "telmosilva",
+      "fullName": "Telmo Silva",
+      "email": "telmosilva@criticalmanufacturing.com",
+      "role": "admin",
+      "password": "[REDACTED]",
+      "approved": true,
+      "forcePasswordChange": true,
+      "passwordChangeRequired": true,
+      "id": 2,
+      "createdAt": "2025-04-24T08:58:01.753Z"
+    },
+    "notes": "User created by admin with generic password",
+    "id": 1,
+    "timestamp": "2025-04-24T08:58:01.753Z"
+  },
+  {
+    "userId": 2,
+    "entityType": "user",
+    "entityId": 2,
+    "action": "update",
+    "previousState": {
+      "username": "telmosilva",
+      "fullName": "Telmo Silva",
+      "email": "telmosilva@criticalmanufacturing.com",
+      "role": "admin",
+      "password": "[REDACTED]",
+      "approved": true,
+      "forcePasswordChange": true,
+      "passwordChangeRequired": true,
+      "id": 2,
+      "createdAt": "2025-04-24T08:58:01.753Z",
+      "lastActive": "2025-04-24T09:16:46.439Z"
+    },
+    "newState": {
+      "username": "telmosilva",
+      "fullName": "Telmo Silva",
+      "email": "telmosilva@criticalmanufacturing.com",
+      "role": "admin",
+      "password": "[REDACTED]",
+      "approved": true,
+      "forcePasswordChange": false,
+      "passwordChangeRequired": true,
+      "id": 2,
+      "createdAt": "2025-04-24T08:58:01.753Z",
+      "lastActive": "2025-04-24T09:16:46.439Z"
+    },
+    "notes": "Password changed by user",
+    "id": 2,
+    "timestamp": "2025-04-24T09:16:46.515Z"
+  }
+]

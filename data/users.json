@@ -1,1 +1,25 @@
-[]
+[
+  {
+    "username": "admin",
+    "password": "372ca84fb642d79ae7ac303ec0546e6c40ddc698f1eccc347d6671f2c9b90f8ac9b93cb3d6b0f262611dd3d5eae24e1bd73591224cfc342ed27fa657b1b5127d.3d82b033f7241ef858fffdcb12f21f05",
+    "role": "admin",
+    "approved": true,
+    "fullName": "Administrator",
+    "id": 1,
+    "createdAt": "2025-04-24T08:55:02.266Z",
+    "lastActive": "2025-04-24T08:58:15.853Z"
+  },
+  {
+    "username": "telmosilva",
+    "fullName": "Telmo Silva",
+    "email": "telmosilva@criticalmanufacturing.com",
+    "role": "admin",
+    "password": "4fe03991cec6781c4b60b465bfcf4161dc5d4f5c14324732b007885ecc80de5714665b3b9845c8fdbf545bd569bd3fa554b336fe140cded04e6ef27ab26017e0.4c76bfd2b431ff48b890c1fb46758645",
+    "approved": true,
+    "forcePasswordChange": false,
+    "passwordChangeRequired": true,
+    "id": 2,
+    "createdAt": "2025-04-24T08:58:01.753Z",
+    "lastActive": "2025-04-24T09:17:05.166Z"
+  }
+]
