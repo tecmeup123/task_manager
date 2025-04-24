@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "userId": 2,
+    "type": "task_assigned",
+    "title": "Task Assigned",
+    "message": "You have been assigned to task \"Check if the cohort for the edition exists and if not create it\" (2501-B)",
+    "entityType": "task",
+    "entityId": 1,
+    "actionUrl": "/tasks?editionId=1&taskId=1",
+    "metadata": {
+      "taskId": 1,
+      "editionId": 1
+    },
+    "id": 1,
+    "isRead": false,
+    "createdAt": "2025-04-24T14:49:27.495Z"
+  }
+]
