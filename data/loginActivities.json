@@ -138,5 +138,15 @@
     "deviceInfo": null,
     "id": 14,
     "timestamp": "2025-04-24T14:14:02.551Z"
+  },
+  {
+    "userId": 2,
+    "ipAddress": "10.82.1.2",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
+    "success": true,
+    "location": null,
+    "deviceInfo": null,
+    "id": 15,
+    "timestamp": "2025-04-24T14:27:04.711Z"
   }
 ]
