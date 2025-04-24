@@ -94,7 +94,7 @@ export default function AddTaskForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       taskCode: generateTaskCode("Week 1"),
-      week: "Week 1",
+      week: selectedWeek,
       name: "",
       duration: "0:30:00",
       dueDate: new Date(),
