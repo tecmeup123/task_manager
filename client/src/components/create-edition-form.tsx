@@ -86,6 +86,24 @@ export default function CreateEditionForm({
     },
   });
 
+  // Handle training type changes
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'trainingType' && value.trainingType === 'SLR') {
+        const examDate = value.startDate || new Date();
+        // Get Monday 35 days before exam date
+        const taskStartDate = new Date(examDate);
+        taskStartDate.setDate(taskStartDate.getDate() - 35);
+        while (taskStartDate.getDay() !== 1) { // 1 is Monday
+          taskStartDate.setDate(taskStartDate.getDate() - 1);
+        }
+        form.setValue('tasksStartDate', taskStartDate);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form]);
+
   // Update the form when the year, month, or variant changes
   useEffect(() => {
     form.setValue("code", getEditionCode(year, month, variant));
