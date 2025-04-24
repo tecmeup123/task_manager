@@ -257,33 +257,7 @@ export default function CreateEditionForm({
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="trainingType"
-                render={({ field }) => (
-                  <FormItem className="md:col-span-1">
-                    <FormLabel>Training Type</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select training type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="GLR">GLR</SelectItem>
-                        <SelectItem value="SLR">SLR</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      GLR: Guided Learning Route, SLR: Self Learning Route
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              
 
               <FormField
                 control={form.control}
