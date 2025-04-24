@@ -86,17 +86,22 @@ export default function CreateEditionForm({
     },
   });
 
-  // Handle training type changes
+  // Handle training type changes and exam completion window for SLR
   useEffect(() => {
     const subscription = form.watch((value, { name }) => {
-      if (name === 'trainingType' && value.trainingType === 'SLR') {
-        const examDate = value.startDate || new Date();
-        // Get Monday 35 days before exam date
-        const taskStartDate = new Date(examDate);
+      if ((name === 'trainingType' || name === 'startDate') && value.trainingType === 'SLR') {
+        const examEndDate = value.startDate || new Date();
+        // Exam window is two days, so the start date is the day before
+        const examStartDate = new Date(examEndDate);
+        examStartDate.setDate(examStartDate.getDate() - 1);
+        
+        // Calculate task start date: 35 days before exam start, adjusted to previous Monday
+        const taskStartDate = new Date(examStartDate);
         taskStartDate.setDate(taskStartDate.getDate() - 35);
         while (taskStartDate.getDay() !== 1) { // 1 is Monday
           taskStartDate.setDate(taskStartDate.getDate() - 1);
         }
+        
         form.setValue('tasksStartDate', taskStartDate);
       }
     });
@@ -264,7 +269,7 @@ export default function CreateEditionForm({
                 name="startDate"
                 render={({ field }) => (
                   <FormItem className="md:col-span-1">
-                    <FormLabel>Start Date</FormLabel>
+                    <FormLabel>{form.watch('trainingType') === 'SLR' ? 'Exam Completion Window End' : 'Start Date'}</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
